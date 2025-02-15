@@ -104,12 +104,12 @@ android {
             buildConfigField(
                 "String",
                 "KEY_128",
-                "\"Sxqa3KHdPs1uSAjNOSVmcvE/OhUMH5eZXQLtoRSUd6G0a22PPPwS38/F/lryy3Cz\""
+                "\"JGjmWcjUTHDG1o+Z+oUCf6KzzKm/0TKaWc/hEVm+IIy0a22PPPwS38/F/lryy3Cz\""
             )
             buildConfigField(
                 "String",
                 "IV_128",
-                "\"foRC3P7jiVX9Z4Fgj0nm9QGP1H7eEEj9DW3z7VloN920a22PPPwS38/F/lryy3Cz\""
+                "\"AGsyNGA8JCrxVhwjSahHv6fAkcfe3RnM/24JuJz6ogK0a22PPPwS38/F/lryy3Cz\""
             )
         }
         create("product") {
@@ -128,12 +128,12 @@ android {
             buildConfigField(
                 "String",
                 "KEY_128",
-                "\"Sxqa3KHdPs1uSAjNOSVmcvE/OhUMH5eZXQLtoRSUd6G0a22PPPwS38/F/lryy3Cz\""
+                "\"JGjmWcjUTHDG1o+Z+oUCf6KzzKm/0TKaWc/hEVm+IIy0a22PPPwS38/F/lryy3Cz\""
             )
             buildConfigField(
                 "String",
                 "IV_128",
-                "\"foRC3P7jiVX9Z4Fgj0nm9QGP1H7eEEj9DW3z7VloN920a22PPPwS38/F/lryy3Cz\""
+                "\"AGsyNGA8JCrxVhwjSahHv6fAkcfe3RnM/24JuJz6ogK0a22PPPwS38/F/lryy3Cz\""
             )
         }
     }
@@ -231,7 +231,8 @@ dependencies {
 
     implementation(libs.lottie)
 
-
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.customactivityoncrash)
 
 
 }

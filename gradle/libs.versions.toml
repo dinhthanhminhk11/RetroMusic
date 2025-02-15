@@ -1,8 +1,10 @@
 [versions]
+customactivityoncrash = "2.4.0"
 gridlayout = "1.0.0"
 lottie = "4.1.0"
 minSdk = "23"
 compileSdk = "34"
+preferenceKtx = "1.2.1"
 runtime = "1.5.1"
 targetSdk = "34"
 
@@ -83,6 +85,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
 
+androidx-preference-ktx-1_2_1 = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
 androidx-test-core = "androidx.test:core-ktx:1.5.0"
 androidx-test-junit = "androidx.test.ext:junit-ktx:1.1.5"
@@ -93,6 +96,7 @@ androidx-test-espresso = "androidx.test.espresso:espresso-core:3.5.1"
 chucker = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
 chucker-release = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
 
+customactivityoncrash = { module = "cat.ereza:customactivityoncrash", version.ref = "customactivityoncrash" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 circleindicator = { module = "me.relex:circleindicator", version.ref = "circleindicator" }
 eventbus = { module = "org.greenrobot:eventbus", version.ref = "eventbus" }
