@@ -16,4 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "RetroMusic"
 include(":app")
- 
+include(":appthemehelper")

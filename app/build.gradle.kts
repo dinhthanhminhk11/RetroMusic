@@ -164,9 +164,8 @@ wire {
 
 
 dependencies {
-
+    implementation(project(":appthemehelper"))
     implementation(libs.androidx.gridlayout)
-
     implementation(libs.androidx.core)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.material)
