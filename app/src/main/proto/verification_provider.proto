@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package code.name.monkey.retromusic;
+
+enum VerificationProvider {
+    VERIFICATION_PROVIDER_TANGO_SMS = 1;
+    VERIFICATION_PROVIDER_TWITTER = 2;
+    VERIFICATION_PROVIDER_FB_ACCOUNT_KIT = 3;
+}

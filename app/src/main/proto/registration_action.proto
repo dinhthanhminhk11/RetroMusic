@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package code.name.monkey.retromusic;
+
+enum RegistrationAction {
+    UNDEFINED = 1;
+    REGISTER = 2;
+    UPDATE = 3;
+    VALIDATE = 4;
+    VALIDATE_DEVICE = 5;
+    VALIDATE_LINKING = 6;
+    REGISTER_VALIDATED = 7;
+    PRE_REGISTER = 8;
+    DEVICE_LINKED = 9;
+}

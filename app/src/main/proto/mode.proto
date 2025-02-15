@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package code.name.monkey.retromusic;
+
+enum Mode {
+    NORMAL = 1;
+    GUEST = 2;
+}

@@ -1,0 +1,110 @@
+syntax = "proto2";
+
+package code.name.monkey.retromusic;
+
+import "registration_action.proto";
+import "mode.proto";
+import "verification_provider.proto";
+
+
+message TangoRegistrationRequest {
+    required Contact contact = 1;
+    required TangoDevice tango_device = 2;
+    optional DeviceTokenList device_token_list = 3;
+    required Options options = 4;
+    optional Capabilities capabilities = 5;
+    required string applicationId = 6;
+    optional Mode mode = 7;
+    optional string accountId = 8;
+    optional RegistrationAction registration_action = 9;
+    optional string username = 10;
+    optional string password = 11;
+    optional string swiftPassword = 12;
+    optional string cloudSecret = 13;
+    optional bool phonenumberOnly = 14;
+    optional bool requestAuthtokens = 15;
+    optional string analyticsKey = 16;
+}
+
+message Capabilities {
+    repeated string capabilities = 1;
+}
+
+message Contact {
+    optional string email = 1;
+    optional PhoneNumber phone_number = 2;
+    repeated SocialNetworkId social_network_ids = 3;
+    optional ZippedContact zipped_contact = 4;
+    optional VerificationProvider verification_provider = 5;
+    optional VerificationParams verificationParams = 6;
+    optional sfixed32 abookSize = 7;
+    optional string device = 8;
+    optional string firstName = 9;
+    optional string hash = 10;
+    optional bool isPhone = 11;
+    optional string iso2CountryCode = 12;
+    optional string lastName = 13;
+    optional bool linkAccounts = 14;
+    optional string locale = 15;
+}
+
+message PhoneNumber {
+    optional string iso2CountryCode = 1;
+    optional string subscriberNumber = 2;
+}
+
+message SocialNetworkId {
+    optional string id = 1;
+    optional string token = 2;
+    optional string socialNetworkName = 3;
+    optional bool authorized = 4;
+    optional bool emailVerified = 5;
+}
+
+message ZippedContact {
+    optional string zippedContent = 1;
+}
+
+message VerificationParams {
+    optional VerificationProviderTangoParams tango = 1;
+    optional VerificationProviderTwitterParams twitter = 2;
+    optional VerificationProviderFbAccountKitParams fbAccountKit = 3;
+}
+message VerificationProviderTangoParams {
+    optional string verificationCode = 1;
+}
+
+message VerificationProviderTwitterParams {
+    optional string authServiceProvider = 1;
+    optional string credentialsAuthorization = 2;
+}
+
+message VerificationProviderFbAccountKitParams {
+    optional string authCode = 1;
+    optional string accessToken = 2;
+}
+
+message DeviceTokenList {
+    repeated DeviceToken tokens = 1;
+}
+
+message DeviceToken {
+    optional string content = 1;
+    optional string type = 2;
+    optional string version = 3;
+}
+
+message Options {
+    optional sfixed32 allowAccessAddressBook = 1;
+    optional sfixed32 storeAddressBook = 2;
+}
+
+message TangoDevice {
+    optional string deviceId = 1;
+    optional string clientOsVersion = 2;
+    optional string clientVersion = 3;
+    optional sfixed32 platform = 4;
+    optional string deviceName = 5;
+    optional DeviceTokenList device_token_list = 6;
+}
+

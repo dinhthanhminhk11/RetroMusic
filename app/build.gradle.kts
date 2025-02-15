@@ -1,47 +1,238 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
+import java.text.SimpleDateFormat
+import java.util.Calendar
+
+
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.cacheFixPlugin)
+    alias(libs.plugins.firebase.crashlytics)
+//    alias(libs.plugins.gms.googleServices)
+    alias(libs.plugins.android.dagger.hilt)
+    alias(libs.plugins.wire)
+    alias(libs.plugins.ksp)
+    kotlin("kapt")
+}
+
+fun getDate(): String {
+    val format = "HH\'h\'-dd"
+    val current = Calendar.getInstance().time
+    return SimpleDateFormat(format).format(current)
 }
 
 android {
     namespace = "code.name.monkey.retromusic"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "code.name.monkey.retromusic"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+        archivesName.set("Retro Music-($versionCode-$versionName)${getDate()}")
+
+        ndk {
+            abiFilters += listOf(
+                "x86", "x86_64", "armeabi", "armeabi-v7a",
+                "arm64-v8a"
+            )
+        }
     }
 
     buildTypes {
+        debug {
+
+        }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+        compose = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    packaging {
+        packagingOptions.resources.excludes += setOf(
+            // Exclude AndroidX version files
+            "META-INF/*.version",
+            // Exclude consumer proguard files
+            "META-INF/proguard/*",
+            // Exclude the Firebase/Fabric/other random properties files
+            "/*.properties",
+            "fabric/*.properties",
+            "META-INF/*.properties",
+        )
+    }
+
+    kapt {
+        correctErrorTypes = true
+    }
+
+    flavorDimensions += "environment"
+    productFlavors {
+        create("private") {
+            dimension = "environment"
+            manifestPlaceholders["appLabel"] = "Retro Music Private"
+            buildConfigField("String", "BASE_URL", "\"https://reqres.in/api/\"")
+            buildConfigField(
+                "String",
+                "KEY_128",
+                "\"Sxqa3KHdPs1uSAjNOSVmcvE/OhUMH5eZXQLtoRSUd6G0a22PPPwS38/F/lryy3Cz\""
+            )
+            buildConfigField(
+                "String",
+                "IV_128",
+                "\"foRC3P7jiVX9Z4Fgj0nm9QGP1H7eEEj9DW3z7VloN920a22PPPwS38/F/lryy3Cz\""
+            )
+        }
+        create("product") {
+            dimension = "environment"
+            manifestPlaceholders["appLabel"] = "Retro Music"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://e0a6-113-160-45-182.ngrok-free.app/api/v1/\""
+            )
+            buildConfigField(
+                "String",
+                "BASE_URL_IMAGE_CATEGORY",
+                "\"https://mms.img.susercontent.com/\""
+            )
+            buildConfigField(
+                "String",
+                "KEY_128",
+                "\"Sxqa3KHdPs1uSAjNOSVmcvE/OhUMH5eZXQLtoRSUd6G0a22PPPwS38/F/lryy3Cz\""
+            )
+            buildConfigField(
+                "String",
+                "IV_128",
+                "\"foRC3P7jiVX9Z4Fgj0nm9QGP1H7eEEj9DW3z7VloN920a22PPPwS38/F/lryy3Cz\""
+            )
+        }
+    }
+
+    configurations.configureEach {
+        resolutionStrategy.force("com.google.code.findbugs:jsr305:1.3.9")
+    }
+
+    sourceSets {
+        getByName("main") {
+            jni {
+                srcDirs("src\\main\\jniLibs")
+            }
+        }
+    }
+
+
 }
+
+wire {
+    sourcePath {
+        srcDir("src/main/proto")
+    }
+    kotlin {
+        out = "build/generated/source/wire"
+    }
+}
+
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    implementation(libs.androidx.gridlayout)
+
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.runtime)
+
+
+    implementation(libs.wire.runtime)
+    implementation(libs.wire.moshi.adapter)
+
+    // testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.test.espresso)
+
+    implementation(libs.androidx.activity.activity)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.fragment)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.livedata)
+    implementation(libs.androidx.lifecycle.extensions)
+    implementation(libs.androidx.legacy.support.v4)
+    // firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.dynamic.links)
+    // hilt
+    implementation(libs.dagger.hilt.library)
+    //TODO hilt not yet support KSP, after support, changed to ksp
+    kapt(libs.dagger.hilt.compiler)
+
+    // api
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.json)
+    implementation(libs.retrofit.converter.scalars)
+    implementation(libs.okhttp3)
+    implementation(libs.okhttp3.logging.interceptor)
+
+    implementation(libs.glide)
+    implementation(libs.eventbus)
+    //ui library
+    implementation(libs.shimmer)
+    implementation(libs.circleindicator)
+    implementation(libs.dotsindicator)
+//    implementation(libs.viewPagerIndicator)
+    implementation(libs.shortcutBadger)
+//    implementation(libs.android.simple.tooltip)
+    implementation(libs.sdp.android)
+    implementation(libs.ssp.android)
+    // socket
+    implementation("io.socket:socket.io-client:1.0.0") {
+        exclude("org.json", "json")
+    }
+    implementation(libs.timber)
+    debugImplementation(libs.chucker)
+    releaseImplementation(libs.chucker.release)
+
+    implementation(libs.lottie)
+
+
+
+
 }
