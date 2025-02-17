@@ -52,6 +52,8 @@ afollestad_materialCab_version = "2.0.1"
 kotlinxCoroutinesAndroid = "1.8.1"
 jaudiotagger = "2.3.15"
 chrisbanes_insetter_version = "0.6.1"
+room_version = "2.6.1"
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -91,6 +93,11 @@ androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata"
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidxlifecycle" }
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+
+#room
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room_version" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room_version" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room_version" }
 
 androidx-preference-ktx-1_2_1 = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
