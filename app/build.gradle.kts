@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.wire)
     alias(libs.plugins.ksp)
     kotlin("kapt")
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 fun getDate(): String {
@@ -234,5 +235,14 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
     implementation(libs.customactivityoncrash)
 
+    implementation(libs.afollestad.material.dialogs.core)
+    implementation(libs.afollestad.material.dialogs.input)
+    implementation(libs.afollestad.material.dialogs.color)
+    implementation(libs.afollestad.material.cab)
+    implementation(libs.kotlinx.coroutines.android)
+    // change info file music
+    implementation(libs.jaudiotagger)
+    implementation(libs.androidx.palette.ktx)
+    implementation(libs.chrisbanes.insetter)
 
 }

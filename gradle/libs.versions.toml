@@ -47,6 +47,11 @@ wireRuntime = "4.9.2"
 core-ktx = "1.9.0"
 junit-junit = "4.13.2"
 espresso-core = "3.6.1"
+afollestad_dialog_version = "3.3.0"
+afollestad_materialCab_version = "2.0.1"
+kotlinxCoroutinesAndroid = "1.8.1"
+jaudiotagger = "2.3.15"
+chrisbanes_insetter_version = "0.6.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -62,6 +67,8 @@ ksp = "com.google.devtools.ksp:1.8.20-1.0.10"
 gms-googleServices = "com.google.gms.google-services:4.3.15"
 firebase-crashlytics = "com.google.firebase.crashlytics:2.9.5"
 wire = { id = "com.squareup.wire", version = "4.9.2" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version = "1.9.0" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version = "1.9.0" }
 
 [libraries]
 android-image-picker = { module = "com.github.esafirm:android-image-picker", version.ref = "androidImagePicker" }
@@ -142,6 +149,17 @@ core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx
 junit-junit = { group = "junit", name = "junit", version.ref = "junit-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version = "1.2.0" }
+
+afollestad-material-dialogs-color = { module = "com.afollestad.material-dialogs:color", version.ref = "afollestad_dialog_version" }
+afollestad-material-dialogs-core = { module = "com.afollestad.material-dialogs:core", version.ref = "afollestad_dialog_version" }
+afollestad-material-dialogs-input = { module = "com.afollestad.material-dialogs:input", version.ref = "afollestad_dialog_version" }
+afollestad-material-cab = { module = "com.afollestad:material-cab", version.ref = "afollestad_materialCab_version" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+
+jaudiotagger = { module = "com.github.Adonai:jaudiotagger", version.ref = "jaudiotagger" }
+androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version = "1.0.0" }
+chrisbanes-insetter = { module = "dev.chrisbanes.insetter:insetter", version.ref = "chrisbanes_insetter_version" }
+
 
 
 
