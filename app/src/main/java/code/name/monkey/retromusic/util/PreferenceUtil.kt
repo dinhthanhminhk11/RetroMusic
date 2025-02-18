@@ -5,15 +5,24 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.App
+import code.name.monkey.retromusic.Constants.ALBUM_DETAIL_SONG_SORT_ORDER
+import code.name.monkey.retromusic.Constants.ALBUM_SONG_SORT_ORDER
+import code.name.monkey.retromusic.Constants.ALBUM_SORT_ORDER
 import code.name.monkey.retromusic.Constants.BLACK_THEME
 import code.name.monkey.retromusic.Constants.COLORED_APP_SHORTCUTS
+import code.name.monkey.retromusic.Constants.FILTER_SONG
 import code.name.monkey.retromusic.Constants.GENERAL_THEME
+import code.name.monkey.retromusic.Constants.GENRE_SORT_ORDER
+import code.name.monkey.retromusic.Constants.INITIALIZED_BLACKLIST
 import code.name.monkey.retromusic.Constants.KEEP_SCREEN_ON
 import code.name.monkey.retromusic.Constants.MATERIAL_YOU
 import code.name.monkey.retromusic.Constants.SHOW_WHEN_LOCKED
+import code.name.monkey.retromusic.Constants.SONG_SORT_ORDER
 import code.name.monkey.retromusic.Constants.TOGGLE_FULL_SCREEN
 import code.name.monkey.retromusic.Constants.WALLPAPER_ACCENT
+import code.name.monkey.retromusic.Constants.WHITELIST_MUSIC
 import code.name.monkey.retromusic.extensions.getStringOrDefault
+import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.util.theme.ThemeMode
 
 object PreferenceUtil {
@@ -79,4 +88,57 @@ object PreferenceUtil {
 
     val isShowWhenLockedEnabled get() = sharedPreferences.getBoolean(SHOW_WHEN_LOCKED, false)
 
+
+    var songSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            SONG_SORT_ORDER,
+            SortOrder.SongSortOrder.SONG_A_Z
+        )
+        set(value) = sharedPreferences.edit {
+            putString(SONG_SORT_ORDER, value)
+        }
+
+    val isWhiteList: Boolean
+        get() = sharedPreferences.getBoolean(WHITELIST_MUSIC, false)
+    val filterLength get() = sharedPreferences.getInt(FILTER_SONG, 20)
+
+    var isInitializedBlacklist
+        get() = sharedPreferences.getBoolean(
+            INITIALIZED_BLACKLIST, false
+        )
+        set(value) = sharedPreferences.edit {
+            putBoolean(INITIALIZED_BLACKLIST, value)
+        }
+
+    var albumSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            ALBUM_SORT_ORDER,
+            SortOrder.AlbumSortOrder.ALBUM_A_Z
+        )
+        set(value) = sharedPreferences.edit {
+            putString(ALBUM_SORT_ORDER, value)
+        }
+
+    var albumDetailSongSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            ALBUM_DETAIL_SONG_SORT_ORDER,
+            SortOrder.AlbumSongSortOrder.SONG_TRACK_LIST
+        )
+        set(value) = sharedPreferences.edit { putString(ALBUM_DETAIL_SONG_SORT_ORDER, value) }
+
+    val albumSongSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            ALBUM_SONG_SORT_ORDER,
+            SortOrder.AlbumSongSortOrder.SONG_TRACK_LIST
+        )
+
+    val genreSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            GENRE_SORT_ORDER,
+            SortOrder.GenreSortOrder.GENRE_A_Z
+        )
+}
+
+enum class CoverLyricsType {
+    REPLACE_COVER, OVER_COVER
 }
