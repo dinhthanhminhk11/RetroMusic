@@ -9,6 +9,7 @@ import code.name.monkey.retromusic.repository.dataSource.ArtistLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.GenreLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.PlaylistLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.RoomRepository
+import code.name.monkey.retromusic.repository.dataSource.SearchLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.TopPlayedLocalRepository
 import code.name.monkey.retromusic.repository.dataSourceImpl.AlbumLocalRepositoryImpl
@@ -16,6 +17,7 @@ import code.name.monkey.retromusic.repository.dataSourceImpl.ArtistLocalReposito
 import code.name.monkey.retromusic.repository.dataSourceImpl.GenreLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.PlaylistLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.RoomRepositoryImpl
+import code.name.monkey.retromusic.repository.dataSourceImpl.SearchLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.SongLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.TopPlayedLocalRepositoryImpl
 import dagger.Module
@@ -97,6 +99,20 @@ class RepositoryModule {
     ): RoomRepository {
         return RoomRepositoryImpl(
             playlistDao, playCountDao, historyDao
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideSearchLocalRepository(
+        songRepository: SongLocalRepositoryImpl,
+        albumRepository: AlbumLocalRepositoryImpl,
+        artistRepository: ArtistLocalRepositoryImpl,
+        roomRepository: RoomRepository,
+        genreRepository: GenreLocalRepositoryImpl
+    ): SearchLocalRepository {
+        return SearchLocalRepositoryImpl(
+            songRepository, albumRepository, artistRepository, roomRepository, genreRepository
         )
     }
 
