@@ -1,7 +1,7 @@
 package code.name.monkey.retromusic.repository.dataSourceImpl
 
 import android.provider.MediaStore
-import code.name.monkey.retromusic.Constants.ALBUM_ARTIST
+import code.name.monkey.retromusic.ALBUM_ARTIST
 import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist

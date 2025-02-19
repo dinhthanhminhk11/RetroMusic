@@ -7,29 +7,8 @@ object Constants {
 
     const val IS_MUSIC =
         MediaStore.Audio.AudioColumns.IS_MUSIC + "=1" + " AND " + MediaStore.Audio.AudioColumns.TITLE + " != ''"
-    const val WALLPAPER_ACCENT = "wallpaper_accent"
-    const val COLORED_APP_SHORTCUTS = "colored_app_shortcuts"
-    const val KEEP_SCREEN_ON = "keep_screen_on"
-    const val TOGGLE_FULL_SCREEN = "toggle_full_screen"
-    const val MATERIAL_YOU = "material_you"
-    const val GENERAL_THEME = "general_theme"
-    const val BLACK_THEME = "black_theme"
-    const val SHOW_WHEN_LOCKED = "show_when_locked"
     const val DATA = "_data"
-    const val SONG_SORT_ORDER = "song_sort_order"
-    const val ALBUM_ARTIST = "album_artist"
-    const val WHITELIST_MUSIC = "whitelist_music"
-    const val FILTER_SONG = "filter_song"
-    const val INITIALIZED_BLACKLIST = "initialized_blacklist"
-    const val ALBUM_SORT_ORDER = "album_sort_order"
-    const val ALBUM_DETAIL_SONG_SORT_ORDER = "album_detail_song_sort_order"
-    const val ALBUM_SONG_SORT_ORDER = "album_song_sort_order"
-    const val GENRE_SORT_ORDER = "genre_sort_order"
-    const val ARTIST_DETAIL_SONG_SORT_ORDER = "artist_detail_song_sort_order"
-    const val ARTIST_ALBUM_SORT_ORDER = "artist_album_sort_order"
-    const val ARTIST_SORT_ORDER = "artist_sort_order"
-    const val ARTIST_SONG_SORT_ORDER = "artist_song_sort_order"
-    const val RECENTLY_PLAYED_CUTOFF = "recently_played_interval"
+
     @Suppress("Deprecation")
     val baseProjection = arrayOf(
         BaseColumns._ID, // 0
@@ -49,4 +28,27 @@ object Constants {
 
     const val NUMBER_OF_TOP_TRACKS = 99
 }
+
+const val WALLPAPER_ACCENT = "wallpaper_accent"
+const val COLORED_APP_SHORTCUTS = "colored_app_shortcuts"
+const val KEEP_SCREEN_ON = "keep_screen_on"
+const val TOGGLE_FULL_SCREEN = "toggle_full_screen"
+const val MATERIAL_YOU = "material_you"
+const val GENERAL_THEME = "general_theme"
+const val BLACK_THEME = "black_theme"
+const val SHOW_WHEN_LOCKED = "show_when_locked"
+const val SONG_SORT_ORDER = "song_sort_order"
+const val ALBUM_ARTIST = "album_artist"
+const val WHITELIST_MUSIC = "whitelist_music"
+const val FILTER_SONG = "filter_song"
+const val INITIALIZED_BLACKLIST = "initialized_blacklist"
+const val ALBUM_SORT_ORDER = "album_sort_order"
+const val ALBUM_DETAIL_SONG_SORT_ORDER = "album_detail_song_sort_order"
+const val ALBUM_SONG_SORT_ORDER = "album_song_sort_order"
+const val GENRE_SORT_ORDER = "genre_sort_order"
+const val ARTIST_DETAIL_SONG_SORT_ORDER = "artist_detail_song_sort_order"
+const val ARTIST_ALBUM_SORT_ORDER = "artist_album_sort_order"
+const val ARTIST_SORT_ORDER = "artist_sort_order"
+const val ARTIST_SONG_SORT_ORDER = "artist_song_sort_order"
+const val RECENTLY_PLAYED_CUTOFF = "recently_played_interval"
 

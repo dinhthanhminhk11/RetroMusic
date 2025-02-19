@@ -1,7 +1,7 @@
 package code.name.monkey.retromusic.helper
 
 import android.provider.MediaStore
-import code.name.monkey.retromusic.Constants.ALBUM_ARTIST
+import code.name.monkey.retromusic.ALBUM_ARTIST
 
 class SortOrder {
     interface SongSortOrder {
