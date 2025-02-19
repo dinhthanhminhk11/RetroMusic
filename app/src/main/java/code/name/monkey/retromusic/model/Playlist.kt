@@ -1,27 +1,35 @@
 package code.name.monkey.retromusic.model
 
-import android.os.Parcel
 import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-open class Playlist() : Parcelable{
-    constructor(parcel: Parcel) : this() {
+@Parcelize
+open class Playlist(
+    val id: Long,
+    val name: String
+) : Parcelable {
+
+    companion object {
+        val empty = Playlist(-1, "")
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Playlist
+
+        if (id != other.id) return false
+        if (name != other.name) return false
+
+        return true
     }
 
-    override fun describeContents(): Int {
-        return 0
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
     }
 
-    companion object CREATOR : Parcelable.Creator<Playlist> {
-        override fun createFromParcel(parcel: Parcel): Playlist {
-            return Playlist(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Playlist?> {
-            return arrayOfNulls(size)
-        }
-    }
 }

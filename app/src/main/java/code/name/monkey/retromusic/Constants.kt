@@ -4,6 +4,10 @@ import android.provider.BaseColumns
 import android.provider.MediaStore
 
 object Constants {
+
+    const val IS_MUSIC =
+        MediaStore.Audio.AudioColumns.IS_MUSIC + "=1" + " AND " + MediaStore.Audio.AudioColumns.TITLE + " != ''"
+
     const val WALLPAPER_ACCENT = "wallpaper_accent"
     const val COLORED_APP_SHORTCUTS = "colored_app_shortcuts"
     const val KEEP_SCREEN_ON = "keep_screen_on"
@@ -26,6 +30,7 @@ object Constants {
     const val ARTIST_ALBUM_SORT_ORDER = "artist_album_sort_order"
     const val ARTIST_SORT_ORDER = "artist_sort_order"
     const val ARTIST_SONG_SORT_ORDER = "artist_song_sort_order"
+
     @Suppress("Deprecation")
     val baseProjection = arrayOf(
         BaseColumns._ID, // 0
