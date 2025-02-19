@@ -1,16 +1,21 @@
 package code.name.monkey.retromusic.core.di
 
 import android.content.Context
+import code.name.monkey.retromusic.db.dao.HistoryDao
+import code.name.monkey.retromusic.db.dao.PlayCountDao
+import code.name.monkey.retromusic.db.dao.PlaylistDao
 import code.name.monkey.retromusic.repository.dataSource.AlbumLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.ArtistLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.GenreLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.PlaylistLocalRepository
+import code.name.monkey.retromusic.repository.dataSource.RoomRepository
 import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.TopPlayedLocalRepository
 import code.name.monkey.retromusic.repository.dataSourceImpl.AlbumLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.ArtistLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.GenreLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.PlaylistLocalRepositoryImpl
+import code.name.monkey.retromusic.repository.dataSourceImpl.RoomRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.SongLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.TopPlayedLocalRepositoryImpl
 import dagger.Module
@@ -82,5 +87,18 @@ class RepositoryModule {
             artistRepository
         )
     }
+
+    @Singleton
+    @Provides
+    fun provideRoomRepository(
+        playlistDao: PlaylistDao,
+        playCountDao: PlayCountDao,
+        historyDao: HistoryDao
+    ): RoomRepository {
+        return RoomRepositoryImpl(
+            playlistDao, playCountDao, historyDao
+        )
+    }
+
 
 }

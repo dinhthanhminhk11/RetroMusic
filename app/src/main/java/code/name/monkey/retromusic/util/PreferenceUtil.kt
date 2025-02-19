@@ -20,6 +20,7 @@ import code.name.monkey.retromusic.GENRE_SORT_ORDER
 import code.name.monkey.retromusic.INITIALIZED_BLACKLIST
 import code.name.monkey.retromusic.KEEP_SCREEN_ON
 import code.name.monkey.retromusic.MATERIAL_YOU
+import code.name.monkey.retromusic.PLAYLIST_SORT_ORDER
 import code.name.monkey.retromusic.RECENTLY_PLAYED_CUTOFF
 import code.name.monkey.retromusic.SHOW_WHEN_LOCKED
 import code.name.monkey.retromusic.SONG_SORT_ORDER
@@ -188,6 +189,15 @@ object PreferenceUtil {
         }
         return System.currentTimeMillis() - interval
     }
+
+    var playlistSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            PLAYLIST_SORT_ORDER,
+            SortOrder.PlaylistSortOrder.PLAYLIST_A_Z
+        )
+        set(value) = sharedPreferences.edit {
+            putString(PLAYLIST_SORT_ORDER, value)
+        }
 }
 
 enum class CoverLyricsType {
