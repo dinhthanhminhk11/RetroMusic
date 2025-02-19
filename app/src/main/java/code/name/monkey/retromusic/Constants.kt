@@ -52,7 +52,7 @@ const val ARTIST_SORT_ORDER = "artist_sort_order"
 const val ARTIST_SONG_SORT_ORDER = "artist_song_sort_order"
 const val RECENTLY_PLAYED_CUTOFF = "recently_played_interval"
 const val PLAYLIST_SORT_ORDER = "playlist_sort_order"
-
+const val LAST_ADDED_CUTOFF = "last_added_interval"
 enum class Filter {
     SONGS,
     ARTISTS,

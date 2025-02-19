@@ -7,6 +7,7 @@ import code.name.monkey.retromusic.db.dao.PlaylistDao
 import code.name.monkey.retromusic.repository.dataSource.AlbumLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.ArtistLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.GenreLocalRepository
+import code.name.monkey.retromusic.repository.dataSource.LastAddedLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.PlaylistLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.RoomRepository
 import code.name.monkey.retromusic.repository.dataSource.SearchLocalRepository
@@ -15,6 +16,7 @@ import code.name.monkey.retromusic.repository.dataSource.TopPlayedLocalRepositor
 import code.name.monkey.retromusic.repository.dataSourceImpl.AlbumLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.ArtistLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.GenreLocalRepositoryImpl
+import code.name.monkey.retromusic.repository.dataSourceImpl.LastAddedLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.PlaylistLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.RoomRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.SearchLocalRepositoryImpl
@@ -113,6 +115,18 @@ class RepositoryModule {
     ): SearchLocalRepository {
         return SearchLocalRepositoryImpl(
             songRepository, albumRepository, artistRepository, roomRepository, genreRepository
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideLastAddedLocalRepository(
+        songRepository: SongLocalRepositoryImpl,
+        albumRepository: AlbumLocalRepositoryImpl,
+        artistRepository: ArtistLocalRepositoryImpl
+    ): LastAddedLocalRepository {
+        return LastAddedLocalRepositoryImpl(
+            songRepository, albumRepository, artistRepository
         )
     }
 

@@ -19,6 +19,7 @@ import code.name.monkey.retromusic.GENERAL_THEME
 import code.name.monkey.retromusic.GENRE_SORT_ORDER
 import code.name.monkey.retromusic.INITIALIZED_BLACKLIST
 import code.name.monkey.retromusic.KEEP_SCREEN_ON
+import code.name.monkey.retromusic.LAST_ADDED_CUTOFF
 import code.name.monkey.retromusic.MATERIAL_YOU
 import code.name.monkey.retromusic.PLAYLIST_SORT_ORDER
 import code.name.monkey.retromusic.RECENTLY_PLAYED_CUTOFF
@@ -197,6 +198,21 @@ object PreferenceUtil {
         )
         set(value) = sharedPreferences.edit {
             putString(PLAYLIST_SORT_ORDER, value)
+        }
+
+    val lastAddedCutoff: Long
+        get() {
+            val calendarUtil = CalendarUtil()
+            val interval =
+                when (sharedPreferences.getStringOrDefault(LAST_ADDED_CUTOFF, "this_month")) {
+                    "today" -> calendarUtil.elapsedToday
+                    "this_week" -> calendarUtil.elapsedWeek
+                    "past_three_months" -> calendarUtil.getElapsedMonths(3)
+                    "this_year" -> calendarUtil.elapsedYear
+                    "this_month" -> calendarUtil.elapsedMonth
+                    else -> calendarUtil.elapsedMonth
+                }
+            return (System.currentTimeMillis() - interval) / 1000
         }
 }
 
