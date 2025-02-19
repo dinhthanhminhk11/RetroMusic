@@ -6,11 +6,13 @@ import code.name.monkey.retromusic.repository.dataSource.ArtistLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.GenreLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.PlaylistLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
+import code.name.monkey.retromusic.repository.dataSource.TopPlayedLocalRepository
 import code.name.monkey.retromusic.repository.dataSourceImpl.AlbumLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.ArtistLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.GenreLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.PlaylistLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.SongLocalRepositoryImpl
+import code.name.monkey.retromusic.repository.dataSourceImpl.TopPlayedLocalRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -63,6 +65,22 @@ class RepositoryModule {
         @ApplicationContext context: Context
     ): PlaylistLocalRepository {
         return PlaylistLocalRepositoryImpl(context.contentResolver)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTopPlayerLocalRepository(
+        @ApplicationContext context: Context,
+        songRepository: SongLocalRepositoryImpl,
+        albumRepository: AlbumLocalRepositoryImpl,
+        artistRepository: ArtistLocalRepositoryImpl
+    ): TopPlayedLocalRepository {
+        return TopPlayedLocalRepositoryImpl(
+            context,
+            songRepository,
+            albumRepository,
+            artistRepository
+        )
     }
 
 }

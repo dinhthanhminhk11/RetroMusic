@@ -20,6 +20,7 @@ import code.name.monkey.retromusic.Constants.GENRE_SORT_ORDER
 import code.name.monkey.retromusic.Constants.INITIALIZED_BLACKLIST
 import code.name.monkey.retromusic.Constants.KEEP_SCREEN_ON
 import code.name.monkey.retromusic.Constants.MATERIAL_YOU
+import code.name.monkey.retromusic.Constants.RECENTLY_PLAYED_CUTOFF
 import code.name.monkey.retromusic.Constants.SHOW_WHEN_LOCKED
 import code.name.monkey.retromusic.Constants.SONG_SORT_ORDER
 import code.name.monkey.retromusic.Constants.TOGGLE_FULL_SCREEN
@@ -172,6 +173,20 @@ object PreferenceUtil {
             ARTIST_SONG_SORT_ORDER,
             SortOrder.AlbumSongSortOrder.SONG_TRACK_LIST
         )
+
+    fun getRecentlyPlayedCutoffTimeMillis(): Long {
+        val calendarUtil = CalendarUtil()
+        val interval: Long = when (sharedPreferences.getString(RECENTLY_PLAYED_CUTOFF, "")) {
+            "today" -> calendarUtil.elapsedToday
+            "this_week" -> calendarUtil.elapsedWeek
+            "past_seven_days" -> calendarUtil.getElapsedDays(7)
+            "past_three_months" -> calendarUtil.getElapsedMonths(3)
+            "this_year" -> calendarUtil.elapsedYear
+            "this_month" -> calendarUtil.elapsedMonth
+            else -> calendarUtil.elapsedMonth
+        }
+        return System.currentTimeMillis() - interval
+    }
 }
 
 enum class CoverLyricsType {
