@@ -2,9 +2,11 @@ package code.name.monkey.retromusic.core.di
 
 import android.content.Context
 import code.name.monkey.retromusic.repository.dataSource.AlbumLocalRepository
+import code.name.monkey.retromusic.repository.dataSource.ArtistLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.GenreLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
 import code.name.monkey.retromusic.repository.dataSourceImpl.AlbumLocalRepositoryImpl
+import code.name.monkey.retromusic.repository.dataSourceImpl.ArtistLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.GenreLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.SongLocalRepositoryImpl
 import dagger.Module
@@ -42,6 +44,15 @@ class RepositoryModule {
         songRepository: SongLocalRepositoryImpl
     ): GenreLocalRepository {
         return GenreLocalRepositoryImpl(context.contentResolver, songRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideArtistLocalRepository(
+        songRepository: SongLocalRepositoryImpl,
+        albumRepository: AlbumLocalRepositoryImpl
+    ): ArtistLocalRepository {
+        return ArtistLocalRepositoryImpl(songRepository, albumRepository)
     }
 
 }

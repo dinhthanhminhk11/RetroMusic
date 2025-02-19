@@ -8,6 +8,10 @@ import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.Constants.ALBUM_DETAIL_SONG_SORT_ORDER
 import code.name.monkey.retromusic.Constants.ALBUM_SONG_SORT_ORDER
 import code.name.monkey.retromusic.Constants.ALBUM_SORT_ORDER
+import code.name.monkey.retromusic.Constants.ARTIST_ALBUM_SORT_ORDER
+import code.name.monkey.retromusic.Constants.ARTIST_DETAIL_SONG_SORT_ORDER
+import code.name.monkey.retromusic.Constants.ARTIST_SONG_SORT_ORDER
+import code.name.monkey.retromusic.Constants.ARTIST_SORT_ORDER
 import code.name.monkey.retromusic.Constants.BLACK_THEME
 import code.name.monkey.retromusic.Constants.COLORED_APP_SHORTCUTS
 import code.name.monkey.retromusic.Constants.FILTER_SONG
@@ -136,6 +140,37 @@ object PreferenceUtil {
         get() = sharedPreferences.getStringOrDefault(
             GENRE_SORT_ORDER,
             SortOrder.GenreSortOrder.GENRE_A_Z
+        )
+
+    var artistDetailSongSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            ARTIST_DETAIL_SONG_SORT_ORDER,
+            SortOrder.ArtistSongSortOrder.SONG_A_Z
+        )
+        set(value) = sharedPreferences.edit { putString(ARTIST_DETAIL_SONG_SORT_ORDER, value) }
+
+    var artistAlbumSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            ARTIST_ALBUM_SORT_ORDER,
+            SortOrder.ArtistAlbumSortOrder.ALBUM_YEAR
+        )
+        set(value) = sharedPreferences.edit {
+            putString(ARTIST_ALBUM_SORT_ORDER, value)
+        }
+
+    var artistSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            ARTIST_SORT_ORDER,
+            SortOrder.ArtistSortOrder.ARTIST_A_Z
+        )
+        set(value) = sharedPreferences.edit {
+            putString(ARTIST_SORT_ORDER, value)
+        }
+
+    val artistSongSortOrder
+        get() = sharedPreferences.getStringOrDefault(
+            ARTIST_SONG_SORT_ORDER,
+            SortOrder.AlbumSongSortOrder.SONG_TRACK_LIST
         )
 }
 

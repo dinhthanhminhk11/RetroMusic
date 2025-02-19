@@ -22,6 +22,10 @@ object Constants {
     const val ALBUM_DETAIL_SONG_SORT_ORDER = "album_detail_song_sort_order"
     const val ALBUM_SONG_SORT_ORDER = "album_song_sort_order"
     const val GENRE_SORT_ORDER = "genre_sort_order"
+    const val ARTIST_DETAIL_SONG_SORT_ORDER = "artist_detail_song_sort_order"
+    const val ARTIST_ALBUM_SORT_ORDER = "artist_album_sort_order"
+    const val ARTIST_SORT_ORDER = "artist_sort_order"
+    const val ARTIST_SONG_SORT_ORDER = "artist_song_sort_order"
     @Suppress("Deprecation")
     val baseProjection = arrayOf(
         BaseColumns._ID, // 0
