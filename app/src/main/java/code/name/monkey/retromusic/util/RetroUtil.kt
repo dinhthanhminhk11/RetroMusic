@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Point
-import code.name.monkey.retromusic.App
+import code.name.monkey.retromusic.MyApplication
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.text.DecimalFormat
@@ -37,11 +37,11 @@ object RetroUtil {
         @SuppressLint("InternalInsetResource")
         get() {
             var result = 0
-            val resourceId = App.getContext()
+            val resourceId = MyApplication.getContext()
                 .resources
                 .getIdentifier("status_bar_height", "dimen", "android")
             if (resourceId > 0) {
-                result = App.getContext().resources.getDimensionPixelSize(resourceId)
+                result = MyApplication.getContext().resources.getDimensionPixelSize(resourceId)
             }
             return result
         }
@@ -50,20 +50,20 @@ object RetroUtil {
         @SuppressLint("InternalInsetResource")
         get() {
             var result = 0
-            val resourceId = App.getContext()
+            val resourceId = MyApplication.getContext()
                 .resources
                 .getIdentifier("navigation_bar_height", "dimen", "android")
             if (resourceId > 0) {
-                result = App.getContext().resources.getDimensionPixelSize(resourceId)
+                result = MyApplication.getContext().resources.getDimensionPixelSize(resourceId)
             }
             return result
         }
 
     val isLandscape: Boolean
-        get() = (App.getContext().resources.configuration.orientation
+        get() = (MyApplication.getContext().resources.configuration.orientation
                 == Configuration.ORIENTATION_LANDSCAPE)
     val isTablet: Boolean
-        get() = (App.getContext().resources.configuration.smallestScreenWidthDp
+        get() = (MyApplication.getContext().resources.configuration.smallestScreenWidthDp
                 >= 600)
 
     fun getIpAddress(useIPv4: Boolean): String? {

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name=".App"
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:configChanges="locale|layoutDirection"
         android:dataExtractionRules="@xml/data_extraction_rules"

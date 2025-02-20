@@ -13,7 +13,7 @@ import code.name.monkey.retromusic.helper.WallpaperAccentManager
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class App : Application() {
+class MyApplication : Application() {
 
     lateinit var billingManager: BillingManager
     private val wallpaperAccentManager = WallpaperAccentManager(this)
@@ -48,9 +48,9 @@ class App : Application() {
     }
 
     companion object {
-        private var instance: App? = null
+        private var instance: MyApplication? = null
 
-        fun getContext(): App {
+        fun getContext(): MyApplication {
             return instance!!
         }
 

@@ -11,7 +11,7 @@ import code.name.monkey.retromusic.ARTIST_ALBUM_SORT_ORDER
 import code.name.monkey.retromusic.ARTIST_DETAIL_SONG_SORT_ORDER
 import code.name.monkey.retromusic.ARTIST_SONG_SORT_ORDER
 import code.name.monkey.retromusic.ARTIST_SORT_ORDER
-import code.name.monkey.retromusic.App
+import code.name.monkey.retromusic.MyApplication
 import code.name.monkey.retromusic.BLACK_THEME
 import code.name.monkey.retromusic.COLORED_APP_SHORTCUTS
 import code.name.monkey.retromusic.FILTER_SONG
@@ -35,7 +35,7 @@ import code.name.monkey.retromusic.util.theme.ThemeMode
 
 object PreferenceUtil {
     private const val PREF_NAME = "MyPrefs"
-    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext())
+    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext())
     val isScreenOnEnabled get() = sharedPreferences.getBoolean(KEEP_SCREEN_ON, false)
 
     val isFullScreenMode

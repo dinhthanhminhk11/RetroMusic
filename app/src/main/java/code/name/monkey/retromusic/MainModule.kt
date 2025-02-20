@@ -25,8 +25,8 @@ class MainModule {
 
     @Provides
     @Singleton
-    fun provideApp(): App {
-        return App()
+    fun provideApp(): MyApplication {
+        return MyApplication()
     }
 
     @Provides
