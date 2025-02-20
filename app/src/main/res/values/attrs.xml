@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <attr name="roundSelector" format="reference" />
     <attr name="rectSelector" format="reference" />
     <attr name="defaultFooterColor" format="color" />
@@ -9,4 +10,6 @@
     <declare-styleable name="NetworkImageView">
         <attr name="url_link" format="string" />
     </declare-styleable>
+
+
 </resources>
