@@ -4,6 +4,8 @@ import android.content.Context
 import code.name.monkey.retromusic.db.dao.HistoryDao
 import code.name.monkey.retromusic.db.dao.PlayCountDao
 import code.name.monkey.retromusic.db.dao.PlaylistDao
+import code.name.monkey.retromusic.repository.Repository
+import code.name.monkey.retromusic.repository.RepositoryImpl
 import code.name.monkey.retromusic.repository.dataSource.AlbumLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.ArtistLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.GenreLocalRepository
@@ -123,6 +125,34 @@ class RepositoryModule {
     ): LastAddedLocalRepository {
         return LastAddedLocalRepositoryImpl(
             context, songRepository
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideRepository(
+        @ApplicationContext context: Context,
+        songRepository: SongLocalRepository,
+        albumRepository: AlbumLocalRepository,
+        artistRepository: ArtistLocalRepository,
+        genreRepository: GenreLocalRepository,
+        lastAddedRepository: LastAddedLocalRepository,
+        playlistRepository: PlaylistLocalRepository,
+        searchRepository: SearchLocalRepository,
+        topPlayedRepository: TopPlayedLocalRepository,
+        roomRepository: RoomRepository
+    ): Repository {
+        return RepositoryImpl(
+            context,
+            songRepository,
+            albumRepository,
+            artistRepository,
+            genreRepository,
+            lastAddedRepository,
+            playlistRepository,
+            searchRepository,
+            topPlayedRepository,
+            roomRepository
         )
     }
 

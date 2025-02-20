@@ -6,12 +6,11 @@ import code.name.monkey.retromusic.model.Song
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class LastAddedPlaylist : AbsSmartPlaylist(
-    name = App.getContext().getString(R.string.last_added),
-    iconRes = R.drawable.ic_library_add
+class NotPlayedPlaylist : AbsSmartPlaylist(
+    name = App.getContext().getString(R.string.not_recently_played),
+    iconRes = R.drawable.ic_audiotrack
 ) {
     override fun songs(): List<Song> {
-        return lastAddedRepository.recentSongs()
+        return topPlayedRepository.notRecentlyPlayedTracks()
     }
-
 }
