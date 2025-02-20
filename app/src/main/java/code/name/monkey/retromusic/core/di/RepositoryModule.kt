@@ -45,27 +45,28 @@ class RepositoryModule {
     @Singleton
     @Provides
     fun provideAlbumLocalRepository(
-        songRepository: SongLocalRepositoryImpl
+        @ApplicationContext context: Context,
+        songRepository: SongLocalRepository
     ): AlbumLocalRepository {
-        return AlbumLocalRepositoryImpl(songRepository)
+        return AlbumLocalRepositoryImpl(context, songRepository)
     }
 
     @Singleton
     @Provides
     fun provideGenreLocalRepository(
         @ApplicationContext context: Context,
-        songRepository: SongLocalRepositoryImpl
+        songRepository: SongLocalRepository
     ): GenreLocalRepository {
-        return GenreLocalRepositoryImpl(context.contentResolver, songRepository)
+        return GenreLocalRepositoryImpl(context, songRepository)
     }
 
     @Singleton
     @Provides
     fun provideArtistLocalRepository(
-        songRepository: SongLocalRepositoryImpl,
-        albumRepository: AlbumLocalRepositoryImpl
+        @ApplicationContext context: Context,
+        songRepository: SongLocalRepositoryImpl
     ): ArtistLocalRepository {
-        return ArtistLocalRepositoryImpl(songRepository, albumRepository)
+        return ArtistLocalRepositoryImpl(context, songRepository)
     }
 
     @Singleton
@@ -80,15 +81,11 @@ class RepositoryModule {
     @Provides
     fun provideTopPlayerLocalRepository(
         @ApplicationContext context: Context,
-        songRepository: SongLocalRepositoryImpl,
-        albumRepository: AlbumLocalRepositoryImpl,
-        artistRepository: ArtistLocalRepositoryImpl
+        songRepository: SongLocalRepository
     ): TopPlayedLocalRepository {
         return TopPlayedLocalRepositoryImpl(
             context,
-            songRepository,
-            albumRepository,
-            artistRepository
+            songRepository
         )
     }
 
@@ -107,11 +104,11 @@ class RepositoryModule {
     @Singleton
     @Provides
     fun provideSearchLocalRepository(
-        songRepository: SongLocalRepositoryImpl,
-        albumRepository: AlbumLocalRepositoryImpl,
-        artistRepository: ArtistLocalRepositoryImpl,
+        songRepository: SongLocalRepository,
+        albumRepository: AlbumLocalRepository,
+        artistRepository: ArtistLocalRepository,
         roomRepository: RoomRepository,
-        genreRepository: GenreLocalRepositoryImpl
+        genreRepository: GenreLocalRepository
     ): SearchLocalRepository {
         return SearchLocalRepositoryImpl(
             songRepository, albumRepository, artistRepository, roomRepository, genreRepository
@@ -121,12 +118,11 @@ class RepositoryModule {
     @Singleton
     @Provides
     fun provideLastAddedLocalRepository(
-        songRepository: SongLocalRepositoryImpl,
-        albumRepository: AlbumLocalRepositoryImpl,
-        artistRepository: ArtistLocalRepositoryImpl
+        @ApplicationContext context: Context,
+        songRepository: SongLocalRepositoryImpl
     ): LastAddedLocalRepository {
         return LastAddedLocalRepositoryImpl(
-            songRepository, albumRepository, artistRepository
+            context, songRepository
         )
     }
 

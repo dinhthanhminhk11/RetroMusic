@@ -11,14 +11,16 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.providers.HistoryStore
 import code.name.monkey.retromusic.providers.SongPlayCountStore
 import code.name.monkey.retromusic.repository.SortedLongCursor
+import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.TopPlayedLocalRepository
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.makeSongCursor
+import code.name.monkey.retromusic.util.splitIntoAlbums
+import code.name.monkey.retromusic.util.splitIntoArtists
 
 class TopPlayedLocalRepositoryImpl(
     private val context: Context,
-    private val songRepository: SongLocalRepositoryImpl,
-    private val albumRepository: AlbumLocalRepositoryImpl,
-    private val artistRepository: ArtistLocalRepositoryImpl
+    private val songRepository: SongLocalRepository
 ) : TopPlayedLocalRepository {
     override fun recentlyPlayedTracks(): List<Song> {
         return songRepository.songs(makeRecentTracksCursorAndClearUpDatabase())
@@ -32,7 +34,8 @@ class TopPlayedLocalRepositoryImpl(
         val allSongs = mutableListOf<Song>().apply {
             addAll(
                 songRepository.songs(
-                    songRepository.makeSongCursor(
+                    makeSongCursor(
+                        context,
                         null, null,
                         MediaStore.Audio.Media.DATE_ADDED + " ASC"
                     )
@@ -51,11 +54,11 @@ class TopPlayedLocalRepositoryImpl(
     }
 
     override fun topAlbums(): List<Album> {
-        return albumRepository.splitIntoAlbums(topTracks(), sorted = false)
+        return splitIntoAlbums(topTracks(), sorted = false)
     }
 
     override fun topArtists(): List<Artist> {
-        return artistRepository.splitIntoArtists(topAlbums())
+        return splitIntoArtists(topAlbums())
     }
 
 
@@ -125,7 +128,7 @@ class TopPlayedLocalRepositoryImpl(
             selection.append(")")
 
             // get a list of songs with the data given the selection statement
-            val songCursor = songRepository.makeSongCursor(selection.toString(), null)
+            val songCursor = makeSongCursor(context, selection.toString(), null)
             if (songCursor != null) {
                 // now return the wrapped TopTracksCursor to handle sorting given order
                 return SortedLongCursor(

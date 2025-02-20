@@ -1,6 +1,6 @@
 package code.name.monkey.retromusic.repository.dataSourceImpl
 
-import android.content.ContentResolver
+import android.content.Context
 import android.database.Cursor
 import android.provider.BaseColumns
 import android.provider.MediaStore
@@ -11,11 +11,13 @@ import code.name.monkey.retromusic.extensions.getStringOrNull
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.repository.dataSource.GenreLocalRepository
+import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.makeSongCursor
 
 class GenreLocalRepositoryImpl(
-    private val contentResolver: ContentResolver,
-    private val songRepository: SongLocalRepositoryImpl
+    private val context: Context,
+    private val songRepository: SongLocalRepository
 ) : GenreLocalRepository {
     override fun genres(query: String): List<Genre> {
         return getGenresFromCursor(makeGenreCursor(query))
@@ -39,7 +41,7 @@ class GenreLocalRepositoryImpl(
     }
 
     private fun getSongCount(genreId: Long): Int {
-        contentResolver.query(
+        context.contentResolver.query(
             MediaStore.Audio.Genres.Members.getContentUri("external", genreId),
             null,
             null,
@@ -60,12 +62,12 @@ class GenreLocalRepositoryImpl(
     private fun getSongsWithNoGenre(): List<Song> {
         val selection =
             BaseColumns._ID + " NOT IN " + "(SELECT " + MediaStore.Audio.Genres.Members.AUDIO_ID + " FROM audio_genres_map)"
-        return songRepository.songs(songRepository.makeSongCursor(selection, null))
+        return songRepository.songs(makeSongCursor(context, selection, null))
     }
 
     private fun makeGenreSongCursor(genreId: Long): Cursor? {
         return try {
-            contentResolver.query(
+            context.contentResolver.query(
                 MediaStore.Audio.Genres.Members.getContentUri("external", genreId),
                 Constants.baseProjection,
                 IS_MUSIC,
@@ -95,7 +97,7 @@ class GenreLocalRepositoryImpl(
     private fun makeGenreCursor(): Cursor? {
         val projection = arrayOf(MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME)
         return try {
-            contentResolver.query(
+            context.contentResolver.query(
                 MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,
                 projection,
                 null,
@@ -110,7 +112,7 @@ class GenreLocalRepositoryImpl(
     private fun makeGenreCursor(query: String): Cursor? {
         val projection = arrayOf(MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME)
         return try {
-            contentResolver.query(
+            context.contentResolver.query(
                 MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,
                 projection,
                 MediaStore.Audio.Genres.NAME + " = ?",

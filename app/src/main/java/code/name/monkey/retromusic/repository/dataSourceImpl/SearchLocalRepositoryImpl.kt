@@ -8,15 +8,19 @@ import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.model.Song
+import code.name.monkey.retromusic.repository.dataSource.AlbumLocalRepository
+import code.name.monkey.retromusic.repository.dataSource.ArtistLocalRepository
+import code.name.monkey.retromusic.repository.dataSource.GenreLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.RoomRepository
 import code.name.monkey.retromusic.repository.dataSource.SearchLocalRepository
+import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
 
 class SearchLocalRepositoryImpl(
-    private val songRepository: SongLocalRepositoryImpl,
-    private val albumRepository: AlbumLocalRepositoryImpl,
-    private val artistRepository: ArtistLocalRepositoryImpl,
+    private val songRepository: SongLocalRepository,
+    private val albumRepository: AlbumLocalRepository,
+    private val artistRepository: ArtistLocalRepository,
     private val roomRepository: RoomRepository,
-    private val genreRepository: GenreLocalRepositoryImpl,
+    private val genreRepository: GenreLocalRepository,
 ) : SearchLocalRepository {
     override suspend fun searchAll(
         context: Context,

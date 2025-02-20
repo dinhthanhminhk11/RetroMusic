@@ -18,13 +18,17 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.providers.BlacklistStore
 import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.addSelectionValues
+import code.name.monkey.retromusic.util.generateBlacklistSelection
+import code.name.monkey.retromusic.util.makeSongCursor
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.text.Collator
 import javax.inject.Inject
 
-class SongLocalRepositoryImpl(private val context: Context) : SongLocalRepository { // có class thì dùng inject constructor
+class SongLocalRepositoryImpl(private val context: Context) :
+    SongLocalRepository { // có class thì dùng inject constructor
     override fun songs(): List<Song> {
-        return sortedSongs(makeSongCursor(null, null))
+        return sortedSongs(makeSongCursor(context, null, null))
     }
 
     override fun songs(cursor: Cursor?): List<Song> {
@@ -41,6 +45,7 @@ class SongLocalRepositoryImpl(private val context: Context) : SongLocalRepositor
     override fun songs(query: String): List<Song> {
         return songs(
             makeSongCursor(
+                context,
                 MediaStore.Audio.AudioColumns.TITLE + " LIKE ?",
                 arrayOf("%$query%")
             )
@@ -82,6 +87,7 @@ class SongLocalRepositoryImpl(private val context: Context) : SongLocalRepositor
     override fun songsByFilePath(filePath: String, ignoreBlacklist: Boolean): List<Song> {
         return songs(
             makeSongCursor(
+                context,
                 Constants.DATA + "=?",
                 arrayOf(filePath),
                 ignoreBlacklist = ignoreBlacklist
@@ -102,6 +108,7 @@ class SongLocalRepositoryImpl(private val context: Context) : SongLocalRepositor
     override fun song(songId: Long): Song {
         return song(
             makeSongCursor(
+                context,
                 MediaStore.Audio.AudioColumns._ID + "=?",
                 arrayOf(songId.toString())
             )
@@ -139,91 +146,5 @@ class SongLocalRepositoryImpl(private val context: Context) : SongLocalRepositor
             composer ?: "",
             albumArtist ?: ""
         )
-    }
-
-    @JvmOverloads
-    fun makeSongCursor(
-        selection: String?,
-        selectionValues: Array<String>?,
-        sortOrder: String = PreferenceUtil.songSortOrder,
-        ignoreBlacklist: Boolean = false
-    ): Cursor? {
-        var selectionFinal = selection
-        var selectionValuesFinal = selectionValues
-        if (!ignoreBlacklist) {
-            selectionFinal = if (selection != null && selection.trim { it <= ' ' } != "") {
-                "$IS_MUSIC AND $selectionFinal"
-            } else {
-                IS_MUSIC
-            }
-
-            // Whitelist
-            if (PreferenceUtil.isWhiteList) {
-                selectionFinal =
-                    selectionFinal + " AND " + Constants.DATA + " LIKE ?"
-                selectionValuesFinal = addSelectionValues(
-                    selectionValuesFinal, arrayListOf(
-                        getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).canonicalPath
-                    )
-                )
-            } else {
-                // Blacklist
-                val paths = BlacklistStore.getInstance(context).paths
-                if (paths.isNotEmpty()) {
-                    selectionFinal = generateBlacklistSelection(selectionFinal, paths.size)
-                    selectionValuesFinal = addSelectionValues(selectionValuesFinal, paths)
-                }
-            }
-
-            selectionFinal =
-                selectionFinal + " AND " + MediaStore.Audio.Media.DURATION + ">= " + (PreferenceUtil.filterLength * 1000)
-        }
-        val uri = if (VersionUtils.hasQ()) {
-            MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-        } else {
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        }
-        return try {
-            context.contentResolver.query(
-                uri,
-                baseProjection,
-                selectionFinal,
-                selectionValuesFinal,
-                sortOrder
-            )
-        } catch (ex: SecurityException) {
-            return null
-        }
-    }
-
-    private fun addSelectionValues(
-        selectionValues: Array<String>?,
-        paths: ArrayList<String>
-    ): Array<String> {
-        var selectionValuesFinal = selectionValues
-        if (selectionValuesFinal == null) {
-            selectionValuesFinal = emptyArray()
-        }
-        val newSelectionValues = Array(selectionValuesFinal.size + paths.size) {
-            "n = $it"
-        }
-        System.arraycopy(selectionValuesFinal, 0, newSelectionValues, 0, selectionValuesFinal.size)
-        for (i in selectionValuesFinal.size until newSelectionValues.size) {
-            newSelectionValues[i] = paths[i - selectionValuesFinal.size] + "%"
-        }
-        return newSelectionValues
-    }
-
-    private fun generateBlacklistSelection(
-        selection: String?,
-        pathCount: Int
-    ): String {
-        val newSelection = StringBuilder(
-            if (selection != null && selection.trim { it <= ' ' } != "") "$selection AND " else "")
-        newSelection.append(Constants.DATA + " NOT LIKE ?")
-        for (i in 0 until pathCount - 1) {
-            newSelection.append(" AND " + Constants.DATA + " NOT LIKE ?")
-        }
-        return newSelection.toString()
     }
 }

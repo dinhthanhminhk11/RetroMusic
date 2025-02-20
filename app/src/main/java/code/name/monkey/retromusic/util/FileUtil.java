@@ -84,7 +84,7 @@ public final class FileUtil {
         }
 
         Cursor songCursor =
-                new SongLocalRepositoryImpl(context).makeSongCursor(selection, selection == null ? null : paths, PreferenceUtil.INSTANCE.getSongSortOrder(), true);
+                SongUtils.makeSongCursor(context, selection, selection == null ? null : paths, PreferenceUtil.INSTANCE.getSongSortOrder(), true);
 
         return songCursor == null
                 ? null
