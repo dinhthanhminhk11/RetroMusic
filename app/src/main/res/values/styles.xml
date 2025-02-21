@@ -272,6 +272,4 @@
         <item name="background">@android:color/transparent</item>
         <item name="haloRadius">0dp</item>
     </style>
-
-    <style name="Theme.RetroMusic.MD3.Black" parent="@style/Theme.RetroMusic.MD3" />
 </resources>

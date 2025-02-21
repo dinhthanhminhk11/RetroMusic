@@ -249,4 +249,11 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
+    implementation (libs.androidx.core.splashscreen)
+    implementation (libs.material.intro)
+    implementation (libs.tankery.circularSeekBar)
+    implementation (libs.fadingedgelayout)
+    implementation (libs.jetradarmobile.android.snowfall)
+    implementation (libs.fastscroll.library)
+
 }

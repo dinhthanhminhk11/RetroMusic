@@ -53,6 +53,13 @@ kotlinxCoroutinesAndroid = "1.8.1"
 jaudiotagger = "2.3.15"
 chrisbanes_insetter_version = "0.6.1"
 room_version = "2.6.1"
+coreSplashscreen = "1.0.1"
+materialIntro = "2.0.0"
+tankery_circularSeekBar_version = "1.4.2"
+fadingedgelayout = "1.0.0"
+jetradarmobile_androidSnowfall_version = "1.2.1"
+fast_scroll_libraryVersion = "1.2.0"
+
 
 
 [plugins]
@@ -167,6 +174,10 @@ jaudiotagger = { module = "com.github.Adonai:jaudiotagger", version.ref = "jaudi
 androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version = "1.0.0" }
 chrisbanes-insetter = { module = "dev.chrisbanes.insetter:insetter", version.ref = "chrisbanes_insetter_version" }
 
-
-
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+material-intro = { module = "com.heinrichreimersoftware:material-intro", version.ref = "materialIntro" }
+tankery-circularSeekBar = { module = "me.tankery.lib:circularSeekBar", version.ref = "tankery_circularSeekBar_version" }
+fadingedgelayout = { module = "com.github.bosphere.android-fadingedgelayout:fadingedgelayout", version.ref = "fadingedgelayout" }
+jetradarmobile-android-snowfall = { module = "com.github.jetradarmobile:android-snowfall", version.ref = "jetradarmobile_androidSnowfall_version" }
+fastscroll-library = { module = "me.zhanghai.android.fastscroll:library", version.ref = "fast_scroll_libraryVersion" }
 

@@ -7,6 +7,7 @@ import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.ALBUM_DETAIL_SONG_SORT_ORDER
 import code.name.monkey.retromusic.ALBUM_SONG_SORT_ORDER
 import code.name.monkey.retromusic.ALBUM_SORT_ORDER
+import code.name.monkey.retromusic.APPBAR_MODE
 import code.name.monkey.retromusic.ARTIST_ALBUM_SORT_ORDER
 import code.name.monkey.retromusic.ARTIST_DETAIL_SONG_SORT_ORDER
 import code.name.monkey.retromusic.ARTIST_SONG_SORT_ORDER
@@ -14,28 +15,37 @@ import code.name.monkey.retromusic.ARTIST_SORT_ORDER
 import code.name.monkey.retromusic.MyApplication
 import code.name.monkey.retromusic.BLACK_THEME
 import code.name.monkey.retromusic.COLORED_APP_SHORTCUTS
+import code.name.monkey.retromusic.CUSTOM_FONT
+import code.name.monkey.retromusic.DESATURATED_COLOR
 import code.name.monkey.retromusic.FILTER_SONG
 import code.name.monkey.retromusic.GENERAL_THEME
 import code.name.monkey.retromusic.GENRE_SORT_ORDER
 import code.name.monkey.retromusic.INITIALIZED_BLACKLIST
 import code.name.monkey.retromusic.KEEP_SCREEN_ON
+import code.name.monkey.retromusic.LANGUAGE_NAME
 import code.name.monkey.retromusic.LAST_ADDED_CUTOFF
+import code.name.monkey.retromusic.LOCALE_AUTO_STORE_ENABLED
 import code.name.monkey.retromusic.MATERIAL_YOU
 import code.name.monkey.retromusic.PLAYLIST_SORT_ORDER
 import code.name.monkey.retromusic.RECENTLY_PLAYED_CUTOFF
 import code.name.monkey.retromusic.SHOW_WHEN_LOCKED
 import code.name.monkey.retromusic.SONG_SORT_ORDER
+import code.name.monkey.retromusic.TAB_TEXT_MODE
 import code.name.monkey.retromusic.TOGGLE_FULL_SCREEN
+import code.name.monkey.retromusic.TOGGLE_HOME_BANNER
 import code.name.monkey.retromusic.WALLPAPER_ACCENT
 import code.name.monkey.retromusic.WHITELIST_MUSIC
 
 import code.name.monkey.retromusic.extensions.getStringOrDefault
 import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.util.theme.ThemeMode
+import code.name.monkey.retromusic.views.TopAppBarLayout
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 object PreferenceUtil {
     private const val PREF_NAME = "MyPrefs"
-    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext())
+    private val sharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext())
     val isScreenOnEnabled get() = sharedPreferences.getBoolean(KEEP_SCREEN_ON, false)
 
     val isFullScreenMode
@@ -213,6 +223,57 @@ object PreferenceUtil {
                     else -> calendarUtil.elapsedMonth
                 }
             return (System.currentTimeMillis() - interval) / 1000
+        }
+
+    val tabTitleMode: Int
+        get() {
+            return when (sharedPreferences.getStringOrDefault(
+                TAB_TEXT_MODE, "0"
+            ).toInt()) {
+                0 -> BottomNavigationView.LABEL_VISIBILITY_AUTO
+                1 -> BottomNavigationView.LABEL_VISIBILITY_LABELED
+                2 -> BottomNavigationView.LABEL_VISIBILITY_SELECTED
+                3 -> BottomNavigationView.LABEL_VISIBILITY_UNLABELED
+                else -> BottomNavigationView.LABEL_VISIBILITY_LABELED
+            }
+        }
+
+    val isCustomFont
+        get() = sharedPreferences.getBoolean(CUSTOM_FONT, false)
+
+    var languageCode: String
+        get() = sharedPreferences.getString(LANGUAGE_NAME, "auto") ?: "auto"
+        set(value) = sharedPreferences.edit {
+            putString(LANGUAGE_NAME, value)
+        }
+
+    var isLocaleAutoStorageEnabled: Boolean
+        get() = sharedPreferences.getBoolean(
+            LOCALE_AUTO_STORE_ENABLED,
+            false
+        )
+        set(value) = sharedPreferences.edit {
+            putBoolean(LOCALE_AUTO_STORE_ENABLED, value)
+        }
+
+    var isDesaturatedColor
+        get() = sharedPreferences.getBoolean(
+            DESATURATED_COLOR, false
+        )
+        set(value) = sharedPreferences.edit {
+            putBoolean(DESATURATED_COLOR, value)
+        }
+
+    val isHomeBanner
+        get() = sharedPreferences.getBoolean(
+            TOGGLE_HOME_BANNER, false
+        )
+
+    val appBarMode: TopAppBarLayout.AppBarMode
+        get() = if (sharedPreferences.getString(APPBAR_MODE, "1") == "0") {
+            TopAppBarLayout.AppBarMode.COLLAPSING
+        } else {
+            TopAppBarLayout.AppBarMode.SIMPLE
         }
 }
 
