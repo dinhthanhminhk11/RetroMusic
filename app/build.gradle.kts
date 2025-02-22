@@ -24,12 +24,12 @@ fun getDate(): String {
 
 android {
     namespace = "code.name.monkey.retromusic"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "code.name.monkey.retromusic"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -255,5 +255,6 @@ dependencies {
     implementation (libs.fadingedgelayout)
     implementation (libs.jetradarmobile.android.snowfall)
     implementation (libs.fastscroll.library)
+    implementation (libs.androidx.mediarouter)
 
 }

@@ -4,6 +4,8 @@ package code.name.monkey.retromusic.util
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.util.VersionUtils
+import code.name.monkey.retromusic.ADAPTIVE_COLOR_APP
+import code.name.monkey.retromusic.ALBUM_COVER_STYLE
 import code.name.monkey.retromusic.ALBUM_DETAIL_SONG_SORT_ORDER
 import code.name.monkey.retromusic.ALBUM_SONG_SORT_ORDER
 import code.name.monkey.retromusic.ALBUM_SORT_ORDER
@@ -12,22 +14,36 @@ import code.name.monkey.retromusic.ARTIST_ALBUM_SORT_ORDER
 import code.name.monkey.retromusic.ARTIST_DETAIL_SONG_SORT_ORDER
 import code.name.monkey.retromusic.ARTIST_SONG_SORT_ORDER
 import code.name.monkey.retromusic.ARTIST_SORT_ORDER
+import code.name.monkey.retromusic.AUDIO_FADE_DURATION
 import code.name.monkey.retromusic.MyApplication
 import code.name.monkey.retromusic.BLACK_THEME
 import code.name.monkey.retromusic.COLORED_APP_SHORTCUTS
+import code.name.monkey.retromusic.CROSS_FADE_DURATION
 import code.name.monkey.retromusic.CUSTOM_FONT
 import code.name.monkey.retromusic.DESATURATED_COLOR
+import code.name.monkey.retromusic.EXPAND_NOW_PLAYING_PANEL
 import code.name.monkey.retromusic.FILTER_SONG
+import code.name.monkey.retromusic.GAP_LESS_PLAYBACK
 import code.name.monkey.retromusic.GENERAL_THEME
 import code.name.monkey.retromusic.GENRE_SORT_ORDER
+import code.name.monkey.retromusic.IGNORE_MEDIA_STORE_ARTWORK
 import code.name.monkey.retromusic.INITIALIZED_BLACKLIST
 import code.name.monkey.retromusic.KEEP_SCREEN_ON
 import code.name.monkey.retromusic.LANGUAGE_NAME
 import code.name.monkey.retromusic.LAST_ADDED_CUTOFF
+import code.name.monkey.retromusic.LAST_CHANGELOG_VERSION
+import code.name.monkey.retromusic.LAST_USED_TAB
+import code.name.monkey.retromusic.LIBRARY_CATEGORIES
 import code.name.monkey.retromusic.LOCALE_AUTO_STORE_ENABLED
+import code.name.monkey.retromusic.MANAGE_AUDIO_FOCUS
 import code.name.monkey.retromusic.MATERIAL_YOU
+import code.name.monkey.retromusic.NOW_PLAYING_SCREEN_ID
+import code.name.monkey.retromusic.PAUSE_HISTORY
+import code.name.monkey.retromusic.PLAYBACK_PITCH
+import code.name.monkey.retromusic.PLAYBACK_SPEED
 import code.name.monkey.retromusic.PLAYLIST_SORT_ORDER
 import code.name.monkey.retromusic.RECENTLY_PLAYED_CUTOFF
+import code.name.monkey.retromusic.REMEMBER_LAST_TAB
 import code.name.monkey.retromusic.SHOW_WHEN_LOCKED
 import code.name.monkey.retromusic.SONG_SORT_ORDER
 import code.name.monkey.retromusic.TAB_TEXT_MODE
@@ -37,15 +53,33 @@ import code.name.monkey.retromusic.WALLPAPER_ACCENT
 import code.name.monkey.retromusic.WHITELIST_MUSIC
 
 import code.name.monkey.retromusic.extensions.getStringOrDefault
+import code.name.monkey.retromusic.fragments.AlbumCoverStyle
+import code.name.monkey.retromusic.fragments.NowPlayingScreen
 import code.name.monkey.retromusic.helper.SortOrder
+import code.name.monkey.retromusic.model.CategoryInfo
 import code.name.monkey.retromusic.util.theme.ThemeMode
 import code.name.monkey.retromusic.views.TopAppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
+import com.google.gson.reflect.TypeToken
 
 object PreferenceUtil {
     private const val PREF_NAME = "MyPrefs"
     private val sharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(MyApplication.getContext())
+
+    val defaultCategories = listOf(
+        CategoryInfo(CategoryInfo.Category.Home, true),
+        CategoryInfo(CategoryInfo.Category.Songs, true),
+        CategoryInfo(CategoryInfo.Category.Albums, true),
+        CategoryInfo(CategoryInfo.Category.Artists, true),
+        CategoryInfo(CategoryInfo.Category.Playlists, true),
+        CategoryInfo(CategoryInfo.Category.Genres, false),
+        CategoryInfo(CategoryInfo.Category.Folder, false),
+        CategoryInfo(CategoryInfo.Category.Search, false)
+    )
+
     val isScreenOnEnabled get() = sharedPreferences.getBoolean(KEEP_SCREEN_ON, false)
 
     val isFullScreenMode
@@ -275,6 +309,124 @@ object PreferenceUtil {
         } else {
             TopAppBarLayout.AppBarMode.SIMPLE
         }
+
+    var libraryCategory: List<CategoryInfo>
+        get() {
+            val gson = Gson()
+            val collectionType = object : TypeToken<List<CategoryInfo>>() {}.type
+
+            val data = sharedPreferences.getStringOrDefault(
+                LIBRARY_CATEGORIES,
+                gson.toJson(defaultCategories, collectionType)
+            )
+            return try {
+                Gson().fromJson(data, collectionType)
+            } catch (e: JsonSyntaxException) {
+                e.printStackTrace()
+                return defaultCategories
+            }
+        }
+        set(value) {
+            val collectionType = object : TypeToken<List<CategoryInfo?>?>() {}.type
+            sharedPreferences.edit {
+                putString(LIBRARY_CATEGORIES, Gson().toJson(value, collectionType))
+            }
+        }
+
+    var albumCoverStyle: AlbumCoverStyle
+        get() {
+            val id: Int = sharedPreferences.getInt(ALBUM_COVER_STYLE, 0)
+            for (albumCoverStyle in AlbumCoverStyle.values()) {
+                if (albumCoverStyle.id == id) {
+                    return albumCoverStyle
+                }
+            }
+            return AlbumCoverStyle.Card
+        }
+        set(value) = sharedPreferences.edit { putInt(ALBUM_COVER_STYLE, value.id) }
+
+    var nowPlayingScreen: NowPlayingScreen
+        get() {
+            val id: Int = sharedPreferences.getInt(NOW_PLAYING_SCREEN_ID, 0)
+            for (nowPlayingScreen in NowPlayingScreen.values()) {
+                if (nowPlayingScreen.id == id) {
+                    return nowPlayingScreen
+                }
+            }
+            return NowPlayingScreen.Adaptive
+        }
+        set(value) = sharedPreferences.edit {
+            putInt(NOW_PLAYING_SCREEN_ID, value.id)
+            // Also set a cover theme for that now playing
+            value.defaultCoverTheme?.let { coverTheme -> albumCoverStyle = coverTheme }
+        }
+
+    val isAdaptiveColor
+        get() = sharedPreferences.getBoolean(
+            ADAPTIVE_COLOR_APP, false
+        )
+
+    var lastTab: Int
+        get() = sharedPreferences
+            .getInt(LAST_USED_TAB, 0)
+        set(value) = sharedPreferences.edit { putInt(LAST_USED_TAB, value) }
+
+    var lastVersion
+        // This was stored as an integer before now it's a long, so avoid a ClassCastException
+        get() = try {
+            sharedPreferences.getLong(LAST_CHANGELOG_VERSION, 0)
+        } catch (e: ClassCastException) {
+            sharedPreferences.edit { remove(LAST_CHANGELOG_VERSION) }
+            0
+        }
+        set(value) = sharedPreferences.edit {
+            putLong(LAST_CHANGELOG_VERSION, value)
+        }
+
+    val rememberLastTab: Boolean
+        get() = sharedPreferences.getBoolean(REMEMBER_LAST_TAB, true)
+
+    val isIgnoreMediaStoreArtwork
+        get() = sharedPreferences.getBoolean(
+            IGNORE_MEDIA_STORE_ARTWORK,
+            false
+        )
+
+    val isExpandPanel get() = sharedPreferences.getBoolean(EXPAND_NOW_PLAYING_PANEL, false)
+
+    val pauseHistory: Boolean
+        get() = sharedPreferences.getBoolean(
+            PAUSE_HISTORY,
+            false
+        )
+
+    val isAudioFocusEnabled
+        get() = sharedPreferences.getBoolean(
+            MANAGE_AUDIO_FOCUS, false
+        )
+    var playbackSpeed
+        get() = sharedPreferences
+            .getFloat(PLAYBACK_SPEED, 1F)
+        set(value) = sharedPreferences.edit { putFloat(PLAYBACK_SPEED, value) }
+
+    var playbackPitch
+        get() = sharedPreferences
+            .getFloat(PLAYBACK_PITCH, 1F)
+        set(value) = sharedPreferences.edit { putFloat(PLAYBACK_PITCH, value) }
+
+    val isGapLessPlayback
+        get() = sharedPreferences.getBoolean(
+            GAP_LESS_PLAYBACK, false
+        )
+
+    var audioFadeDuration
+        get() = sharedPreferences
+            .getInt(AUDIO_FADE_DURATION, 0)
+        set(value) = sharedPreferences.edit { putInt(AUDIO_FADE_DURATION, value) }
+
+    val crossFadeDuration
+        get() = sharedPreferences
+            .getInt(CROSS_FADE_DURATION, 0)
 }
 
 enum class CoverLyricsType {

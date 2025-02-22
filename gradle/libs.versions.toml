@@ -59,7 +59,7 @@ tankery_circularSeekBar_version = "1.4.2"
 fadingedgelayout = "1.0.0"
 jetradarmobile_androidSnowfall_version = "1.2.1"
 fast_scroll_libraryVersion = "1.2.0"
-
+mediarouter = "1.6.0"
 
 
 [plugins]
@@ -180,4 +180,5 @@ tankery-circularSeekBar = { module = "me.tankery.lib:circularSeekBar", version.r
 fadingedgelayout = { module = "com.github.bosphere.android-fadingedgelayout:fadingedgelayout", version.ref = "fadingedgelayout" }
 jetradarmobile-android-snowfall = { module = "com.github.jetradarmobile:android-snowfall", version.ref = "jetradarmobile_androidSnowfall_version" }
 fastscroll-library = { module = "me.zhanghai.android.fastscroll:library", version.ref = "fast_scroll_libraryVersion" }
+androidx-mediarouter = { group = "androidx.mediarouter", name = "mediarouter", version.ref = "mediarouter" }
 

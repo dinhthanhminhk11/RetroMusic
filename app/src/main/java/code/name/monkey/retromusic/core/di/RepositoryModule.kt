@@ -4,6 +4,7 @@ import android.content.Context
 import code.name.monkey.retromusic.db.dao.HistoryDao
 import code.name.monkey.retromusic.db.dao.PlayCountDao
 import code.name.monkey.retromusic.db.dao.PlaylistDao
+import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.repository.RepositoryImpl
 import code.name.monkey.retromusic.repository.dataSource.AlbumLocalRepository
@@ -24,6 +25,7 @@ import code.name.monkey.retromusic.repository.dataSourceImpl.RoomRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.SearchLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.SongLocalRepositoryImpl
 import code.name.monkey.retromusic.repository.dataSourceImpl.TopPlayedLocalRepositoryImpl
+import code.name.monkey.retromusic.service.MusicService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -156,5 +158,10 @@ class RepositoryModule {
         )
     }
 
+    @Provides
+    @Singleton
+    fun provideMusicPlayerRemote(songRepository: SongLocalRepository): MusicPlayerRemote {
+        return MusicPlayerRemote(songRepository)
+    }
 
 }

@@ -8,7 +8,8 @@ object Constants {
     const val IS_MUSIC =
         MediaStore.Audio.AudioColumns.IS_MUSIC + "=1" + " AND " + MediaStore.Audio.AudioColumns.TITLE + " != ''"
     const val DATA = "_data"
-
+    const val USER_PROFILE = "profile.jpg"
+    const val USER_BANNER = "banner.jpg"
     @Suppress("Deprecation")
     val baseProjection = arrayOf(
         BaseColumns._ID, // 0
