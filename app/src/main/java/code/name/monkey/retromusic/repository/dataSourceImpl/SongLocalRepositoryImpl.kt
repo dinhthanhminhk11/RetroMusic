@@ -25,7 +25,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.text.Collator
 import javax.inject.Inject
 
-class SongLocalRepositoryImpl(private val context: Context) :
+class SongLocalRepositoryImpl @Inject constructor(private val context: Context) :
     SongLocalRepository { // có class thì dùng inject constructor
     override fun songs(): List<Song> {
         return sortedSongs(makeSongCursor(context, null, null))

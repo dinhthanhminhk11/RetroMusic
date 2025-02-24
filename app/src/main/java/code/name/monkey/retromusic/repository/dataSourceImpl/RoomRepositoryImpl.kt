@@ -20,8 +20,9 @@ import code.name.monkey.retromusic.helper.SortOrder.PlaylistSortOrder.Companion.
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.repository.dataSource.RoomRepository
 import code.name.monkey.retromusic.util.PreferenceUtil
+import javax.inject.Inject
 
-class RoomRepositoryImpl(
+class RoomRepositoryImpl @Inject constructor(
     private val playlistDao: PlaylistDao,
     private val playCountDao: PlayCountDao,
     private val historyDao: HistoryDao

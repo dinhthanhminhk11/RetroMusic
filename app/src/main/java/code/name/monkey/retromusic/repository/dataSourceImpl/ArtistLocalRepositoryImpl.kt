@@ -13,8 +13,9 @@ import code.name.monkey.retromusic.util.makeSongCursor
 import code.name.monkey.retromusic.util.splitIntoAlbums
 import code.name.monkey.retromusic.util.splitIntoArtists
 import java.text.Collator
+import javax.inject.Inject
 
-class ArtistLocalRepositoryImpl(
+class ArtistLocalRepositoryImpl @Inject constructor(
     private val context: Context,
     private val songRepository: SongLocalRepository,
 ) : ArtistLocalRepository {
@@ -149,7 +150,6 @@ class ArtistLocalRepositoryImpl(
                 }
             }
     }
-
 
 
     private fun sortArtists(artists: List<Artist>): List<Artist> {

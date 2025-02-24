@@ -3,11 +3,16 @@ package code.name.monkey.retromusic.service
 import android.content.Context
 import android.content.Intent
 import android.media.audiofx.AudioEffect
+import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.service.playback.Playback
 import code.name.monkey.retromusic.util.PreferenceUtil
+import javax.inject.Inject
 
-class PlaybackManager(val context: Context) {
+class PlaybackManager @Inject constructor(
+    val context: Context,
+    private val musicPlayerRemote: MusicPlayerRemote
+) {
 
     var playback: Playback? = null
     private var playbackLocation = PlaybackLocation.LOCAL
@@ -114,7 +119,7 @@ class PlaybackManager(val context: Context) {
                 playback?.release()
             }
             playback = null
-            playback = CrossFadePlayer(context)
+            playback = CrossFadePlayer(context, musicPlayerRemote)
             return true
         }
         return false
@@ -139,7 +144,8 @@ class PlaybackManager(val context: Context) {
         if (playback != null) {
             audioEffectsIntent.putExtra(
                 AudioEffect.EXTRA_AUDIO_SESSION,
-                playback!!.audioSessionId)
+                playback!!.audioSessionId
+            )
         }
         audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.packageName)
         context.sendBroadcast(audioEffectsIntent)
@@ -175,7 +181,7 @@ class PlaybackManager(val context: Context) {
         return if (PreferenceUtil.crossFadeDuration == 0) {
             MultiPlayer(context)
         } else {
-            CrossFadePlayer(context)
+            CrossFadePlayer(context, musicPlayerRemote)
         }
     }
 

@@ -28,8 +28,9 @@ import code.name.monkey.retromusic.repository.dataSource.RoomRepository
 import code.name.monkey.retromusic.repository.dataSource.SearchLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.TopPlayedLocalRepository
+import javax.inject.Inject
 
-class RepositoryImpl(
+class RepositoryImpl @Inject constructor(
     private val context: Context,
     private val songRepository: SongLocalRepository,
     private val albumRepository: AlbumLocalRepository,

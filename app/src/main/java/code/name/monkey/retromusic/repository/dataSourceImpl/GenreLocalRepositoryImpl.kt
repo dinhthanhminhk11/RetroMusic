@@ -14,8 +14,9 @@ import code.name.monkey.retromusic.repository.dataSource.GenreLocalRepository
 import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.makeSongCursor
+import javax.inject.Inject
 
-class GenreLocalRepositoryImpl(
+class GenreLocalRepositoryImpl @Inject constructor(
     private val context: Context,
     private val songRepository: SongLocalRepository
 ) : GenreLocalRepository {

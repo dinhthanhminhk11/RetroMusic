@@ -16,6 +16,7 @@ import code.name.monkey.retromusic.service.playback.Playback.PlaybackCallbacks
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.logE
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 /** @author Prathamesh M */
 
@@ -26,7 +27,7 @@ import kotlinx.coroutines.*
 * play but with decreasing volume and start the player with the next song with increasing volume
 * and vice versa for upcoming song and so on.
 */
-class CrossFadePlayer(context: Context, private val musicPlayerRemote: MusicPlayerRemote) :
+class CrossFadePlayer @Inject constructor(context: Context, private val musicPlayerRemote: MusicPlayerRemote) :
     LocalPlayback(context) {
 
     private var currentPlayer: CurrentPlayer = CurrentPlayer.NOT_SET

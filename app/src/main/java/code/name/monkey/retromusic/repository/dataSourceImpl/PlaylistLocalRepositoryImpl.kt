@@ -13,8 +13,9 @@ import code.name.monkey.retromusic.model.Playlist
 import code.name.monkey.retromusic.model.PlaylistSong
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.repository.dataSource.PlaylistLocalRepository
+import javax.inject.Inject
 
-class PlaylistLocalRepositoryImpl(private val contentResolver: ContentResolver) :
+class PlaylistLocalRepositoryImpl @Inject constructor(private val contentResolver: ContentResolver) :
     PlaylistLocalRepository {
     override fun playlist(cursor: Cursor?): Playlist {
         return cursor.use {

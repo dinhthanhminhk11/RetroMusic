@@ -9,8 +9,9 @@ import code.name.monkey.retromusic.util.getSongLoaderSortOrder
 import code.name.monkey.retromusic.util.makeSongCursor
 import code.name.monkey.retromusic.util.sortAlbumSongs
 import code.name.monkey.retromusic.util.splitIntoAlbums
+import javax.inject.Inject
 
-class AlbumLocalRepositoryImpl(
+class AlbumLocalRepositoryImpl @Inject constructor(
     private val context: Context,
     private val songRepository: SongLocalRepository
 ) : AlbumLocalRepository {

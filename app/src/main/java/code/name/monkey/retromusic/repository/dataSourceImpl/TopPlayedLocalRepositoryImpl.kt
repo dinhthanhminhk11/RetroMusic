@@ -17,8 +17,9 @@ import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.makeSongCursor
 import code.name.monkey.retromusic.util.splitIntoAlbums
 import code.name.monkey.retromusic.util.splitIntoArtists
+import javax.inject.Inject
 
-class TopPlayedLocalRepositoryImpl(
+class TopPlayedLocalRepositoryImpl @Inject constructor(
     private val context: Context,
     private val songRepository: SongLocalRepository
 ) : TopPlayedLocalRepository {
