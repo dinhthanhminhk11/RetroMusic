@@ -155,5 +155,4 @@ class RepositoryModule {
             roomRepository
         )
     }
-
 }

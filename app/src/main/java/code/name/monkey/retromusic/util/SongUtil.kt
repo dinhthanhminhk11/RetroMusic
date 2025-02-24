@@ -7,6 +7,10 @@ import android.os.Environment
 import android.provider.MediaStore
 import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.Constants
+import code.name.monkey.retromusic.extensions.getInt
+import code.name.monkey.retromusic.extensions.getLong
+import code.name.monkey.retromusic.extensions.getString
+import code.name.monkey.retromusic.extensions.getStringOrNull
 import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
@@ -165,4 +169,48 @@ fun getSongLoaderSortOrder(): String {
 fun splitIntoArtists(albums: List<Album>): List<Artist> {
     return albums.groupBy { it.artistId }
         .map { Artist(it.key, it.value) }
+}
+
+fun songs(cursor: Cursor?): List<Song> {
+    val songs = arrayListOf<Song>()
+    if (cursor != null && cursor.moveToFirst()) {
+        do {
+            songs.add(getSongFromCursorImpl(cursor))
+        } while (cursor.moveToNext())
+    }
+    cursor?.close()
+    return songs
+}
+
+fun getSongFromCursorImpl(
+    cursor: Cursor
+): Song {
+    val id = cursor.getLong(MediaStore.Audio.AudioColumns._ID)
+    val title = cursor.getString(MediaStore.Audio.AudioColumns.TITLE)
+    val trackNumber = cursor.getInt(MediaStore.Audio.AudioColumns.TRACK)
+    val year = cursor.getInt(MediaStore.Audio.AudioColumns.YEAR)
+    val duration = cursor.getLong(MediaStore.Audio.AudioColumns.DURATION)
+    val data = cursor.getString(Constants.DATA)
+    val dateModified = cursor.getLong(MediaStore.Audio.AudioColumns.DATE_MODIFIED)
+    val albumId = cursor.getLong(MediaStore.Audio.AudioColumns.ALBUM_ID)
+    val albumName = cursor.getStringOrNull(MediaStore.Audio.AudioColumns.ALBUM)
+    val artistId = cursor.getLong(MediaStore.Audio.AudioColumns.ARTIST_ID)
+    val artistName = cursor.getStringOrNull(MediaStore.Audio.AudioColumns.ARTIST)
+    val composer = cursor.getStringOrNull(MediaStore.Audio.AudioColumns.COMPOSER)
+    val albumArtist = cursor.getStringOrNull("album_artist")
+    return Song(
+        id,
+        title,
+        trackNumber,
+        year,
+        duration,
+        data,
+        dateModified,
+        albumId,
+        albumName ?: "",
+        artistId,
+        artistName ?: "",
+        composer ?: "",
+        albumArtist ?: ""
+    )
 }

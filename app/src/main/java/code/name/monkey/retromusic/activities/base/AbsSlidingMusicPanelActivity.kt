@@ -78,12 +78,10 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
         val TAG: String = AbsSlidingMusicPanelActivity::class.java.simpleName
     }
 
-    @Inject
-    lateinit var musicPlayerRemote: MusicPlayerRemote
-
     var fromNotification = false
     private var windowInsets: WindowInsetsCompat? = null
-//    protected val libraryViewModel by viewModel<LibraryViewModel>()
+
+    //    protected val libraryViewModel by viewModel<LibraryViewModel>()
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>
     private lateinit var playerFragment: AbsPlayerFragment
     private var miniPlayerFragment: MiniPlayerFragment? = null
@@ -158,7 +156,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
                     }
 
                     BottomSheetBehavior.STATE_HIDDEN -> {
-                        musicPlayerRemote.clearQueue()
+                        MusicPlayerRemote.clearQueue()
                     }
 
                     else -> {
@@ -378,7 +376,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
         // Mini player should be hidden in Playing Queue
         // it may pop up if hideBottomSheet is called
         if (currentFragment(R.id.fragment_container) !is PlayingQueueFragment) {
-            hideBottomSheet(musicPlayerRemote.playingQueue.isEmpty())
+            hideBottomSheet(MusicPlayerRemote.playingQueue.isEmpty())
         }
     }
 
@@ -456,7 +454,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
     fun setBottomNavVisibility(
         visible: Boolean,
         animate: Boolean = false,
-        hideBottomSheet: Boolean = musicPlayerRemote.playingQueue.isEmpty(),
+        hideBottomSheet: Boolean = MusicPlayerRemote.playingQueue.isEmpty(),
     ) {
         if (isInOneTabMode) {
             hideBottomSheet(
@@ -505,7 +503,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
 //                if (isBottomNavVisible) dip(R.dimen.bottom_nav_height) else 0
 //            )
         } else {
-            if (musicPlayerRemote.playingQueue.isNotEmpty()) {
+            if (MusicPlayerRemote.playingQueue.isNotEmpty()) {
                 binding.slidingPanel.elevation = 0F
                 binding.navigationView.elevation = 5F
                 if (isBottomNavVisible) {

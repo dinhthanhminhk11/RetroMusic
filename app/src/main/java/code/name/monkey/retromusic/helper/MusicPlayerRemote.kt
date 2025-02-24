@@ -12,8 +12,10 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.IBinder
 import android.provider.DocumentsContract
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import code.name.monkey.retromusic.Constants
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.model.Song
@@ -22,6 +24,8 @@ import code.name.monkey.retromusic.service.CastPlayer
 import code.name.monkey.retromusic.service.MusicService
 import code.name.monkey.retromusic.util.getExternalStorageDirectory
 import code.name.monkey.retromusic.util.logE
+import code.name.monkey.retromusic.util.makeSongCursor
+import code.name.monkey.retromusic.util.songs
 import java.io.File
 import java.util.ArrayList
 import java.util.Random
@@ -30,8 +34,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
-@Singleton
-class MusicPlayerRemote @Inject constructor(private val songRepository: SongLocalRepository) {
+object MusicPlayerRemote {
     val TAG: String = MusicPlayerRemote::class.java.simpleName
     private val mConnectionMap = WeakHashMap<Context, ServiceBinder>()
     var musicService: MusicService? = null
@@ -408,7 +411,13 @@ class MusicPlayerRemote @Inject constructor(private val songRepository: SongLoca
                         songId = uri.lastPathSegment
                     }
                     if (songId != null) {
-                        songs = songRepository.songs(songId)
+                        songs = songs(
+                            makeSongCursor(
+                                context,
+                                MediaStore.Audio.AudioColumns.TITLE + " LIKE ?",
+                                arrayOf("%$songId%")
+                            )
+                        )
                     }
                 }
             }
@@ -429,7 +438,14 @@ class MusicPlayerRemote @Inject constructor(private val songRepository: SongLoca
                     songFile = File(uri.path!!)
                 }
                 if (songFile != null) {
-                    songs = songRepository.songsByFilePath(songFile.absolutePath, true)
+                    songs = songs(
+                        makeSongCursor(
+                            context,
+                            Constants.DATA + "=?",
+                            arrayOf(songFile.absolutePath),
+                            ignoreBlacklist = true
+                        )
+                    )
                 }
             }
             if (!songs.isNullOrEmpty()) {
@@ -457,7 +473,7 @@ class MusicPlayerRemote @Inject constructor(private val songRepository: SongLoca
         musicService?.switchToLocalPlayback()
     }
 
-    inner class ServiceBinder internal constructor(private val mCallback: ServiceConnection?) :
+    class ServiceBinder internal constructor(private val mCallback: ServiceConnection?) :
         ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {

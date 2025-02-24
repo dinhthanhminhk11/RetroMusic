@@ -1,6 +1,7 @@
 package code.name.monkey.retromusic.util
 
 
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.util.VersionUtils
@@ -44,8 +45,11 @@ import code.name.monkey.retromusic.PLAYBACK_SPEED
 import code.name.monkey.retromusic.PLAYLIST_SORT_ORDER
 import code.name.monkey.retromusic.RECENTLY_PLAYED_CUTOFF
 import code.name.monkey.retromusic.REMEMBER_LAST_TAB
+import code.name.monkey.retromusic.SCREEN_ON_LYRICS
+import code.name.monkey.retromusic.SHOW_LYRICS
 import code.name.monkey.retromusic.SHOW_WHEN_LOCKED
 import code.name.monkey.retromusic.SONG_SORT_ORDER
+import code.name.monkey.retromusic.SWIPE_DOWN_DISMISS
 import code.name.monkey.retromusic.TAB_TEXT_MODE
 import code.name.monkey.retromusic.TOGGLE_FULL_SCREEN
 import code.name.monkey.retromusic.TOGGLE_HOME_BANNER
@@ -427,6 +431,26 @@ object PreferenceUtil {
     val crossFadeDuration
         get() = sharedPreferences
             .getInt(CROSS_FADE_DURATION, 0)
+
+    val lyricsScreenOn
+        get() = sharedPreferences.getBoolean(SCREEN_ON_LYRICS, false)
+
+    var showLyrics: Boolean
+        get() = sharedPreferences.getBoolean(SHOW_LYRICS, false)
+        set(value) = sharedPreferences.edit { putBoolean(SHOW_LYRICS, value) }
+
+
+    val swipeDownToDismiss
+        get() = sharedPreferences.getBoolean(SWIPE_DOWN_DISMISS, true)
+
+    fun registerOnSharedPreferenceChangedListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener,
+    ) = sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
+
+
+    fun unregisterOnSharedPreferenceChangedListener(
+        changeListener: SharedPreferences.OnSharedPreferenceChangeListener,
+    ) = sharedPreferences.unregisterOnSharedPreferenceChangeListener(changeListener)
 }
 
 enum class CoverLyricsType {

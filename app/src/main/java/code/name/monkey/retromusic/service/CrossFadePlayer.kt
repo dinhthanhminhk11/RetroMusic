@@ -27,7 +27,7 @@ import javax.inject.Inject
 * play but with decreasing volume and start the player with the next song with increasing volume
 * and vice versa for upcoming song and so on.
 */
-class CrossFadePlayer @Inject constructor(context: Context, private val musicPlayerRemote: MusicPlayerRemote) :
+class CrossFadePlayer(context: Context) :
     LocalPlayback(context) {
 
     private var currentPlayer: CurrentPlayer = CurrentPlayer.NOT_SET
@@ -310,7 +310,7 @@ class CrossFadePlayer @Inject constructor(context: Context, private val musicPla
     fun onDurationUpdated(progress: Int, total: Int) {
         if (total > 0 && (total - progress).div(1000) == crossFadeDuration) {
             getNextPlayer()?.let { player ->
-                val nextSong = musicPlayerRemote.nextSong
+                val nextSong = MusicPlayerRemote.nextSong
                 // Switch to other player (Crossfade) only if next song exists
                 // If we get an empty song it's can be because the app was cleared from background
                 // And MusicPlayerRemote don't have access to MusicService

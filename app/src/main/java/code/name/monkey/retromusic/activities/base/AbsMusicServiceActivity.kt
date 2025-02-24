@@ -20,7 +20,6 @@ import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.service.MusicService
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.logD
-import dagger.hilt.android.migration.CustomInjection.inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
@@ -30,7 +29,8 @@ abstract class AbsMusicServiceActivity : AbsBaseActivity(), IMusicServiceEventLi
     private val mMusicServiceEventListeners = ArrayList<IMusicServiceEventListener>()
 
     @Inject
-    lateinit var  repository: Repository
+    lateinit var repository: Repository
+
     @Inject
     lateinit var musicPlayerRemote: MusicPlayerRemote
 

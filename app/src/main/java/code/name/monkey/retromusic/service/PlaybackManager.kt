@@ -9,9 +9,8 @@ import code.name.monkey.retromusic.service.playback.Playback
 import code.name.monkey.retromusic.util.PreferenceUtil
 import javax.inject.Inject
 
-class PlaybackManager @Inject constructor(
-    val context: Context,
-    private val musicPlayerRemote: MusicPlayerRemote
+class PlaybackManager(
+    val context: Context
 ) {
 
     var playback: Playback? = null
@@ -119,7 +118,7 @@ class PlaybackManager @Inject constructor(
                 playback?.release()
             }
             playback = null
-            playback = CrossFadePlayer(context, musicPlayerRemote)
+            playback = CrossFadePlayer(context)
             return true
         }
         return false
@@ -181,7 +180,7 @@ class PlaybackManager @Inject constructor(
         return if (PreferenceUtil.crossFadeDuration == 0) {
             MultiPlayer(context)
         } else {
-            CrossFadePlayer(context, musicPlayerRemote)
+            CrossFadePlayer(context)
         }
     }
 
