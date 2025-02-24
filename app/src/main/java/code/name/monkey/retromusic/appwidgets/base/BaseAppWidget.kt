@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
 package code.name.monkey.retromusic.appwidgets.base
 
 import android.app.PendingIntent
@@ -6,13 +20,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapShader
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.RectF
-import android.graphics.Shader
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.widget.RemoteViews
@@ -22,6 +30,11 @@ import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.service.MusicService
+import code.name.monkey.retromusic.service.MusicService.Companion.APP_WIDGET_UPDATE
+import code.name.monkey.retromusic.service.MusicService.Companion.EXTRA_APP_WIDGET_NAME
+import code.name.monkey.retromusic.service.MusicService.Companion.FAVORITE_STATE_CHANGED
+import code.name.monkey.retromusic.service.MusicService.Companion.META_CHANGED
+import code.name.monkey.retromusic.service.MusicService.Companion.PLAY_STATE_CHANGED
 
 abstract class BaseAppWidget : AppWidgetProvider() {
 
@@ -34,8 +47,8 @@ abstract class BaseAppWidget : AppWidgetProvider() {
         appWidgetIds: IntArray
     ) {
         defaultAppWidget(context, appWidgetIds)
-        val updateIntent = Intent(MusicService.APP_WIDGET_UPDATE)
-        updateIntent.putExtra(MusicService.EXTRA_APP_WIDGET_NAME, NAME)
+        val updateIntent = Intent(APP_WIDGET_UPDATE)
+        updateIntent.putExtra(EXTRA_APP_WIDGET_NAME, NAME)
         updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
         updateIntent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY)
         LocalBroadcastManager.getInstance(context).sendBroadcast(updateIntent)
@@ -46,7 +59,7 @@ abstract class BaseAppWidget : AppWidgetProvider() {
      */
     fun notifyChange(service: MusicService, what: String) {
         if (hasInstances(service)) {
-            if (MusicService.META_CHANGED == what || MusicService.PLAY_STATE_CHANGED == what || MusicService.FAVORITE_STATE_CHANGED == what) {
+            if (META_CHANGED == what || PLAY_STATE_CHANGED == what || FAVORITE_STATE_CHANGED == what) {
                 performUpdate(service, null)
             }
         }

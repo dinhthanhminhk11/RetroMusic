@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2019 Hemanth Savarala.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by
+ *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ */
+
 package code.name.monkey.retromusic.util
 
 import android.content.Context
@@ -7,17 +21,18 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.core.content.edit
-import code.name.monkey.retromusic.MyApplication
+import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.model.Artist
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
-import java.util.Locale
+import java.util.*
+
 
 class CustomArtistImageUtil private constructor(context: Context) {
 
@@ -27,8 +42,8 @@ class CustomArtistImageUtil private constructor(context: Context) {
     )
 
     suspend fun setCustomArtistImage(artist: Artist, uri: Uri) {
-        val context = MyApplication.getContext()
-        withContext(Dispatchers.IO) {
+        val context = App.getContext()
+        withContext(IO) {
             runCatching {
                 Glide.with(context)
                     .asBitmap()
@@ -78,10 +93,10 @@ class CustomArtistImageUtil private constructor(context: Context) {
     }
 
     suspend fun resetCustomArtistImage(artist: Artist) {
-        withContext(Dispatchers.IO) {
+        withContext(IO) {
             mPreferences.edit { putBoolean(getFileName(artist), false) }
-            ArtistSignatureUtil.getInstance(MyApplication.getContext()).updateArtistSignature(artist.name)
-            MyApplication.getContext().contentResolver.notifyChange(
+            ArtistSignatureUtil.getInstance(App.getContext()).updateArtistSignature(artist.name)
+            App.getContext().contentResolver.notifyChange(
                 MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
                 null
             ) // trigger media store changed to force artist image reload
@@ -120,7 +135,7 @@ class CustomArtistImageUtil private constructor(context: Context) {
 
         @JvmStatic
         fun getFile(artist: Artist): File {
-            val dir = File(MyApplication.getContext().filesDir, FOLDER_NAME)
+            val dir = File(App.getContext().filesDir, FOLDER_NAME)
             return File(dir, getFileName(artist))
         }
     }

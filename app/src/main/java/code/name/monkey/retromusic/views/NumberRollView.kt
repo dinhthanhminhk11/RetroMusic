@@ -1,3 +1,6 @@
+// Copyright 2015 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 package code.name.monkey.retromusic.views
 
 import android.animation.Animator
@@ -13,6 +16,10 @@ import androidx.annotation.VisibleForTesting
 import code.name.monkey.retromusic.R
 import java.text.NumberFormat
 
+/**
+ * View that shows an integer number. It provides a smooth roll animation on changing the
+ * number.
+ */
 class NumberRollView(context: Context?, attrs: AttributeSet?) :
     FrameLayout(context!!, attrs) {
     private var mUpNumber: TextView? = null

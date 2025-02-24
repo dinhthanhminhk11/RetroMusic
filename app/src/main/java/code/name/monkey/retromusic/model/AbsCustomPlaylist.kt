@@ -1,23 +1,21 @@
 package code.name.monkey.retromusic.model
 
-import code.name.monkey.retromusic.repository.dataSource.LastAddedLocalRepository
-import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
-import code.name.monkey.retromusic.repository.dataSource.TopPlayedLocalRepository
-import javax.inject.Inject
+import code.name.monkey.retromusic.repository.LastAddedRepository
+import code.name.monkey.retromusic.repository.SongRepository
+import code.name.monkey.retromusic.repository.TopPlayedRepository
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 abstract class AbsCustomPlaylist(
     id: Long,
     name: String
-) : Playlist(id, name) {
-
-    @Inject
-    protected lateinit var songRepository: SongLocalRepository
-
-    @Inject
-    protected lateinit var topPlayedRepository: TopPlayedLocalRepository
-
-    @Inject
-    protected lateinit var lastAddedRepository: LastAddedLocalRepository
+) : Playlist(id, name), KoinComponent {
 
     abstract fun songs(): List<Song>
+
+    protected val songRepository by inject<SongRepository>()
+
+    protected val topPlayedRepository by inject<TopPlayedRepository>()
+
+    protected val lastAddedRepository by inject<LastAddedRepository>()
 }

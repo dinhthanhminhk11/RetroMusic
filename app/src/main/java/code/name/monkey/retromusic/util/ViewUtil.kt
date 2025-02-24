@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2019 Hemanth Savarala.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by
+ *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ */
+
 package code.name.monkey.retromusic.util
 
 import android.content.res.ColorStateList
@@ -8,7 +22,7 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.SeekBar
 import androidx.core.graphics.BlendModeColorFilterCompat
-import androidx.core.graphics.BlendModeCompat
+import androidx.core.graphics.BlendModeCompat.SRC_IN
 import code.name.monkey.appthemehelper.util.ATHUtil
 import code.name.monkey.appthemehelper.util.ColorUtil
 import code.name.monkey.appthemehelper.util.MaterialValueHelper
@@ -26,10 +40,7 @@ object ViewUtil {
             val layerDrawable = progressSlider.progressDrawable as LayerDrawable
             val progressDrawable = layerDrawable.findDrawableByLayerId(android.R.id.progress)
             progressDrawable.colorFilter =
-                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                    newColor,
-                    BlendModeCompat.SRC_IN
-                )
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(newColor, SRC_IN)
         } else {
             progressSlider.progressTintList = ColorStateList.valueOf(newColor)
         }
@@ -42,10 +53,7 @@ object ViewUtil {
 
         val progress = layerDrawable.findDrawableByLayerId(android.R.id.progress)
         progress.colorFilter =
-            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                newColor,
-                BlendModeCompat.SRC_IN
-            )
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(newColor, SRC_IN)
 
         val background = layerDrawable.findDrawableByLayerId(android.R.id.background)
         val primaryColor =
@@ -54,7 +62,7 @@ object ViewUtil {
             MaterialValueHelper.getPrimaryDisabledTextColor(
                 progressSlider.context,
                 ColorUtil.isColorLight(primaryColor)
-            ), BlendModeCompat.SRC_IN
+            ), SRC_IN
         )
 
         val secondaryProgress = layerDrawable.findDrawableByLayerId(android.R.id.secondaryProgress)
@@ -63,7 +71,7 @@ object ViewUtil {
                 ColorUtil.withAlpha(
                     newColor,
                     0.65f
-                ), BlendModeCompat.SRC_IN
+                ), SRC_IN
             )
     }
 

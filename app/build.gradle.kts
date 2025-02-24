@@ -14,6 +14,7 @@ plugins {
     alias(libs.plugins.ksp)
     kotlin("kapt")
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.androidx.navigation.safe.args)
 }
 
 fun getDate(): String {
@@ -77,19 +78,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-    }
-
-    packaging {
-        packagingOptions.resources.excludes += setOf(
-            // Exclude AndroidX version files
-            "META-INF/*.version",
-            // Exclude consumer proguard files
-            "META-INF/proguard/*",
-            // Exclude the Firebase/Fabric/other random properties files
-            "/*.properties",
-            "fabric/*.properties",
-            "META-INF/*.properties",
-        )
     }
 
     kapt {
@@ -173,6 +161,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.runtime)
 
 
@@ -190,7 +179,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.livedata)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.extensions)
     implementation(libs.androidx.legacy.support.v4)
     // firebase
@@ -212,6 +201,8 @@ dependencies {
     implementation(libs.okhttp3.logging.interceptor)
 
     implementation(libs.glide)
+    kapt(libs.glide.ksp)
+    implementation(libs.glide.okhttp3.integration)
     implementation(libs.eventbus)
     //ui library
     implementation(libs.shimmer)
@@ -249,12 +240,19 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
-    implementation (libs.androidx.core.splashscreen)
-    implementation (libs.material.intro)
-    implementation (libs.tankery.circularSeekBar)
-    implementation (libs.fadingedgelayout)
-    implementation (libs.jetradarmobile.android.snowfall)
-    implementation (libs.fastscroll.library)
-    implementation (libs.androidx.mediarouter)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.material.intro)
+    implementation(libs.tankery.circularSeekBar)
+    implementation(libs.fadingedgelayout)
+    implementation(libs.jetradarmobile.android.snowfall)
+    implementation(libs.fastscroll.library)
+    implementation(libs.androidx.mediarouter)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.advrecyclerview)
+    implementation(libs.slidableactivity)
+    implementation(libs.dhaval2404.imagepicker)
+    implementation(libs.keyboardvisibilityevent)
+
 
 }

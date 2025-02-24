@@ -9,6 +9,7 @@ import code.name.monkey.retromusic.databinding.CollapsingAppbarLayoutBinding
 import code.name.monkey.retromusic.databinding.SimpleAppbarLayoutBinding
 import code.name.monkey.retromusic.util.PreferenceUtil
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.shape.MaterialShapeDrawable
 import dev.chrisbanes.insetter.applyInsetter
@@ -47,7 +48,7 @@ class TopAppBarLayout @JvmOverloads constructor(
 
     fun pinWhenScrolled() {
         simpleAppbarBinding?.root?.updateLayoutParams<LayoutParams> {
-            scrollFlags = LayoutParams.SCROLL_FLAG_NO_SCROLL
+            scrollFlags = SCROLL_FLAG_NO_SCROLL
         }
     }
 

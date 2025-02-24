@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2019 Hemanth Savarala.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by
+ *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ */
 package code.name.monkey.retromusic.service
 
 import android.annotation.SuppressLint
@@ -5,25 +18,18 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.SharedPreferences
+import android.content.*
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.ServiceInfo
 import android.database.ContentObserver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.media.AudioManager
-import android.os.Binder
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.IBinder
-import android.os.Looper
-import android.os.PowerManager
+import android.os.*
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
+import android.os.PowerManager.WakeLock
 import android.provider.MediaStore
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -40,42 +46,63 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.media.MediaBrowserServiceCompat
 import androidx.preference.PreferenceManager
 import code.name.monkey.appthemehelper.util.VersionUtils
-import code.name.monkey.retromusic.ALBUM_ART_ON_LOCK_SCREEN
-import code.name.monkey.retromusic.BLURRED_ALBUM_ART
-import code.name.monkey.retromusic.BuildConfig
-import code.name.monkey.retromusic.CLASSIC_NOTIFICATION
-import code.name.monkey.retromusic.COLORED_NOTIFICATION
-import code.name.monkey.retromusic.CROSS_FADE_DURATION
-import code.name.monkey.retromusic.PLAYBACK_PITCH
-import code.name.monkey.retromusic.PLAYBACK_SPEED
-import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.TOGGLE_HEADSET
+import code.name.monkey.retromusic.*
+import code.name.monkey.retromusic.activities.LockScreenActivity
+import code.name.monkey.retromusic.appwidgets.*
+import code.name.monkey.retromusic.auto.AutoMediaIDHelper
+import code.name.monkey.retromusic.auto.AutoMusicProvider
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.extensions.toMediaSessionQueue
 import code.name.monkey.retromusic.extensions.uri
+import code.name.monkey.retromusic.glide.BlurTransformation
+import code.name.monkey.retromusic.glide.RetroGlideExtension.getSongModel
+import code.name.monkey.retromusic.glide.RetroGlideExtension.songCoverOptions
+import code.name.monkey.retromusic.helper.ShuffleHelper.makeShuffleList
 import code.name.monkey.retromusic.model.Song
+import code.name.monkey.retromusic.model.Song.Companion.emptySong
 import code.name.monkey.retromusic.model.smartplaylist.AbsSmartPlaylist
 import code.name.monkey.retromusic.providers.HistoryStore
+import code.name.monkey.retromusic.providers.MusicPlaybackQueueStore
 import code.name.monkey.retromusic.providers.SongPlayCountStore
+import code.name.monkey.retromusic.service.notification.PlayingNotification
+import code.name.monkey.retromusic.service.notification.PlayingNotificationClassic
+import code.name.monkey.retromusic.service.notification.PlayingNotificationImpl24
 import code.name.monkey.retromusic.service.playback.Playback
+import code.name.monkey.retromusic.service.playback.Playback.PlaybackCallbacks
 import code.name.monkey.retromusic.util.MusicUtil
+import code.name.monkey.retromusic.util.MusicUtil.toggleFavorite
+import code.name.monkey.retromusic.util.PackageValidator
+import code.name.monkey.retromusic.util.PreferenceUtil.crossFadeDuration
+import code.name.monkey.retromusic.util.PreferenceUtil.isAlbumArtOnLockScreen
+import code.name.monkey.retromusic.util.PreferenceUtil.isBluetoothSpeaker
+import code.name.monkey.retromusic.util.PreferenceUtil.isBlurredAlbumArt
+import code.name.monkey.retromusic.util.PreferenceUtil.isClassicNotification
+import code.name.monkey.retromusic.util.PreferenceUtil.isHeadsetPlugged
+import code.name.monkey.retromusic.util.PreferenceUtil.isLockScreen
+import code.name.monkey.retromusic.util.PreferenceUtil.isPauseOnZeroVolume
+import code.name.monkey.retromusic.util.PreferenceUtil.playbackPitch
+import code.name.monkey.retromusic.util.PreferenceUtil.playbackSpeed
+import code.name.monkey.retromusic.util.PreferenceUtil.registerOnSharedPreferenceChangedListener
+import code.name.monkey.retromusic.util.PreferenceUtil.unregisterOnSharedPreferenceChangedListener
+import code.name.monkey.retromusic.volume.AudioVolumeObserver
 import code.name.monkey.retromusic.volume.OnAudioVolumeChangedListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Objects
-import java.util.Random
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import org.koin.java.KoinJavaComponent.get
+import java.util.*
 
+
+/**
+ * @author Karim Abou Zeid (kabouzeid), Andrew Neal. Modified by Prathamesh More
+ */
 class MusicService : MediaBrowserServiceCompat(),
-    SharedPreferences.OnSharedPreferenceChangeListener, Playback.PlaybackCallbacks,
-    OnAudioVolumeChangedListener {
+    OnSharedPreferenceChangeListener, PlaybackCallbacks, OnAudioVolumeChangedListener {
     private val musicBind: IBinder = MusicBinder()
 
     @JvmField
@@ -92,7 +119,7 @@ class MusicService : MediaBrowserServiceCompat(),
     private val mMusicProvider = get<AutoMusicProvider>(AutoMusicProvider::class.java)
     private lateinit var storage: PersistentStorage
     private var trackEndedByCrossfade = false
-    private val serviceScope = CoroutineScope(Job() + Dispatchers.Main)
+    private val serviceScope = CoroutineScope(Job() + Main)
 
     @JvmField
     var position = -1
@@ -149,10 +176,10 @@ class MusicService : MediaBrowserServiceCompat(),
     private lateinit var mediaStoreObserver: ContentObserver
     private var musicPlayerHandlerThread: HandlerThread? = null
     private var notHandledMetaChangedForCurrentTrack = false
-    private var originalPlayingQueue = java.util.ArrayList<Song>()
+    private var originalPlayingQueue = ArrayList<Song>()
 
     @JvmField
-    var playingQueue = java.util.ArrayList<Song>()
+    var playingQueue = ArrayList<Song>()
 
     private var playerHandler: Handler? = null
 
@@ -230,7 +257,7 @@ class MusicService : MediaBrowserServiceCompat(),
                     when (intent.getIntExtra("state", -1)) {
                         0 -> pause()
                         // Check whether the current song is empty which means the playing queue hasn't restored yet
-                        1 -> if (currentSong != Song.emptySong) {
+                        1 -> if (currentSong != emptySong) {
                             play()
                         } else {
                             receivedHeadsetConnected = true
@@ -242,7 +269,7 @@ class MusicService : MediaBrowserServiceCompat(),
     }
     private var throttledSeekHandler: ThrottledSeekHandler? = null
     private var uiThreadHandler: Handler? = null
-    private var wakeLock: PowerManager.WakeLock? = null
+    private var wakeLock: WakeLock? = null
     private var notificationManager: NotificationManager? = null
     private var isForeground = false
     override fun onCreate() {
@@ -484,7 +511,7 @@ class MusicService : MediaBrowserServiceCompat(),
             SHUFFLE_MODE_NONE -> {
                 this.shuffleMode = shuffleMode
                 val currentSongId = Objects.requireNonNull(currentSong).id
-                playingQueue = java.util.ArrayList(originalPlayingQueue)
+                playingQueue = ArrayList(originalPlayingQueue)
                 var newPosition = 0
                 for (song in playingQueue) {
                     if (song.id == currentSongId) {
@@ -502,7 +529,7 @@ class MusicService : MediaBrowserServiceCompat(),
         return if ((position >= 0) && (position < playingQueue.size)) {
             playingQueue[position]
         } else {
-            Song.emptySong
+            emptySong
         }
     }
 
@@ -518,7 +545,7 @@ class MusicService : MediaBrowserServiceCompat(),
     }
 
     private fun initNotification() {
-        playingNotification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+        playingNotification = if (VERSION.SDK_INT >= VERSION_CODES.N
             && !isClassicNotification
         ) {
             PlayingNotificationImpl24.from(this, notificationManager!!, mediaSession!!)
@@ -734,8 +761,8 @@ class MusicService : MediaBrowserServiceCompat(),
             && startPosition >= 0 && startPosition < playingQueue.size
         ) {
             // it is important to copy the playing queue here first as we might add/remove songs later
-            originalPlayingQueue = java.util.ArrayList(playingQueue)
-            this.playingQueue = java.util.ArrayList(originalPlayingQueue)
+            originalPlayingQueue = ArrayList(playingQueue)
+            this.playingQueue = ArrayList(originalPlayingQueue)
             var position = startPosition
             if (shuffleMode == SHUFFLE_MODE_SHUFFLE) {
                 makeShuffleList(this.playingQueue, startPosition)
@@ -791,7 +818,7 @@ class MusicService : MediaBrowserServiceCompat(),
         // Every chromecast method needs to run on main thread or you are greeted with IllegalStateException
         // So it will use Main dispatcher
         // And by using Default dispatcher for local playback we are reduce the burden of main thread
-        serviceScope.launch(if (playbackManager.isLocalPlayback) Dispatchers.Default else Dispatchers.Main) {
+        serviceScope.launch(if (playbackManager.isLocalPlayback) Default else Main) {
             openTrackAndPrepareNextAt(position) { success ->
                 if (success) {
                     play()
@@ -823,9 +850,9 @@ class MusicService : MediaBrowserServiceCompat(),
     }
 
     fun isCurrentFavorite(completion: (isFavorite: Boolean) -> Unit) {
-        serviceScope.launch(Dispatchers.IO) {
+        serviceScope.launch(IO) {
             val isFavorite = MusicUtil.isFavorite(currentSong)
-            withContext(Dispatchers.Main) {
+            withContext(Main) {
                 completion(isFavorite)
             }
         }
@@ -898,7 +925,7 @@ class MusicService : MediaBrowserServiceCompat(),
 
     private suspend fun restoreQueuesAndPositionIfNecessary() {
         if (!queuesRestored && playingQueue.isEmpty()) {
-            withContext(Dispatchers.IO) {
+            withContext(IO) {
                 val restoredQueue =
                     MusicPlaybackQueueStore.getInstance(this@MusicService).savedPlayingQueue
                 val restoredOriginalQueue =
@@ -915,7 +942,7 @@ class MusicService : MediaBrowserServiceCompat(),
                     originalPlayingQueue = ArrayList(restoredOriginalQueue)
                     playingQueue = ArrayList(restoredQueue)
                     position = restoredPosition
-                    withContext(Dispatchers.Main) {
+                    withContext(Main) {
                         openCurrent {
                             prepareNext()
                             if (restoredPositionInTrack > 0) {
@@ -1104,7 +1131,7 @@ class MusicService : MediaBrowserServiceCompat(),
                 updateMediaSessionMetaData(::updateMediaSessionPlaybackState)
                 savePosition()
                 savePositionInTrack()
-                serviceScope.launch(Dispatchers.IO) {
+                serviceScope.launch(IO) {
                     val currentSong = currentSong
                     HistoryStore.getInstance(this@MusicService).addSongId(currentSong.id)
                     if (songPlayCountHelper.shouldBumpPlayCount()) {
@@ -1251,12 +1278,7 @@ class MusicService : MediaBrowserServiceCompat(),
 
     private fun registerHeadsetEvents() {
         if (!headsetReceiverRegistered && isHeadsetPlugged) {
-            ContextCompat.registerReceiver(
-                this,
-                headsetReceiver,
-                headsetReceiverIntentFilter,
-                ContextCompat.RECEIVER_EXPORTED
-            )
+            ContextCompat.registerReceiver(this, headsetReceiver, headsetReceiverIntentFilter, ContextCompat.RECEIVER_EXPORTED)
             headsetReceiverRegistered = true
         }
     }
@@ -1290,7 +1312,7 @@ class MusicService : MediaBrowserServiceCompat(),
     }
 
     private fun saveQueues() {
-        serviceScope.launch(Dispatchers.IO) {
+        serviceScope.launch(IO) {
             MusicPlaybackQueueStore.getInstance(this@MusicService)
                 .saveQueues(playingQueue, originalPlayingQueue)
         }

@@ -5,9 +5,9 @@ import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import code.name.monkey.appthemehelper.util.TintHelper
+import code.name.monkey.retromusic.App.Companion.getContext
 import code.name.monkey.retromusic.Constants.USER_BANNER
 import code.name.monkey.retromusic.Constants.USER_PROFILE
-import code.name.monkey.retromusic.MyApplication.Companion.getContext
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.extensions.accentColor
 import code.name.monkey.retromusic.glide.artistimage.ArtistImage
@@ -18,7 +18,7 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.ArtistSignatureUtil
 import code.name.monkey.retromusic.util.CustomArtistImageUtil.Companion.getFile
 import code.name.monkey.retromusic.util.CustomArtistImageUtil.Companion.getInstance
-import code.name.monkey.retromusic.util.MusicUtil
+import code.name.monkey.retromusic.util.MusicUtil.getMediaStoreAlbumCoverUri
 import code.name.monkey.retromusic.util.PreferenceUtil
 import com.bumptech.glide.GenericTransitionOptions
 import com.bumptech.glide.Priority
@@ -30,10 +30,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.bumptech.glide.request.transition.Transition
 import com.bumptech.glide.signature.MediaStoreSignature
 import java.io.File
+
 
 object RetroGlideExtension {
 
@@ -59,7 +61,7 @@ object RetroGlideExtension {
         return if (ignoreMediaStore) {
             AudioFileCover(song.data)
         } else {
-            MusicUtil.getMediaStoreAlbumCoverUri(song.albumId)
+            getMediaStoreAlbumCoverUri(song.albumId)
         }
     }
 
@@ -102,7 +104,7 @@ object RetroGlideExtension {
             .priority(Priority.LOW)
             .error(getDrawable(DEFAULT_ARTIST_IMAGE))
             .placeholder(getDrawable(DEFAULT_ARTIST_IMAGE))
-            .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+            .override(SIZE_ORIGINAL, SIZE_ORIGINAL)
             .signature(createSignature(artist))
     }
 

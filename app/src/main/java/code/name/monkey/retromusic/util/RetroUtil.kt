@@ -1,14 +1,26 @@
+/*
+ * Copyright (c) 2019 Hemanth Savarala.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by
+ *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ */
 package code.name.monkey.retromusic.util
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Point
-import code.name.monkey.retromusic.MyApplication
+import code.name.monkey.retromusic.App.Companion.getContext
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.text.DecimalFormat
-import java.util.Collections
+import java.util.*
 
 object RetroUtil {
     fun formatValue(numValue: Float): String {
@@ -34,36 +46,34 @@ object RetroUtil {
     }
 
     val statusBarHeight: Int
-        @SuppressLint("InternalInsetResource")
         get() {
             var result = 0
-            val resourceId = MyApplication.getContext()
+            val resourceId = getContext()
                 .resources
                 .getIdentifier("status_bar_height", "dimen", "android")
             if (resourceId > 0) {
-                result = MyApplication.getContext().resources.getDimensionPixelSize(resourceId)
+                result = getContext().resources.getDimensionPixelSize(resourceId)
             }
             return result
         }
 
     val navigationBarHeight: Int
-        @SuppressLint("InternalInsetResource")
         get() {
             var result = 0
-            val resourceId = MyApplication.getContext()
+            val resourceId = getContext()
                 .resources
                 .getIdentifier("navigation_bar_height", "dimen", "android")
             if (resourceId > 0) {
-                result = MyApplication.getContext().resources.getDimensionPixelSize(resourceId)
+                result = getContext().resources.getDimensionPixelSize(resourceId)
             }
             return result
         }
 
     val isLandscape: Boolean
-        get() = (MyApplication.getContext().resources.configuration.orientation
+        get() = (getContext().resources.configuration.orientation
                 == Configuration.ORIENTATION_LANDSCAPE)
     val isTablet: Boolean
-        get() = (MyApplication.getContext().resources.configuration.smallestScreenWidthDp
+        get() = (getContext().resources.configuration.smallestScreenWidthDp
                 >= 600)
 
     fun getIpAddress(useIPv4: Boolean): String? {

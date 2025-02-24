@@ -1,3 +1,16 @@
+/*
+ * Copyright (C) 2017 wangchenyan
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package code.name.monkey.retromusic.lyrics
 
 import android.animation.ValueAnimator
@@ -13,6 +26,7 @@ import android.text.TextPaint
 import android.text.format.DateUtils
 import android.util.AttributeSet
 import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.LinearInterpolator
@@ -20,15 +34,14 @@ import android.widget.Scroller
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.withSave
 import code.name.monkey.retromusic.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
+import java.lang.Runnable
 import kotlin.math.abs
 
+/**
+ * 歌词 Created by wcy on 2015/11/9.
+ */
 @SuppressLint("StaticFieldLeak")
 class CoverLrcView @JvmOverloads constructor(
     context: Context?,
@@ -73,8 +86,8 @@ class CoverLrcView @JvmOverloads constructor(
 
     private val viewScope = CoroutineScope(Dispatchers.Main + Job())
 
-    private val mSimpleOnGestureListener: GestureDetector.SimpleOnGestureListener =
-        object : GestureDetector.SimpleOnGestureListener() {
+    private val mSimpleOnGestureListener: SimpleOnGestureListener =
+        object : SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean {
                 if (hasLrc() && mOnPlayClickListener != null) {
                     if (mOffset != getOffset(0)) {

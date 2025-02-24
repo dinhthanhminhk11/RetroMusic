@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
 package code.name.monkey.retromusic.activities.base
 
 import android.Manifest
@@ -23,11 +37,6 @@ import code.name.monkey.retromusic.util.logD
 import com.google.android.material.snackbar.Snackbar
 
 abstract class AbsBaseActivity : AbsThemeActivity() {
-    companion object {
-        const val PERMISSION_REQUEST = 100
-        const val BLUETOOTH_PERMISSION_REQUEST = 101
-    }
-
     private var hadPermissions: Boolean = false
     private lateinit var permissions: Array<String>
     private var permissionDeniedMessage: String? = null
@@ -88,10 +97,8 @@ abstract class AbsBaseActivity : AbsThemeActivity() {
 
     protected fun hasPermissions(): Boolean {
         for (permission in permissions) {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    permission
-                ) != PackageManager.PERMISSION_GRANTED
+            if (ActivityCompat.checkSelfPermission(this,
+                    permission) != PackageManager.PERMISSION_GRANTED
             ) {
                 return false
             }
@@ -160,11 +167,9 @@ abstract class AbsBaseActivity : AbsThemeActivity() {
                             Snackbar.LENGTH_SHORT
                         )
                             .setAction(R.string.action_grant) {
-                                ActivityCompat.requestPermissions(
-                                    this,
+                                ActivityCompat.requestPermissions(this,
                                     arrayOf(Manifest.permission.BLUETOOTH_CONNECT),
-                                    BLUETOOTH_PERMISSION_REQUEST
-                                )
+                                    BLUETOOTH_PERMISSION_REQUEST)
                             }
                             .setActionTextColor(accentColor()).show()
                     }
@@ -173,6 +178,10 @@ abstract class AbsBaseActivity : AbsThemeActivity() {
         }
     }
 
+    companion object {
+        const val PERMISSION_REQUEST = 100
+        const val BLUETOOTH_PERMISSION_REQUEST = 101
+    }
 
     // this lets keyboard close when clicked in background
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {

@@ -16,7 +16,6 @@ import code.name.monkey.retromusic.service.playback.Playback.PlaybackCallbacks
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.logE
 import kotlinx.coroutines.*
-import javax.inject.Inject
 
 /** @author Prathamesh M */
 
@@ -27,8 +26,7 @@ import javax.inject.Inject
 * play but with decreasing volume and start the player with the next song with increasing volume
 * and vice versa for upcoming song and so on.
 */
-class CrossFadePlayer(context: Context) :
-    LocalPlayback(context) {
+class CrossFadePlayer(context: Context) : LocalPlayback(context) {
 
     private var currentPlayer: CurrentPlayer = CurrentPlayer.NOT_SET
     private var player1 = MediaPlayer()
@@ -36,7 +34,7 @@ class CrossFadePlayer(context: Context) :
     private var durationListener = DurationListener()
     private var mIsInitialized = false
     private var hasDataSource: Boolean = false /* Whether first player has DataSource */
-    private var nextDataSource: String? = null
+    private var nextDataSource:String? = null
     private var crossFadeAnimator: Animator? = null
     override var callbacks: PlaybackCallbacks? = null
     private var crossFadeDuration = PreferenceUtil.crossFadeDuration
@@ -213,11 +211,9 @@ class CrossFadePlayer(context: Context) :
             CurrentPlayer.PLAYER_ONE -> {
                 player1
             }
-
             CurrentPlayer.PLAYER_TWO -> {
                 player2
             }
-
             CurrentPlayer.NOT_SET -> {
                 null
             }
@@ -229,11 +225,9 @@ class CrossFadePlayer(context: Context) :
             CurrentPlayer.PLAYER_ONE -> {
                 player2
             }
-
             CurrentPlayer.PLAYER_TWO -> {
                 player1
             }
-
             CurrentPlayer.NOT_SET -> {
                 null
             }

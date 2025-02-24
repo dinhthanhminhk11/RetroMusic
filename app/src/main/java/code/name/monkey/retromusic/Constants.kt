@@ -1,15 +1,43 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
 package code.name.monkey.retromusic
 
 import android.provider.BaseColumns
 import android.provider.MediaStore
 
 object Constants {
+    const val PRO_VERSION_PRODUCT_ID = "pro_version"
+    const val RATE_ON_GOOGLE_PLAY =
+        "https://play.google.com/store/apps/details?id=code.name.monkey.retromusic"
+    const val TRANSLATE = "https://crowdin.com/project/retromusicplayer"
+    const val WEBSITE = "https://retromusic.app"
+    const val GITHUB_PROJECT = "https://github.com/RetroMusicPlayer/RetroMusicPlayer"
+    const val TELEGRAM_CHANGE_LOG = "https://t.me/retromusiclog"
+    const val USER_PROFILE = "profile.jpg"
+    const val USER_BANNER = "banner.jpg"
+    const val APP_TELEGRAM_LINK = "https://t.me/retromusicapp/"
+    const val APP_TWITTER_LINK = "https://twitter.com/retromusicapp"
+    const val FAQ_LINK = "https://github.com/RetroMusicPlayer/RetroMusicPlayer/blob/master/FAQ.md"
+    const val PINTEREST = "https://in.pinterest.com/retromusicapp/"
+    const val AUDIO_SCROBBLER_URL = "https://ws.audioscrobbler.com/2.0/"
 
     const val IS_MUSIC =
         MediaStore.Audio.AudioColumns.IS_MUSIC + "=1" + " AND " + MediaStore.Audio.AudioColumns.TITLE + " != ''"
+
     const val DATA = "_data"
-    const val USER_PROFILE = "profile.jpg"
-    const val USER_BANNER = "banner.jpg"
+
     @Suppress("Deprecation")
     val baseProjection = arrayOf(
         BaseColumns._ID, // 0
@@ -26,7 +54,6 @@ object Constants {
         MediaStore.Audio.AudioColumns.COMPOSER, // 11
         ALBUM_ARTIST // 12
     )
-
     const val NUMBER_OF_TOP_TRACKS = 99
 }
 
@@ -136,17 +163,3 @@ const val PAUSE_HISTORY = "pause_history"
 const val MANAGE_AUDIO_FOCUS = "manage_audio_focus"
 const val SWIPE_DOWN_DISMISS = "swipe_to_dismiss"
 const val ENABLE_SEARCH_PLAYLIST= "enable_search_playlist"
-
-
-
-enum class Filter {
-    SONGS,
-    ARTISTS,
-    ALBUMS,
-    ALBUM_ARTISTS,
-    GENRES,
-    PLAYLISTS,
-    NO_FILTER
-}
-
-

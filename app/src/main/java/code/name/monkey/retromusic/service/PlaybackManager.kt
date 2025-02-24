@@ -3,15 +3,12 @@ package code.name.monkey.retromusic.service
 import android.content.Context
 import android.content.Intent
 import android.media.audiofx.AudioEffect
-import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.service.playback.Playback
 import code.name.monkey.retromusic.util.PreferenceUtil
-import javax.inject.Inject
 
-class PlaybackManager(
-    val context: Context
-) {
+
+class PlaybackManager(val context: Context) {
 
     var playback: Playback? = null
     private var playbackLocation = PlaybackLocation.LOCAL
@@ -141,10 +138,8 @@ class PlaybackManager(
     private fun closeAudioEffectSession() {
         val audioEffectsIntent = Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION)
         if (playback != null) {
-            audioEffectsIntent.putExtra(
-                AudioEffect.EXTRA_AUDIO_SESSION,
-                playback!!.audioSessionId
-            )
+            audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION,
+                playback!!.audioSessionId)
         }
         audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.packageName)
         context.sendBroadcast(audioEffectsIntent)

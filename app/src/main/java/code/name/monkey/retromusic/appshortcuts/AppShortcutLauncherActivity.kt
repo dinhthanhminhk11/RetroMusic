@@ -1,11 +1,22 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
 package code.name.monkey.retromusic.appshortcuts
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE
-import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import code.name.monkey.retromusic.appshortcuts.shortcuttype.LastAddedShortcutType
 import code.name.monkey.retromusic.appshortcuts.shortcuttype.ShuffleAllShortcutType
@@ -19,8 +30,9 @@ import code.name.monkey.retromusic.service.MusicService
 import code.name.monkey.retromusic.service.MusicService.Companion.ACTION_PLAY_PLAYLIST
 import code.name.monkey.retromusic.service.MusicService.Companion.INTENT_EXTRA_PLAYLIST
 import code.name.monkey.retromusic.service.MusicService.Companion.INTENT_EXTRA_SHUFFLE_MODE
+import code.name.monkey.retromusic.service.MusicService.Companion.SHUFFLE_MODE_NONE
 import code.name.monkey.retromusic.service.MusicService.Companion.SHUFFLE_MODE_SHUFFLE
-@RequiresApi(Build.VERSION_CODES.N_MR1)
+
 class AppShortcutLauncherActivity : Activity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +68,7 @@ class AppShortcutLauncherActivity : Activity() {
             INTENT_EXTRA_PLAYLIST to playlist,
             INTENT_EXTRA_SHUFFLE_MODE to shuffleMode
         )
+        intent.setPackage(this.packageName)
 
         intent.putExtras(bundle)
 

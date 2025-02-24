@@ -1,44 +1,51 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
 package code.name.monkey.retromusic.helper
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ComponentName
-import android.content.ContentResolver
-import android.content.Context
-import android.content.ContextWrapper
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.database.Cursor
 import android.net.Uri
 import android.os.IBinder
 import android.provider.DocumentsContract
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import code.name.monkey.retromusic.Constants
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.model.Song
-import code.name.monkey.retromusic.repository.dataSource.SongLocalRepository
+import code.name.monkey.retromusic.repository.SongRepository
 import code.name.monkey.retromusic.service.CastPlayer
 import code.name.monkey.retromusic.service.MusicService
 import code.name.monkey.retromusic.util.getExternalStorageDirectory
 import code.name.monkey.retromusic.util.logE
-import code.name.monkey.retromusic.util.makeSongCursor
-import code.name.monkey.retromusic.util.songs
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
-import java.util.ArrayList
-import java.util.Random
-import java.util.WeakHashMap
-import javax.inject.Inject
-import javax.inject.Singleton
+import java.util.*
+import kotlin.collections.set
 
 
-object MusicPlayerRemote {
+object MusicPlayerRemote : KoinComponent {
     val TAG: String = MusicPlayerRemote::class.java.simpleName
     private val mConnectionMap = WeakHashMap<Context, ServiceBinder>()
     var musicService: MusicService? = null
 
+    private val songRepository by inject<SongRepository>()
+
+    @JvmStatic
     val isPlaying: Boolean
         get() = musicService != null && musicService!!.isPlaying
 
@@ -68,6 +75,7 @@ object MusicPlayerRemote {
             }
         }
 
+    @JvmStatic
     val playingQueue: List<Song>
         get() = if (musicService != null) {
             musicService?.playingQueue as List<Song>
@@ -88,6 +96,7 @@ object MusicPlayerRemote {
             musicService!!.repeatMode
         } else MusicService.REPEAT_MODE_NONE
 
+    @JvmStatic
     val shuffleMode: Int
         get() = if (musicService != null) {
             musicService!!.shuffleMode
@@ -200,12 +209,12 @@ object MusicPlayerRemote {
     /**
      * Async
      */
-
+    @JvmStatic
     fun openQueue(queue: List<Song>, startPosition: Int, startPlaying: Boolean) {
         doOpenQueue(queue, startPosition, startPlaying, MusicService.SHUFFLE_MODE_NONE)
     }
 
-
+    @JvmStatic
     fun openAndShuffleQueue(queue: List<Song>, startPlaying: Boolean) {
         var startPosition = 0
         if (queue.isNotEmpty()) {
@@ -215,17 +224,12 @@ object MusicPlayerRemote {
         doOpenQueue(queue, startPosition, startPlaying, MusicService.SHUFFLE_MODE_SHUFFLE)
     }
 
-
+    @JvmStatic
     fun openQueueKeepShuffleMode(queue: List<Song>, startPosition: Int, startPlaying: Boolean) {
         doOpenQueue(queue, startPosition, startPlaying, shuffleMode)
     }
 
-    private fun doOpenQueue(
-        queue: List<Song>,
-        startPosition: Int,
-        startPlaying: Boolean,
-        shuffleMode: Int
-    ) {
+    private fun doOpenQueue(queue: List<Song>, startPosition: Int, startPlaying: Boolean, shuffleMode: Int) {
         if (!tryToHandleOpenPlayingQueue(
                 queue,
                 startPosition,
@@ -356,6 +360,7 @@ object MusicPlayerRemote {
         return false
     }
 
+    @JvmStatic
     fun removeFromQueue(song: Song): Boolean {
         if (musicService != null) {
             musicService!!.removeSong(song)
@@ -364,7 +369,7 @@ object MusicPlayerRemote {
         return false
     }
 
-
+    @JvmStatic
     fun removeFromQueue(songs: List<Song>): Boolean {
         if (musicService != null) {
             musicService!!.removeSongs(songs)
@@ -397,7 +402,7 @@ object MusicPlayerRemote {
         return false
     }
 
-
+    @JvmStatic
     fun playFromUri(context: Context, uri: Uri) {
         if (musicService != null) {
 
@@ -411,13 +416,7 @@ object MusicPlayerRemote {
                         songId = uri.lastPathSegment
                     }
                     if (songId != null) {
-                        songs = songs(
-                            makeSongCursor(
-                                context,
-                                MediaStore.Audio.AudioColumns.TITLE + " LIKE ?",
-                                arrayOf("%$songId%")
-                            )
-                        )
+                        songs = songRepository.songs(songId)
                     }
                 }
             }
@@ -438,14 +437,7 @@ object MusicPlayerRemote {
                     songFile = File(uri.path!!)
                 }
                 if (songFile != null) {
-                    songs = songs(
-                        makeSongCursor(
-                            context,
-                            Constants.DATA + "=?",
-                            arrayOf(songFile.absolutePath),
-                            ignoreBlacklist = true
-                        )
-                    )
+                    songs = songRepository.songsByFilePath(songFile.absolutePath, true)
                 }
             }
             if (!songs.isNullOrEmpty()) {
