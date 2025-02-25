@@ -1,29 +1,11 @@
-/*
- * Copyright (c) 2019 Hemanth Savarala.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by
- *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- */
-
-package code.name.monkey.retromusic.repository
+package code.name.monkey.retromusic.repository.data_source_impl
 
 import android.content.Context
 import android.database.Cursor
 import android.os.Environment
 import android.provider.MediaStore
-import android.provider.MediaStore.Audio.AudioColumns
-import android.provider.MediaStore.Audio.Media
 import code.name.monkey.appthemehelper.util.VersionUtils
 import code.name.monkey.retromusic.Constants
-import code.name.monkey.retromusic.Constants.IS_MUSIC
-import code.name.monkey.retromusic.Constants.baseProjection
 import code.name.monkey.retromusic.extensions.getInt
 import code.name.monkey.retromusic.extensions.getLong
 import code.name.monkey.retromusic.extensions.getString
@@ -31,31 +13,12 @@ import code.name.monkey.retromusic.extensions.getStringOrNull
 import code.name.monkey.retromusic.helper.SortOrder
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.providers.BlacklistStore
+import code.name.monkey.retromusic.repository.data_source.SongRepository
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.getExternalStoragePublicDirectory
 import java.text.Collator
 
-/**
- * Created by hemanths on 10/08/17.
- */
-interface SongRepository {
-
-    fun songs(): List<Song>
-
-    fun songs(cursor: Cursor?): List<Song>
-
-    fun sortedSongs(cursor: Cursor?): List<Song>
-
-    fun songs(query: String): List<Song>
-
-    fun songsByFilePath(filePath: String, ignoreBlacklist: Boolean = false): List<Song>
-
-    fun song(cursor: Cursor?): Song
-
-    fun song(songId: Long): Song
-}
-
-class RealSongRepository(private val context: Context) : SongRepository {
+class SongRepositoryImpl(private val context: Context) : SongRepository {
 
     override fun songs(): List<Song> {
         return sortedSongs(makeSongCursor(null, null))
@@ -77,23 +40,29 @@ class RealSongRepository(private val context: Context) : SongRepository {
         val songs = songs(cursor)
         return when (PreferenceUtil.songSortOrder) {
             SortOrder.SongSortOrder.SONG_A_Z -> {
-                songs.sortedWith{ s1, s2 -> collator.compare(s1.title, s2.title) }
+                songs.sortedWith { s1, s2 -> collator.compare(s1.title, s2.title) }
             }
+
             SortOrder.SongSortOrder.SONG_Z_A -> {
-                songs.sortedWith{ s1, s2 -> collator.compare(s2.title, s1.title) }
+                songs.sortedWith { s1, s2 -> collator.compare(s2.title, s1.title) }
             }
+
             SortOrder.SongSortOrder.SONG_ALBUM -> {
-                songs.sortedWith{ s1, s2 -> collator.compare(s1.albumName, s2.albumName) }
+                songs.sortedWith { s1, s2 -> collator.compare(s1.albumName, s2.albumName) }
             }
+
             SortOrder.SongSortOrder.SONG_ALBUM_ARTIST -> {
-                songs.sortedWith{ s1, s2 -> collator.compare(s1.albumArtist, s2.albumArtist) }
+                songs.sortedWith { s1, s2 -> collator.compare(s1.albumArtist, s2.albumArtist) }
             }
+
             SortOrder.SongSortOrder.SONG_ARTIST -> {
-                songs.sortedWith{ s1, s2 -> collator.compare(s1.artistName, s2.artistName) }
+                songs.sortedWith { s1, s2 -> collator.compare(s1.artistName, s2.artistName) }
             }
+
             SortOrder.SongSortOrder.COMPOSER -> {
-                songs.sortedWith{ s1, s2 -> collator.compare(s1.composer, s2.composer) }
+                songs.sortedWith { s1, s2 -> collator.compare(s1.composer, s2.composer) }
             }
+
             else -> songs
         }
     }
@@ -109,11 +78,21 @@ class RealSongRepository(private val context: Context) : SongRepository {
     }
 
     override fun songs(query: String): List<Song> {
-        return songs(makeSongCursor(AudioColumns.TITLE + " LIKE ?", arrayOf("%$query%")))
+        return songs(
+            makeSongCursor(
+                MediaStore.Audio.AudioColumns.TITLE + " LIKE ?",
+                arrayOf("%$query%")
+            )
+        )
     }
 
     override fun song(songId: Long): Song {
-        return song(makeSongCursor(AudioColumns._ID + "=?", arrayOf(songId.toString())))
+        return song(
+            makeSongCursor(
+                MediaStore.Audio.AudioColumns._ID + "=?",
+                arrayOf(songId.toString())
+            )
+        )
     }
 
     override fun songsByFilePath(filePath: String, ignoreBlacklist: Boolean): List<Song> {
@@ -129,18 +108,18 @@ class RealSongRepository(private val context: Context) : SongRepository {
     private fun getSongFromCursorImpl(
         cursor: Cursor
     ): Song {
-        val id = cursor.getLong(AudioColumns._ID)
-        val title = cursor.getString(AudioColumns.TITLE)
-        val trackNumber = cursor.getInt(AudioColumns.TRACK)
-        val year = cursor.getInt(AudioColumns.YEAR)
-        val duration = cursor.getLong(AudioColumns.DURATION)
+        val id = cursor.getLong(MediaStore.Audio.AudioColumns._ID)
+        val title = cursor.getString(MediaStore.Audio.AudioColumns.TITLE)
+        val trackNumber = cursor.getInt(MediaStore.Audio.AudioColumns.TRACK)
+        val year = cursor.getInt(MediaStore.Audio.AudioColumns.YEAR)
+        val duration = cursor.getLong(MediaStore.Audio.AudioColumns.DURATION)
         val data = cursor.getString(Constants.DATA)
-        val dateModified = cursor.getLong(AudioColumns.DATE_MODIFIED)
-        val albumId = cursor.getLong(AudioColumns.ALBUM_ID)
-        val albumName = cursor.getStringOrNull(AudioColumns.ALBUM)
-        val artistId = cursor.getLong(AudioColumns.ARTIST_ID)
-        val artistName = cursor.getStringOrNull(AudioColumns.ARTIST)
-        val composer = cursor.getStringOrNull(AudioColumns.COMPOSER)
+        val dateModified = cursor.getLong(MediaStore.Audio.AudioColumns.DATE_MODIFIED)
+        val albumId = cursor.getLong(MediaStore.Audio.AudioColumns.ALBUM_ID)
+        val albumName = cursor.getStringOrNull(MediaStore.Audio.AudioColumns.ALBUM)
+        val artistId = cursor.getLong(MediaStore.Audio.AudioColumns.ARTIST_ID)
+        val artistName = cursor.getStringOrNull(MediaStore.Audio.AudioColumns.ARTIST)
+        val composer = cursor.getStringOrNull(MediaStore.Audio.AudioColumns.COMPOSER)
         val albumArtist = cursor.getStringOrNull("album_artist")
         return Song(
             id,
@@ -170,9 +149,9 @@ class RealSongRepository(private val context: Context) : SongRepository {
         var selectionValuesFinal = selectionValues
         if (!ignoreBlacklist) {
             selectionFinal = if (selection != null && selection.trim { it <= ' ' } != "") {
-                "$IS_MUSIC AND $selectionFinal"
+                "${Constants.IS_MUSIC} AND $selectionFinal"
             } else {
-                IS_MUSIC
+                Constants.IS_MUSIC
             }
 
             // Whitelist
@@ -194,17 +173,17 @@ class RealSongRepository(private val context: Context) : SongRepository {
             }
 
             selectionFinal =
-                selectionFinal + " AND " + Media.DURATION + ">= " + (PreferenceUtil.filterLength * 1000)
+                selectionFinal + " AND " + MediaStore.Audio.Media.DURATION + ">= " + (PreferenceUtil.filterLength * 1000)
         }
         val uri = if (VersionUtils.hasQ()) {
-            Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+            MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
         } else {
-            Media.EXTERNAL_CONTENT_URI
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         }
         return try {
             context.contentResolver.query(
                 uri,
-                baseProjection,
+                Constants.baseProjection,
                 selectionFinal,
                 selectionValuesFinal,
                 sortOrder

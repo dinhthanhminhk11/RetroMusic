@@ -1,53 +1,28 @@
-/*
- * Copyright (c) 2019 Hemanth Savarala.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by
- *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- */
-
-package code.name.monkey.retromusic.repository
+package code.name.monkey.retromusic.repository.data_source_impl
 
 import android.content.Context
 import android.database.Cursor
 import android.provider.BaseColumns
 import android.provider.MediaStore
-import code.name.monkey.retromusic.Constants.NUMBER_OF_TOP_TRACKS
+import code.name.monkey.retromusic.Constants
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.providers.HistoryStore
 import code.name.monkey.retromusic.providers.SongPlayCountStore
+import code.name.monkey.retromusic.repository.SortedLongCursor
+import code.name.monkey.retromusic.repository.data_source.AlbumRepository
+import code.name.monkey.retromusic.repository.data_source.ArtistRepository
+import code.name.monkey.retromusic.repository.data_source.SongRepository
+import code.name.monkey.retromusic.repository.data_source.TopPlayedRepository
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.makeSongCursor
+import code.name.monkey.retromusic.util.splitIntoAlbums
+import code.name.monkey.retromusic.util.splitIntoArtists
 
-
-/**
- * Created by hemanths on 16/08/17.
- */
-
-interface TopPlayedRepository {
-    fun recentlyPlayedTracks(): List<Song>
-
-    fun topTracks(): List<Song>
-
-    fun notRecentlyPlayedTracks(): List<Song>
-
-    fun topAlbums(): List<Album>
-
-    fun topArtists(): List<Artist>
-}
-
-class RealTopPlayedRepository(
+class TopPlayedRepositoryImpl(
     private val context: Context,
-    private val songRepository: RealSongRepository,
-    private val albumRepository: RealAlbumRepository,
-    private val artistRepository: RealArtistRepository
+    private val songRepository: SongRepository
 ) : TopPlayedRepository {
 
     override fun recentlyPlayedTracks(): List<Song> {
@@ -62,7 +37,8 @@ class RealTopPlayedRepository(
         val allSongs = mutableListOf<Song>().apply {
             addAll(
                 songRepository.songs(
-                    songRepository.makeSongCursor(
+                    makeSongCursor(
+                        context,
                         null, null,
                         MediaStore.Audio.Media.DATE_ADDED + " ASC"
                     )
@@ -81,11 +57,11 @@ class RealTopPlayedRepository(
     }
 
     override fun topAlbums(): List<Album> {
-        return albumRepository.splitIntoAlbums(topTracks(), sorted = false)
+        return splitIntoAlbums(topTracks(), sorted = false)
     }
 
     override fun topArtists(): List<Artist> {
-        return artistRepository.splitIntoArtists(topAlbums())
+        return splitIntoArtists(topAlbums())
     }
 
 
@@ -117,7 +93,8 @@ class RealTopPlayedRepository(
     private fun makeTopTracksCursorImpl(): SortedLongCursor? {
         // first get the top results ids from the internal database
         val cursor =
-            SongPlayCountStore.getInstance(context).getTopPlayedResults(NUMBER_OF_TOP_TRACKS)
+            SongPlayCountStore.getInstance(context)
+                .getTopPlayedResults(Constants.NUMBER_OF_TOP_TRACKS)
 
         cursor.use { songs ->
             return makeSortedCursor(
@@ -155,7 +132,7 @@ class RealTopPlayedRepository(
             selection.append(")")
 
             // get a list of songs with the data given the selection statement
-            val songCursor = songRepository.makeSongCursor(selection.toString(), null)
+            val songCursor = makeSongCursor(context, selection.toString(), null)
             if (songCursor != null) {
                 // now return the wrapped TopTracksCursor to handle sorting given order
                 return SortedLongCursor(

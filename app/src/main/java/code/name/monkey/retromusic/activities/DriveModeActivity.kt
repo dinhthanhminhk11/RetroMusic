@@ -1,17 +1,3 @@
-/*
- * Copyright (c) 2020 Hemanth Savarla.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- */
 package code.name.monkey.retromusic.activities
 
 import android.content.Intent
@@ -34,7 +20,7 @@ import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper
 import code.name.monkey.retromusic.helper.MusicProgressViewUpdateHelper.Callback
 import code.name.monkey.retromusic.helper.PlayPauseButtonOnClickHandler
 import code.name.monkey.retromusic.model.Song
-import code.name.monkey.retromusic.repository.RealRepository
+import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.service.MusicService
 import code.name.monkey.retromusic.util.MusicUtil
 import com.bumptech.glide.Glide
@@ -44,18 +30,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 
-
-/**
- * Created by hemanths on 2020-02-02.
- */
-
 class DriveModeActivity : AbsMusicServiceActivity(), Callback {
 
     private lateinit var binding: ActivityDriveModeBinding
     private var lastPlaybackControlsColor: Int = Color.GRAY
     private var lastDisabledPlaybackControlsColor: Int = Color.GRAY
     private lateinit var progressViewUpdateHelper: MusicProgressViewUpdateHelper
-    private val repository: RealRepository by inject()
+    private val repository: Repository by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

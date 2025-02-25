@@ -1,17 +1,4 @@
-/*
- * Copyright (c) 2020 Hemanth Savarla.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- */
+
 package code.name.monkey.retromusic.helper.menu
 
 import android.content.Intent
@@ -21,7 +8,7 @@ import code.name.monkey.retromusic.dialogs.AddToPlaylistDialog
 import code.name.monkey.retromusic.dialogs.DeleteSongsDialog
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.Song
-import code.name.monkey.retromusic.repository.RealRepository
+import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.util.MusicUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +34,7 @@ object SongsMenuHelper : KoinComponent {
             }
             R.id.action_add_to_playlist -> {
                 CoroutineScope(Dispatchers.IO).launch {
-                    val playlists = get<RealRepository>().fetchPlaylists()
+                    val playlists = get<Repository>().fetchPlaylists()
                     withContext(Dispatchers.Main) {
                         AddToPlaylistDialog.create(playlists, songs)
                             .show(activity.supportFragmentManager, "ADD_PLAYLIST")

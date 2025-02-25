@@ -17,6 +17,7 @@ package code.name.monkey.retromusic.providers;
 import static code.name.monkey.retromusic.service.MusicService.MEDIA_STORE_CHANGED;
 import static code.name.monkey.retromusic.util.FileUtilsKt.getExternalStoragePublicDirectory;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -64,6 +65,7 @@ public class BlacklistStore extends SQLiteOpenHelper {
     return sInstance;
   }
 
+  @SuppressLint("SQLiteString")
   @Override
   public void onCreate(@NonNull final SQLiteDatabase db) {
     db.execSQL(

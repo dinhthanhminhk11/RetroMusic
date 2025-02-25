@@ -1,25 +1,9 @@
-/*
- * Copyright (c) 2019 Hemanth Savarala.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by
- *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- */
-
-package code.name.monkey.retromusic.repository
+package code.name.monkey.retromusic.repository.data_source_impl
 
 import android.content.ContentResolver
 import android.database.Cursor
 import android.provider.BaseColumns
-import android.provider.MediaStore.Audio.AudioColumns
-import android.provider.MediaStore.Audio.Playlists.*
-import android.provider.MediaStore.Audio.PlaylistsColumns
+import android.provider.MediaStore
 import code.name.monkey.retromusic.Constants
 import code.name.monkey.retromusic.extensions.getInt
 import code.name.monkey.retromusic.extensions.getLong
@@ -28,31 +12,10 @@ import code.name.monkey.retromusic.extensions.getStringOrNull
 import code.name.monkey.retromusic.model.Playlist
 import code.name.monkey.retromusic.model.PlaylistSong
 import code.name.monkey.retromusic.model.Song
+import code.name.monkey.retromusic.repository.data_source.PlaylistRepository
 
-/**
- * Created by hemanths on 16/08/17.
- */
-interface PlaylistRepository {
-    fun playlist(cursor: Cursor?): Playlist
-
-    fun searchPlaylist(query: String): List<Playlist>
-
-    fun playlist(playlistName: String): Playlist
-
-    fun playlists(): List<Playlist>
-
-    fun playlists(cursor: Cursor?): List<Playlist>
-
-    fun favoritePlaylist(playlistName: String): List<Playlist>
-
-    fun deletePlaylist(playlistId: Long)
-
-    fun playlist(playlistId: Long): Playlist
-
-    fun playlistSongs(playlistId: Long): List<Song>
-}
 @Suppress("Deprecation")
-class RealPlaylistRepository(
+class PlaylistRepositoryImpl(
     private val contentResolver: ContentResolver
 ) : PlaylistRepository {
 
@@ -67,7 +30,12 @@ class RealPlaylistRepository(
     }
 
     override fun playlist(playlistName: String): Playlist {
-        return playlist(makePlaylistCursor(PlaylistsColumns.NAME + "=?", arrayOf(playlistName)))
+        return playlist(
+            makePlaylistCursor(
+                MediaStore.Audio.PlaylistsColumns.NAME + "=?",
+                arrayOf(playlistName)
+            )
+        )
     }
 
     override fun playlist(playlistId: Long): Playlist {
@@ -80,7 +48,12 @@ class RealPlaylistRepository(
     }
 
     override fun searchPlaylist(query: String): List<Playlist> {
-        return playlists(makePlaylistCursor(PlaylistsColumns.NAME + "=?", arrayOf(query)))
+        return playlists(
+            makePlaylistCursor(
+                MediaStore.Audio.PlaylistsColumns.NAME + "=?",
+                arrayOf(query)
+            )
+        )
     }
 
     override fun playlists(): List<Playlist> {
@@ -101,14 +74,14 @@ class RealPlaylistRepository(
     override fun favoritePlaylist(playlistName: String): List<Playlist> {
         return playlists(
             makePlaylistCursor(
-                PlaylistsColumns.NAME + "=?",
+                MediaStore.Audio.PlaylistsColumns.NAME + "=?",
                 arrayOf(playlistName)
             )
         )
     }
 
     override fun deletePlaylist(playlistId: Long) {
-        val localUri = EXTERNAL_CONTENT_URI
+        val localUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI
         val localStringBuilder = StringBuilder()
         localStringBuilder.append("_id IN (")
         localStringBuilder.append(playlistId)
@@ -143,19 +116,19 @@ class RealPlaylistRepository(
     }
 
     private fun getPlaylistSongFromCursorImpl(cursor: Cursor, playlistId: Long): PlaylistSong {
-        val id = cursor.getLong(Members.AUDIO_ID)
-        val title = cursor.getString(AudioColumns.TITLE)
-        val trackNumber = cursor.getInt(AudioColumns.TRACK)
-        val year = cursor.getInt(AudioColumns.YEAR)
-        val duration = cursor.getLong(AudioColumns.DURATION)
+        val id = cursor.getLong(MediaStore.Audio.Playlists.Members.AUDIO_ID)
+        val title = cursor.getString(MediaStore.Audio.AudioColumns.TITLE)
+        val trackNumber = cursor.getInt(MediaStore.Audio.AudioColumns.TRACK)
+        val year = cursor.getInt(MediaStore.Audio.AudioColumns.YEAR)
+        val duration = cursor.getLong(MediaStore.Audio.AudioColumns.DURATION)
         val data = cursor.getString(Constants.DATA)
-        val dateModified = cursor.getLong(AudioColumns.DATE_MODIFIED)
-        val albumId = cursor.getLong(AudioColumns.ALBUM_ID)
-        val albumName = cursor.getString(AudioColumns.ALBUM)
-        val artistId = cursor.getLong(AudioColumns.ARTIST_ID)
-        val artistName = cursor.getString(AudioColumns.ARTIST)
-        val idInPlaylist = cursor.getLong(Members._ID)
-        val composer = cursor.getStringOrNull(AudioColumns.COMPOSER)
+        val dateModified = cursor.getLong(MediaStore.Audio.AudioColumns.DATE_MODIFIED)
+        val albumId = cursor.getLong(MediaStore.Audio.AudioColumns.ALBUM_ID)
+        val albumName = cursor.getString(MediaStore.Audio.AudioColumns.ALBUM)
+        val artistId = cursor.getLong(MediaStore.Audio.AudioColumns.ARTIST_ID)
+        val artistName = cursor.getString(MediaStore.Audio.AudioColumns.ARTIST)
+        val idInPlaylist = cursor.getLong(MediaStore.Audio.Playlists.Members._ID)
+        val composer = cursor.getStringOrNull(MediaStore.Audio.AudioColumns.COMPOSER)
         val albumArtist = cursor.getStringOrNull("album_artist")
         return PlaylistSong(
             id,
@@ -181,37 +154,37 @@ class RealPlaylistRepository(
         values: Array<String>?
     ): Cursor? {
         return contentResolver.query(
-            EXTERNAL_CONTENT_URI,
+            MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
             arrayOf(
                 BaseColumns._ID, /* 0 */
-                PlaylistsColumns.NAME /* 1 */
+                MediaStore.Audio.PlaylistsColumns.NAME /* 1 */
             ),
             selection,
             values,
-            DEFAULT_SORT_ORDER
+            MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER
         )
     }
 
 
     private fun makePlaylistSongCursor(playlistId: Long): Cursor? {
         return contentResolver.query(
-            Members.getContentUri("external", playlistId),
+            MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId),
             arrayOf(
-                Members.AUDIO_ID, // 0
-                AudioColumns.TITLE, // 1
-                AudioColumns.TRACK, // 2
-                AudioColumns.YEAR, // 3
-                AudioColumns.DURATION, // 4
+                MediaStore.Audio.Playlists.Members.AUDIO_ID, // 0
+                MediaStore.Audio.AudioColumns.TITLE, // 1
+                MediaStore.Audio.AudioColumns.TRACK, // 2
+                MediaStore.Audio.AudioColumns.YEAR, // 3
+                MediaStore.Audio.AudioColumns.DURATION, // 4
                 Constants.DATA, // 5
-                AudioColumns.DATE_MODIFIED, // 6
-                AudioColumns.ALBUM_ID, // 7
-                AudioColumns.ALBUM, // 8
-                AudioColumns.ARTIST_ID, // 9
-                AudioColumns.ARTIST, // 10
-                Members._ID,//11
-                AudioColumns.COMPOSER,//12
+                MediaStore.Audio.AudioColumns.DATE_MODIFIED, // 6
+                MediaStore.Audio.AudioColumns.ALBUM_ID, // 7
+                MediaStore.Audio.AudioColumns.ALBUM, // 8
+                MediaStore.Audio.AudioColumns.ARTIST_ID, // 9
+                MediaStore.Audio.AudioColumns.ARTIST, // 10
+                MediaStore.Audio.Playlists.Members._ID,//11
+                MediaStore.Audio.AudioColumns.COMPOSER,//12
                 "album_artist"//13
-            ), Constants.IS_MUSIC, null, Members.DEFAULT_SORT_ORDER
+            ), Constants.IS_MUSIC, null, MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER
         )
     }
 }

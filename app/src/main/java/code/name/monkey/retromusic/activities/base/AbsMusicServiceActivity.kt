@@ -1,17 +1,3 @@
-/*
- * Copyright (c) 2020 Hemanth Savarla.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- */
 package code.name.monkey.retromusic.activities.base
 
 import android.Manifest
@@ -26,7 +12,7 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.db.toPlayCount
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.IMusicServiceEventListener
-import code.name.monkey.retromusic.repository.RealRepository
+import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.service.MusicService.Companion.FAVORITE_STATE_CHANGED
 import code.name.monkey.retromusic.service.MusicService.Companion.MEDIA_STORE_CHANGED
 import code.name.monkey.retromusic.service.MusicService.Companion.META_CHANGED
@@ -44,7 +30,7 @@ import java.lang.ref.WeakReference
 abstract class AbsMusicServiceActivity : AbsBaseActivity(), IMusicServiceEventListener {
 
     private val mMusicServiceEventListeners = ArrayList<IMusicServiceEventListener>()
-    private val repository: RealRepository by inject()
+    private val repository: Repository by inject()
     private var serviceToken: MusicPlayerRemote.ServiceToken? = null
     private var musicStateReceiver: MusicStateReceiver? = null
     private var receiverRegistered: Boolean = false

@@ -1,17 +1,4 @@
-/*
- * Copyright (c) 2020 Hemanth Savarla.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- */
+
 package code.name.monkey.retromusic.fragments
 
 import android.animation.ValueAnimator
@@ -26,7 +13,7 @@ import code.name.monkey.retromusic.fragments.search.Filter
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.IMusicServiceEventListener
 import code.name.monkey.retromusic.model.*
-import code.name.monkey.retromusic.repository.RealRepository
+import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.util.DensityUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.logD
@@ -40,7 +27,7 @@ import java.io.File
 
 
 class LibraryViewModel(
-    private val repository: RealRepository,
+    private val repository: Repository,
 ) : ViewModel(), IMusicServiceEventListener {
 
     private val _paletteColor = MutableLiveData<Int>()

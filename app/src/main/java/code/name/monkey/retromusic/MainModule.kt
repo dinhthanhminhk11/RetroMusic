@@ -15,7 +15,28 @@ import code.name.monkey.retromusic.network.provideDefaultCache
 import code.name.monkey.retromusic.network.provideLastFmRest
 import code.name.monkey.retromusic.network.provideLastFmRetrofit
 import code.name.monkey.retromusic.network.provideOkHttp
-import code.name.monkey.retromusic.repository.*
+import code.name.monkey.retromusic.repository.Repository
+import code.name.monkey.retromusic.repository.RepositoryImpl
+import code.name.monkey.retromusic.repository.data_source.AlbumRepository
+import code.name.monkey.retromusic.repository.data_source.ArtistRepository
+import code.name.monkey.retromusic.repository.data_source.GenreRepository
+import code.name.monkey.retromusic.repository.data_source.LastAddedRepository
+import code.name.monkey.retromusic.repository.data_source.LocalDataRepository
+import code.name.monkey.retromusic.repository.data_source.PlaylistRepository
+import code.name.monkey.retromusic.repository.data_source.RoomRepository
+import code.name.monkey.retromusic.repository.data_source.SearchRepository
+import code.name.monkey.retromusic.repository.data_source.SongRepository
+import code.name.monkey.retromusic.repository.data_source.TopPlayedRepository
+import code.name.monkey.retromusic.repository.data_source_impl.AlbumRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.ArtistRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.GenreRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.LastAddedRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.LocalDataRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.PlaylistRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.RoomRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.SearchRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.SongRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.TopPlayedRepositoryImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.bind
@@ -58,7 +79,7 @@ private val roomModule = module {
     }
 
     single {
-        RealRoomRepository(get(), get(), get())
+        RoomRepositoryImpl(get(), get(), get())
     } bind RoomRepository::class
 }
 private val autoModule = module {
@@ -84,7 +105,7 @@ private val mainModule = module {
 }
 private val dataModule = module {
     single {
-        RealRepository(
+        RepositoryImpl(
             get(),
             get(),
             get(),
@@ -101,48 +122,47 @@ private val dataModule = module {
     } bind Repository::class
 
     single {
-        RealSongRepository(get())
+        SongRepositoryImpl(get())
     } bind SongRepository::class
 
     single {
-        RealGenreRepository(get(), get())
+        GenreRepositoryImpl(get(), get())
     } bind GenreRepository::class
 
     single {
-        RealAlbumRepository(get())
+        AlbumRepositoryImpl(get(), get())
     } bind AlbumRepository::class
 
     single {
-        RealArtistRepository(get(), get())
+        ArtistRepositoryImpl(get(), get())
     } bind ArtistRepository::class
 
     single {
-        RealPlaylistRepository(get())
+        PlaylistRepositoryImpl(get())
     } bind PlaylistRepository::class
 
     single {
-        RealTopPlayedRepository(get(), get(), get(), get())
+        TopPlayedRepositoryImpl(get(), get())
     } bind TopPlayedRepository::class
 
     single {
-        RealLastAddedRepository(
-            get(),
+        LastAddedRepositoryImpl(
             get(),
             get()
         )
     } bind LastAddedRepository::class
 
     single {
-        RealSearchRepository(
+        SearchRepositoryImpl(
             get(),
             get(),
             get(),
             get(),
             get()
         )
-    }
+    } bind SearchRepository::class
     single {
-        RealLocalDataRepository(get())
+        LocalDataRepositoryImpl(get())
     } bind LocalDataRepository::class
 }
 

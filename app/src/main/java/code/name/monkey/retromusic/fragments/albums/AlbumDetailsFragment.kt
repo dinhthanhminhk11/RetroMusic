@@ -1,17 +1,4 @@
-/*
- * Copyright (c) 2020 Hemanth Savarla.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- */
+
 package code.name.monkey.retromusic.fragments.albums
 
 import android.app.ActivityOptions
@@ -60,7 +47,7 @@ import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
-import code.name.monkey.retromusic.repository.RealRepository
+import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.util.*
 import com.bumptech.glide.Glide
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -368,7 +355,7 @@ class AlbumDetailsFragment : AbsMainActivityFragment(R.layout.fragment_album_det
 
             R.id.action_add_to_playlist -> {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val playlists = get<RealRepository>().fetchPlaylists()
+                    val playlists = get<Repository>().fetchPlaylists()
                     withContext(Dispatchers.Main) {
                         AddToPlaylistDialog.create(playlists, songs)
                             .show(childFragmentManager, "ADD_PLAYLIST")

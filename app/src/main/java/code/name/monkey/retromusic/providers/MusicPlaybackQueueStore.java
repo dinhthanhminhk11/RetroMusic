@@ -1,17 +1,6 @@
-/*
- * Copyright (c) 2019 Hemanth Savarala.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by
- *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- */
 package code.name.monkey.retromusic.providers;
+
+import static code.name.monkey.retromusic.util.SongUtils.songs;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,7 +18,7 @@ import java.util.List;
 import code.name.monkey.retromusic.App;
 import code.name.monkey.retromusic.Constants;
 import code.name.monkey.retromusic.model.Song;
-import code.name.monkey.retromusic.repository.RealSongRepository;
+import code.name.monkey.retromusic.repository.data_source.SongRepository;
 
 /**
  * @author Andrew Neal, modified for Phonograph by Karim Abou Zeid
@@ -159,7 +148,7 @@ public class MusicPlaybackQueueStore extends SQLiteOpenHelper {
   @NonNull
   private List<Song> getQueue(@NonNull final String tableName) {
     Cursor cursor = getReadableDatabase().query(tableName, null, null, null, null, null, null);
-    return new RealSongRepository(App.Companion.getContext()).songs(cursor);
+    return songs(cursor);
   }
 
   /**

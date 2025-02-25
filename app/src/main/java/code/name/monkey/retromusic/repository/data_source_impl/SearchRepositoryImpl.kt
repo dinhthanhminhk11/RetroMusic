@@ -1,18 +1,4 @@
-/*
- * Copyright (c) 2019 Hemanth Savarala.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by
- *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- */
-
-package code.name.monkey.retromusic.repository
+package code.name.monkey.retromusic.repository.data_source_impl
 
 import android.content.Context
 import code.name.monkey.retromusic.R
@@ -22,15 +8,25 @@ import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.model.Song
+import code.name.monkey.retromusic.repository.data_source.SongRepository
+import code.name.monkey.retromusic.repository.data_source.AlbumRepository
+import code.name.monkey.retromusic.repository.data_source.ArtistRepository
+import code.name.monkey.retromusic.repository.data_source.GenreRepository
+import code.name.monkey.retromusic.repository.data_source.RoomRepository
+import code.name.monkey.retromusic.repository.data_source.SearchRepository
 
-class RealSearchRepository(
+class SearchRepositoryImpl(
     private val songRepository: SongRepository,
     private val albumRepository: AlbumRepository,
     private val artistRepository: ArtistRepository,
     private val roomRepository: RoomRepository,
     private val genreRepository: GenreRepository,
-) {
-    suspend fun searchAll(context: Context, query: String?, filter: Filter): MutableList<Any> {
+) : SearchRepository {
+    override suspend fun searchAll(
+        context: Context,
+        query: String?,
+        filter: Filter
+    ): MutableList<Any> {
         val results = mutableListOf<Any>()
         if (query.isNullOrEmpty()) return results
         query.let { searchString ->
@@ -96,7 +92,8 @@ class RealSearchRepository(
             val playlist: List<PlaylistWithSongs> =
                 if (filter == Filter.PLAYLISTS || filter == Filter.NO_FILTER) {
                     roomRepository.playlistWithSongs().filter { playlist ->
-                        playlist.playlistEntity.playlistName.lowercase().contains(searchString.lowercase())
+                        playlist.playlistEntity.playlistName.lowercase()
+                            .contains(searchString.lowercase())
                     }
                 } else {
                     emptyList()

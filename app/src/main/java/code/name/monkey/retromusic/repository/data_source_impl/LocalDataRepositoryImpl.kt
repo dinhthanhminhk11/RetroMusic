@@ -1,15 +1,12 @@
-package code.name.monkey.retromusic.repository
+package code.name.monkey.retromusic.repository.data_source_impl
 
 import android.content.Context
 import code.name.monkey.retromusic.model.Contributor
+import code.name.monkey.retromusic.repository.data_source.LocalDataRepository
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 
-interface LocalDataRepository {
-    fun contributors(): List<Contributor>
-}
-
-class RealLocalDataRepository(
+class LocalDataRepositoryImpl(
     private val context: Context
 ) : LocalDataRepository {
 

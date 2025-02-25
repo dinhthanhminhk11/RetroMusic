@@ -25,7 +25,7 @@ import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.model.lyrics.AbsSynchronizedLyrics
 import code.name.monkey.retromusic.repository.Repository
-import code.name.monkey.retromusic.repository.SongRepository
+import code.name.monkey.retromusic.repository.data_source.SongRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext

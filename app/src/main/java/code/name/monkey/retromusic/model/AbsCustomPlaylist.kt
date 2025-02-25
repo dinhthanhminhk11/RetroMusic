@@ -1,8 +1,8 @@
 package code.name.monkey.retromusic.model
 
-import code.name.monkey.retromusic.repository.LastAddedRepository
-import code.name.monkey.retromusic.repository.SongRepository
-import code.name.monkey.retromusic.repository.TopPlayedRepository
+import code.name.monkey.retromusic.repository.data_source.LastAddedRepository
+import code.name.monkey.retromusic.repository.data_source.SongRepository
+import code.name.monkey.retromusic.repository.data_source.TopPlayedRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

@@ -1,17 +1,3 @@
-/*
- * Copyright (c) 2020 Hemanth Savarla.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- */
 package code.name.monkey.retromusic.activities
 
 import android.content.Intent
@@ -100,9 +86,11 @@ class MainActivity : AbsCastActivity() {
                     // Show Bottom Navigation Bar
                     setBottomNavVisibility(visible = true, animate = true)
                 }
+
                 R.id.playing_queue_fragment -> {
                     setBottomNavVisibility(visible = false, hideBottomSheet = true)
                 }
+
                 else -> setBottomNavVisibility(
                     visible = false,
                     animate = true
@@ -142,7 +130,7 @@ class MainActivity : AbsCastActivity() {
             if (intent.action != null &&
                 intent.action == MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH
             ) {
-                val songs: List<Song> = getSongs(intent.extras!!)
+                val songs: List<Song> = getSongs(applicationContext, intent.extras!!)
                 if (MusicPlayerRemote.shuffleMode == MusicService.SHUFFLE_MODE_SHUFFLE) {
                     MusicPlayerRemote.openAndShuffleQueue(songs, true)
                 } else {
