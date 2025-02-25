@@ -1,6 +1,7 @@
-
 package code.name.monkey.retromusic.fragments.search
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -14,6 +15,7 @@ import androidx.core.content.getSystemService
 import androidx.core.view.*
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
@@ -148,10 +150,19 @@ class SearchFragment : AbsMainActivityFragment(R.layout.fragment_search),
         searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 super.onChanged()
-                binding.empty.isVisible = searchAdapter.itemCount < 1
+                val checkEmpty = searchAdapter.itemCount < 1
+                animateVisibility(binding.empty, checkEmpty)
             }
         })
+
+        var itemAnimator = DefaultItemAnimator()
+            .apply {
+                supportsChangeAnimations = false
+                addDuration = 350
+            }
+
         binding.recyclerView.apply {
+            itemAnimator = itemAnimator
             layoutManager = LinearLayoutManager(requireContext())
             adapter = searchAdapter
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -213,6 +224,57 @@ class SearchFragment : AbsMainActivityFragment(R.layout.fragment_search),
                 binding.searchView.setText(spokenText)
             }
         }
+
+    private fun animateVisibility(
+        view: View,
+        show: Boolean,
+        progressView: View? = null
+    ) {
+        if (show) {
+            if (view.visibility != View.VISIBLE) {
+                view.animate().cancel()
+                view.alpha = 0f
+                view.scaleX = 0.8f
+                view.scaleY = 0.8f
+                view.visibility = View.VISIBLE
+                view.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(150)
+                    .start()
+
+                progressView?.apply {
+                    visibility = View.VISIBLE
+                    alpha = 1f
+                }
+                binding.iconEmpty.playAnimation()
+            }
+        } else {
+            if (view.visibility == View.VISIBLE) {
+                view.animate().cancel()
+                view.animate()
+                    .alpha(0f)
+                    .scaleX(0.8f)
+                    .scaleY(0.8f)
+                    .setDuration(150)
+                    .withEndAction { view.visibility = View.GONE }
+                    .start()
+
+                progressView?.animate()?.apply {
+                    setListener(null)
+                    cancel()
+                    setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            progressView.visibility = View.GONE
+                        }
+                    })
+                    alpha(0f).setDuration(150).start()
+                }
+                binding.iconEmpty.cancelAnimation()
+            }
+        }
+    }
 
     override fun onResume() {
         super.onResume()
