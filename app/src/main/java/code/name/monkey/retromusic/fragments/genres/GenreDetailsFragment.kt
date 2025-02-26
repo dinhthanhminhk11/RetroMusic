@@ -86,7 +86,7 @@ class GenreDetailsFragment : AbsMainActivityFragment(R.layout.fragment_playlist_
 
     private fun checkIsEmpty() {
         checkForPadding()
-        binding.emptyEmoji.text = getEmojiByUnicode(0x1F631)
+//        binding.emptyEmoji.text = getEmojiByUnicode(0x1F631)
         binding.empty.isVisible = songAdapter.itemCount == 0
     }
 

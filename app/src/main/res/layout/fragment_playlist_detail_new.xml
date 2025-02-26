@@ -26,23 +26,22 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
                 android:paddingTop="?actionBarSize"
-                android:paddingBottom="16dp"
-                android:paddingHorizontal="16dp">
+                android:paddingBottom="16dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/playlistSearchView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/play_button"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/clear_search"
                     android:background="@null"
                     android:hint="@string/action_search"
                     android:inputType="text|textAutoComplete"
                     android:padding="12dp"
-                    android:textAppearance="@style/TextViewSubtitle1">
-                </com.google.android.material.textfield.TextInputEditText>
+                    android:textAppearance="@style/TextViewSubtitle1"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/clear_search"
+                    app:layout_constraintTop_toBottomOf="@id/play_button"></com.google.android.material.textfield.TextInputEditText>
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/clear_search"
@@ -152,13 +151,16 @@
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         tools:visibility="visible">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/emptyEmoji"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/empty_text_emoji"
-            android:textAppearance="@style/TextViewHeadline3" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/iconEmpty"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_100sdp"
+            android:background="@null"
+            android:backgroundTint="@null"
+            android:backgroundTintMode="@null"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="duck_empty1.tgs"
+            app:lottie_loop="true" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/emptyText"

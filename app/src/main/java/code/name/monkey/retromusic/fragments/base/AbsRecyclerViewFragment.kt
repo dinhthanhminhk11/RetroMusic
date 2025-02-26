@@ -1,4 +1,3 @@
-
 package code.name.monkey.retromusic.fragments.base
 
 import android.os.Bundle
@@ -192,10 +191,12 @@ abstract class AbsRecyclerViewFragment<A : RecyclerView.Adapter<*>, LM : Recycle
                 null,
                 navOptions
             )
+
             R.id.action_import_playlist -> ImportPlaylistDialog().show(
                 childFragmentManager,
                 "ImportPlaylist"
             )
+
             R.id.action_add_to_playlist -> CreatePlaylistDialog.create(emptyList()).show(
                 childFragmentManager,
                 "ShowCreatePlaylistDialog"

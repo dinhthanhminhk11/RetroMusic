@@ -43,13 +43,16 @@
         android:visibility="gone"
         tools:visibility="visible">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/emptyEmoji"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/empty_text_emoji"
-            android:textAppearance="@style/TextViewHeadline3" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/iconEmpty"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_100sdp"
+            android:background="@null"
+            android:backgroundTint="@null"
+            android:backgroundTintMode="@null"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="duck_empty1.tgs"
+            app:lottie_loop="true" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/emptyText"

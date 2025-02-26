@@ -1,4 +1,3 @@
-
 package code.name.monkey.retromusic.fragments.albums
 
 import android.os.Bundle

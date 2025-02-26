@@ -190,13 +190,18 @@ class PlaylistDetailsFragment : AbsMainActivityFragment(R.layout.fragment_playli
     private fun checkIsEmpty() {
         if (_binding != null) {
             if (playlistSongAdapter.itemCount != 0) {
+                binding.iconEmpty.cancelAnimation()
                 binding.empty.isVisible = false
             } else {
                 binding.empty.isVisible = true
                 if (playlistSongAdapter.hasSongs()) {
+                    binding.iconEmpty.setAnimation("utyan_empty.json")
+                    binding.iconEmpty.playAnimation()
                     binding.emptyText.text = getString(R.string.no_search_results)
                 } else {
+                    binding.iconEmpty.setAnimation("duck_empty1.tgs")
                     binding.emptyText.text = getString(R.string.no_songs)
+                    binding.iconEmpty.playAnimation()
                 }
             }
         }
