@@ -160,7 +160,7 @@
             android:backgroundTint="@null"
             android:backgroundTintMode="@null"
             app:lottie_autoPlay="true"
-            app:lottie_fileName="empty_ver2.tgs"
+            app:lottie_fileName="utyan_empty.json"
             app:lottie_loop="true"
             app:lottie_repeatCount="0" />
 

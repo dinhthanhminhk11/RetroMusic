@@ -54,8 +54,7 @@
             android:backgroundTintMode="@null"
             app:lottie_autoPlay="true"
             app:lottie_fileName="duck_empty1.tgs"
-            app:lottie_loop="true"
-            app:lottie_repeatCount="0" />
+            app:lottie_loop="true" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/emptyText"

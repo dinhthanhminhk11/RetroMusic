@@ -32,6 +32,7 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.MusicUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.ThemedFastScroller
+import code.name.monkey.retromusic.util.ViewUtil.animateEmptyVisibility
 import com.bumptech.glide.Glide
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.transition.MaterialArcMotion
@@ -174,7 +175,13 @@ class PlaylistDetailsFragment : AbsMainActivityFragment(R.layout.fragment_playli
             RecyclerView.AdapterDataObserver() {
             override fun onChanged() {
                 super.onChanged()
+                val checkEmpty = playlistSongAdapter.itemCount == 0
                 checkIsEmpty()
+                animateEmptyVisibility(
+                    view = binding.empty,
+                    show = checkEmpty,
+                    iconEmpty = binding.iconEmpty
+                )
             }
         })
     }
@@ -189,19 +196,16 @@ class PlaylistDetailsFragment : AbsMainActivityFragment(R.layout.fragment_playli
 
     private fun checkIsEmpty() {
         if (_binding != null) {
-            if (playlistSongAdapter.itemCount != 0) {
-                binding.iconEmpty.cancelAnimation()
-                binding.empty.isVisible = false
-            } else {
-                binding.empty.isVisible = true
-                if (playlistSongAdapter.hasSongs()) {
-                    binding.iconEmpty.setAnimation("utyan_empty.json")
-                    binding.iconEmpty.playAnimation()
-                    binding.emptyText.text = getString(R.string.no_search_results)
-                } else {
-                    binding.iconEmpty.setAnimation("duck_empty1.tgs")
-                    binding.emptyText.text = getString(R.string.no_songs)
-                    binding.iconEmpty.playAnimation()
+            if (playlistSongAdapter.itemCount == 0) {
+                if (!binding.empty.isVisible) {
+                    if (playlistSongAdapter.hasSongs()) {
+                        binding.iconEmpty.setAnimation("empty_ver2.tgs")
+                        binding.iconEmpty.repeatCount = 0
+                        binding.emptyText.text = getString(R.string.no_search_results)
+                    } else {
+                        binding.iconEmpty.setAnimation("duck_empty1.tgs")
+                        binding.emptyText.text = getString(R.string.no_songs)
+                    }
                 }
             }
         }

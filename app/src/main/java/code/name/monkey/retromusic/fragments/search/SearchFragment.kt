@@ -25,6 +25,8 @@ import code.name.monkey.retromusic.databinding.FragmentSearchBinding
 import code.name.monkey.retromusic.extensions.*
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.ViewUtil.animateEmptyVisibility
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -151,7 +153,11 @@ class SearchFragment : AbsMainActivityFragment(R.layout.fragment_search),
             override fun onChanged() {
                 super.onChanged()
                 val checkEmpty = searchAdapter.itemCount < 1
-                animateVisibility(binding.empty, checkEmpty)
+                animateEmptyVisibility(
+                    view = binding.empty,
+                    show = checkEmpty,
+                    iconEmpty = binding.iconEmpty
+                )
             }
         })
 
@@ -225,56 +231,6 @@ class SearchFragment : AbsMainActivityFragment(R.layout.fragment_search),
             }
         }
 
-    private fun animateVisibility(
-        view: View,
-        show: Boolean,
-        progressView: View? = null
-    ) {
-        if (show) {
-            if (view.visibility != View.VISIBLE) {
-                view.animate().cancel()
-                view.alpha = 0f
-                view.scaleX = 0.8f
-                view.scaleY = 0.8f
-                view.visibility = View.VISIBLE
-                view.animate()
-                    .alpha(1f)
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(150)
-                    .start()
-
-                progressView?.apply {
-                    visibility = View.VISIBLE
-                    alpha = 1f
-                }
-                binding.iconEmpty.playAnimation()
-            }
-        } else {
-            if (view.visibility == View.VISIBLE) {
-                view.animate().cancel()
-                view.animate()
-                    .alpha(0f)
-                    .scaleX(0.8f)
-                    .scaleY(0.8f)
-                    .setDuration(150)
-                    .withEndAction { view.visibility = View.GONE }
-                    .start()
-
-                progressView?.animate()?.apply {
-                    setListener(null)
-                    cancel()
-                    setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            progressView.visibility = View.GONE
-                        }
-                    })
-                    alpha(0f).setDuration(150).start()
-                }
-                binding.iconEmpty.cancelAnimation()
-            }
-        }
-    }
 
     override fun onResume() {
         super.onResume()

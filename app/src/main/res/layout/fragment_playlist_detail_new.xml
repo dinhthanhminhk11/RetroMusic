@@ -160,13 +160,15 @@
             android:backgroundTintMode="@null"
             app:lottie_autoPlay="true"
             app:lottie_fileName="duck_empty1.tgs"
-            app:lottie_loop="true" />
+            app:lottie_loop="true"
+             />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/emptyText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_10sdp"
             android:text="@string/no_songs"
             android:textAppearance="@style/TextViewHeadline5"
             android:textColor="?android:attr/textColorSecondary"
