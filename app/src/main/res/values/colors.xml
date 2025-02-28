@@ -38,4 +38,5 @@
     <color name="widget_md3_bg_color">@color/lighterColorSurface</color>
     <color name="widget_circle_button_color">@color/md_indigo_A400</color>
     <color name="widget_md3_button_bg_color">@color/lighterColorSurface</color>
+    <color name="color_gray_C7">#C7C7C7</color>
 </resources>

@@ -69,4 +69,10 @@
     <dimen name="seekbar_padding">16dp</dimen>
     <dimen name="cast_mini_controller_height">64dp</dimen>
     <dimen name="cast_mini_controller_image_size">48dp</dimen>
+    <dimen name="otp_view_item_size">48dp</dimen>
+    <dimen name="otp_view_item_radius">5dp</dimen>
+    <dimen name="otp_view_item_spacing">5dp</dimen>
+    <dimen name="otp_view_item_line_width">2dp</dimen>
+    <dimen name="otp_view_cursor_width">2dp</dimen>
+    <dimen name="app_bar_height">172dp</dimen>
 </resources>

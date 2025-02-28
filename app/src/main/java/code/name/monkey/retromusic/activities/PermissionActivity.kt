@@ -84,7 +84,7 @@ class PermissionActivity : AbsMusicServiceActivity() {
         })
     }
 
-    private fun setupTitle() {
+    private fun setupTitle() {//
         val color = accentColor()
         val hexColor = String.format("#%06X", 0xFFFFFF and color)
         val appName =

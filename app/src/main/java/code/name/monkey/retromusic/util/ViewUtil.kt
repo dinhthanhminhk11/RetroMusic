@@ -1,17 +1,3 @@
-/*
- * Copyright (c) 2019 Hemanth Savarala.
- *
- * Licensed under the GNU General Public License v3
- *
- * This is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by
- *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- */
-
 package code.name.monkey.retromusic.util
 
 import android.animation.Animator
@@ -25,9 +11,11 @@ import android.widget.ProgressBar
 import android.widget.SeekBar
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat.SRC_IN
+import androidx.navigation.navOptions
 import code.name.monkey.appthemehelper.util.ATHUtil
 import code.name.monkey.appthemehelper.util.ColorUtil
 import code.name.monkey.appthemehelper.util.MaterialValueHelper
+import code.name.monkey.retromusic.R
 import com.airbnb.lottie.LottieAnimationView
 
 object ViewUtil {
@@ -143,6 +131,30 @@ object ViewUtil {
                     })
                     alpha(0f).setDuration(150).start()
                 }
+            }
+        }
+    }
+
+    val navOptions by lazy {
+        navOptions {
+            launchSingleTop = false
+            anim {
+                enter = R.anim.retro_fragment_open_enter
+                exit = R.anim.retro_fragment_open_exit
+                popEnter = R.anim.retro_fragment_close_enter
+                popExit = R.anim.retro_fragment_close_exit
+            }
+        }
+    }
+
+    val navOptionsByMinh by lazy {
+        navOptions {
+            launchSingleTop = false
+            anim {
+                enter = R.anim.fragment_slide_left_enter
+                exit = R.anim.fragment_slide_left_exit
+                popEnter = R.anim.fragment_slide_right_enter
+                popExit = R.anim.fragment_slide_right_exit
             }
         }
     }

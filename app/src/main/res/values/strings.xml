@@ -571,4 +571,34 @@
     <string name="your_account_data_is_only_used_for_authentication">Your account data is only used for authentication.</string>
     <string name="could_not_write_tags_to_file">Could not write tags to the music file!</string>
     <string name="sleep_timer_no_permission">No permission to schedule alarms, please allow Retro Music.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="message_welcome_splash"><![CDATA[Hàng triệu bài hát. <br>Miễn phí trên %s.]]></string>
+    <string name="message_login_splash"><![CDATA[Đăng nhập vào<br>%s]]></string>
+    <string name="message_welcome_splash_register">Đăng ký để bắt đầu nghe</string>
+    <string name="login_splash">Đăng nhập</string>
+    <string name="register_splash">Đăng kí miễn phí</string>
+    <string name="register_splash2">Đăng kí</string>
+    <string name="email_button_splash">Tiếp tục với email</string>
+    <string name="phone_button_splash">Tiếp tục bằng số điện thoại</string>
+    <string name="you_have_account">Bạn đã có tài khoản?</string>
+    <string name="you_not_have_account">Bạn chưa có tài khoản?</string>
+    <string name="message_develop">Tính năng đang phát triển</string>
+    <string name="continue_text">Tiếp</string>
+    <string name="create_account">Tạo tài khoản</string>
+    <string name="what_is_you_email">Email của bạn là gì?</string>
+    <string name="message_verify_account">Bạn cần xác nhận email này sau.</string>
+    <string name="email_text_register">Email</string>
+    <string name="confirm">Xác thực</string>
+    <string name="content_otp_text_view">Nhập mã otp được gửi đến email &lt;b&gt;%s&lt;/b&gt; của bạn</string>
+    <string name="arr_you_have_otp">Bạn không nhận được OTP?</string>
+    <string name="sent_again">Gửi lại</string>
+    <string name="set_password_title">Đặt mật khẩu</string>
+    <string name="set_password_content">Đặt mật khẩu để hoàn thành bước cuối cùng thiết lập tài khoản của bạn</string>
+    <string name="success">Hoàn thành</string>
+    <string name="welcome_back">Chào mừng trở lại</string>
+    <string name="enter_form">Nhập thông tin của bạn để tiếp tục</string>
+    <string name="login_by_otp">Đăng nhập bằng OTP</string>
+    <string name="login_by_pass">Đăng nhập bằng mật khẩu</string>
 </resources>

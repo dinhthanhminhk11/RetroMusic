@@ -39,6 +39,7 @@ import code.name.monkey.retromusic.TOGGLE_ADD_CONTROLS
 import code.name.monkey.retromusic.TOGGLE_FULL_SCREEN
 import code.name.monkey.retromusic.TOGGLE_VOLUME
 import code.name.monkey.retromusic.activities.PermissionActivity
+import code.name.monkey.retromusic.activities.auth.AuthActivity
 import code.name.monkey.retromusic.databinding.SlidingMusicPanelLayoutBinding
 import code.name.monkey.retromusic.extensions.currentFragment
 import code.name.monkey.retromusic.extensions.darkAccentColor
@@ -198,6 +199,13 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val checkLogin: Boolean = false
+        if (checkLogin) {
+            startActivity(Intent(this, AuthActivity::class.java))
+            finish()
+        }
+
         if (!hasPermissions()) {
             startActivity(Intent(this, PermissionActivity::class.java))
             finish()
@@ -271,7 +279,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
 
             ALBUM_COVER_TRANSFORM, CAROUSEL_EFFECT,
             ALBUM_COVER_STYLE, TOGGLE_VOLUME, EXTRA_SONG_INFO, CIRCLE_PLAY_BUTTON,
-                -> {
+            -> {
                 chooseFragmentForTheme()
                 onServiceConnected()
             }

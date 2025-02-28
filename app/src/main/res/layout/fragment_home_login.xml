@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.auth.HomeLoginFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:fitsSystemWindows="true"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            style="@style/Toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title=""
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/ToolbarTextAppearanceNormal" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <include
+        android:id="@+id/layout_logo_splash"
+        layout="@layout/layout_logo_splash"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appBarLayout" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="@dimen/_26sdp"
+        android:layout_marginBottom="@dimen/_30sdp"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/layout_button_splash"
+            layout="@layout/layout_button_splash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_40sdp"
+            android:text="@string/you_not_have_account"
+            android:textAppearance="@style/TextViewSubtitle1"
+            tools:maxLines="@string/grid_size_1" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/loginTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="@string/register_splash2"
+            android:textAppearance="@style/TextViewSubtitle1"
+            android:textStyle="bold"
+            tools:maxLines="@string/grid_size_1" />
+    </LinearLayout>
+
+</RelativeLayout>
