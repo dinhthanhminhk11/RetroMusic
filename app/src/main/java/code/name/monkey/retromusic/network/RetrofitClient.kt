@@ -4,14 +4,23 @@ import android.content.Context
 import code.name.monkey.retromusic.App
 import code.name.monkey.retromusic.BuildConfig
 import code.name.monkey.retromusic.network.conversion.LyricsConverterFactory
+import code.name.monkey.retromusic.util.Utility.getCountryCode
+import code.name.monkey.retromusic.util.Utility.getDeviceId
+import code.name.monkey.retromusic.util.Utility.getLanguageCode
+import code.name.monkey.retromusic.util.Utility.getUserAgent
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.google.gson.GsonBuilder
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
+import java.util.Collections
 import java.util.concurrent.TimeUnit
 
 
@@ -69,6 +78,58 @@ fun provideLastFmRetrofit(client: OkHttpClient): Retrofit {
 
 fun provideLastFmRest(retrofit: Retrofit): LastFMService {
     return retrofit.create(LastFMService::class.java)
+}
+
+fun headerInterceptorLoginProtobuf(
+    deviceId: String,
+    countryCode: String,
+    languageCode: String
+): Interceptor {
+    return Interceptor { chain ->
+        val request = chain.request()
+            .newBuilder().apply {
+                header("Content-Type", "application/x-protobuf")
+                header("Accept-Encoding", "gzip")
+                header("xinternalgatewayauthnotrequired", "true")
+                header("user-agent", getUserAgent("Retro-Android", "8.79.1732129784"))
+                header("Device-ID", deviceId)
+                header("tg-loc-country", countryCode)
+                header("tg-loc-language", languageCode)
+            }.build()
+
+        chain.proceed(request)
+    }
+}
+
+fun provideOkHttpLoginProtobuf(context: Context, cache: Cache): OkHttpClient {
+    val deviceId = getDeviceId(context)
+    val countryCode = getCountryCode(context)
+    val languageCode = getLanguageCode()
+    return OkHttpClient.Builder().also { client ->
+        client.retryOnConnectionFailure(true)
+        client.addInterceptor(headerInterceptorLoginProtobuf(deviceId, countryCode, languageCode))
+        client.addNetworkInterceptor(logInterceptor())
+        client.connectTimeout(30, TimeUnit.SECONDS)
+        client.readTimeout(30, TimeUnit.SECONDS)
+        client.protocols(Collections.singletonList(Protocol.HTTP_1_1))
+        client.cache(cache)
+    }.build()
+}
+
+fun provideRetrofitLoginProtobuf(client: OkHttpClient): Retrofit {
+    val gson = GsonBuilder()
+        .setLenient()
+        .create()
+    return Retrofit.Builder()
+        .baseUrl(BuildConfig.BASE_URL)
+        .client(client)
+        .addConverterFactory(ScalarsConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build()
+}
+
+fun provideAuthService(retrofit: Retrofit): AuthService {
+    return retrofit.create(AuthService::class.java)
 }
 
 fun provideDeezerRest(retrofit: Retrofit): DeezerService {

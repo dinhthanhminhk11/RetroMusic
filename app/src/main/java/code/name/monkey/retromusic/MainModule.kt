@@ -11,10 +11,13 @@ import code.name.monkey.retromusic.fragments.artists.ArtistDetailsViewModel
 import code.name.monkey.retromusic.fragments.genres.GenreDetailsViewModel
 import code.name.monkey.retromusic.fragments.playlists.PlaylistDetailsViewModel
 import code.name.monkey.retromusic.model.Genre
+import code.name.monkey.retromusic.network.provideAuthService
 import code.name.monkey.retromusic.network.provideDefaultCache
 import code.name.monkey.retromusic.network.provideLastFmRest
 import code.name.monkey.retromusic.network.provideLastFmRetrofit
 import code.name.monkey.retromusic.network.provideOkHttp
+import code.name.monkey.retromusic.network.provideOkHttpLoginProtobuf
+import code.name.monkey.retromusic.network.provideRetrofitLoginProtobuf
 import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.repository.RepositoryImpl
 import code.name.monkey.retromusic.repository.data_source.AlbumRepository
@@ -55,6 +58,21 @@ val networkModule = module {
     }
     single {
         provideLastFmRest(get())
+    }
+}
+
+val networkRetroSeverLoginModule = module {
+    factory {
+        provideDefaultCache()
+    }
+    factory {
+        provideOkHttpLoginProtobuf(get(), get())
+    }
+    single {
+        provideRetrofitLoginProtobuf(get())
+    }
+    single {
+        provideAuthService(get())
     }
 }
 
@@ -202,4 +220,12 @@ private val viewModules = module {
     }
 }
 
-val appModules = listOf(mainModule, dataModule, autoModule, viewModules, networkModule, roomModule)
+val appModules = listOf(
+    mainModule,
+    dataModule,
+    autoModule,
+    viewModules,
+    networkModule,
+    networkRetroSeverLoginModule,
+    roomModule
+)
