@@ -13,6 +13,10 @@ import com.google.android.material.snackbar.Snackbar
 
 class HomeRegisterFragment :
     BaseNormalFragment<FragmentHomeRegisterBinding>(FragmentHomeRegisterBinding::inflate) {
+    override fun onNetworkChanged(isConnected: Boolean) {
+
+    }
+
     override fun initView() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()

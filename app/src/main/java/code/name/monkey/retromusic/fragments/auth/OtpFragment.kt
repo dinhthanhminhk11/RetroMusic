@@ -6,6 +6,10 @@ import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 
 
 class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::inflate) {
+    override fun onNetworkChanged(isConnected: Boolean) {
+
+    }
+
     override fun initView() {
 
     }

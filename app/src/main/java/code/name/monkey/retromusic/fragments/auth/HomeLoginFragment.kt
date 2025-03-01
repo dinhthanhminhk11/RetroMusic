@@ -14,6 +14,10 @@ import com.google.android.material.snackbar.Snackbar
 
 class HomeLoginFragment :
     BaseNormalFragment<FragmentHomeLoginBinding>(FragmentHomeLoginBinding::inflate) {
+    override fun onNetworkChanged(isConnected: Boolean) {
+
+    }
+
     override fun initView() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()

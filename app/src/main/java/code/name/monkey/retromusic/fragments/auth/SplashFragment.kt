@@ -11,6 +11,9 @@ import code.name.monkey.retromusic.util.ViewUtil
 
 
 class SplashFragment : BaseNormalFragment<FragmentSplashBinding>(FragmentSplashBinding::inflate) {
+    override fun onNetworkChanged(isConnected: Boolean) {
+
+    }
 
 
     override fun initView() {

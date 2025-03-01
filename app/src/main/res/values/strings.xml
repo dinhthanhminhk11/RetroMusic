@@ -589,6 +589,7 @@
     <string name="create_account">Tạo tài khoản</string>
     <string name="what_is_you_email">Email của bạn là gì?</string>
     <string name="message_verify_account">Bạn cần xác nhận email này sau.</string>
+    <string name="disconnect_internet">Mất kết nối vui lòng thử lại......</string>
     <string name="email_text_register">Email</string>
     <string name="confirm">Xác thực</string>
     <string name="content_otp_text_view">Nhập mã otp được gửi đến email &lt;b&gt;%s&lt;/b&gt; của bạn</string>

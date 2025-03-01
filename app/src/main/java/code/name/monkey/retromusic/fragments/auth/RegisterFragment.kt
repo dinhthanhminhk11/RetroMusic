@@ -12,6 +12,17 @@ import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 
 class RegisterFragment :
     BaseNormalFragment<FragmentRegisterBinding>(FragmentRegisterBinding::inflate) {
+
+    private var isNetworkConnected = false;
+    private var isEmailValid = false;
+
+    override fun onNetworkChanged(isConnected: Boolean) {
+        isNetworkConnected = isConnected
+        updateButtonState()
+        binding.subTitle.text =
+            if (isConnected) getString(R.string.message_verify_account) else getString(R.string.disconnect_internet)
+    }
+
     override fun initView() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
@@ -20,7 +31,8 @@ class RegisterFragment :
         binding.username.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 val email = s.toString()
-                binding.btnContinue.isEnabled = validateEmail(email)
+                isEmailValid = validateEmail(email)
+                updateButtonState()
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -59,4 +71,7 @@ class RegisterFragment :
         return emailPattern.matcher(email).matches()
     }
 
+    private fun updateButtonState() {
+        binding.btnContinue.isEnabled = isNetworkConnected && isEmailValid
+    }
 }

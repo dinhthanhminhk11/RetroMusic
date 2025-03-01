@@ -200,7 +200,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val checkLogin: Boolean = false
+        val checkLogin: Boolean = true
         if (checkLogin) {
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
