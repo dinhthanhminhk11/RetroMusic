@@ -7,6 +7,7 @@ import androidx.navigation.fragment.findNavController
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.FragmentRegisterBinding
 import code.name.monkey.retromusic.encryption.Login
+import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 
@@ -20,8 +21,9 @@ class RegisterFragment :
     override fun onNetworkChanged(isConnected: Boolean) {
         isNetworkConnected = isConnected
         updateButtonState()
-        binding.subTitle.text =
+        binding.subTitle.animatedTextChange(
             if (isNetworkConnected) getString(R.string.message_verify_account) else getString(R.string.disconnect_internet)
+        )
     }
 
     override fun initView() {

@@ -1,0 +1,29 @@
+package code.name.monkey.retromusic.fragments.auth.register
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.network.model.request.auth.REQLogin
+import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
+import code.name.monkey.retromusic.repository.Repository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+class RegisterViewModel(private val repository: Repository) : ViewModel() {
+    val _authState = MutableLiveData<Result<LoginResponseNative>>()
+    val authState: LiveData<Result<LoginResponseNative>> get() = _authState
+
+    fun register(reqLogin: REQLogin) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _authState.postValue(Result.Loading)
+            try {
+                val response = repository.register(reqLogin)
+                _authState.postValue(response)
+            } catch (e: Exception) {
+                _authState.postValue(Result.Error(e))
+            }
+        }
+    }
+}
