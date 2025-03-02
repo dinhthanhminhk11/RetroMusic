@@ -602,4 +602,6 @@
     <string name="enter_form">Nhập thông tin của bạn để tiếp tục</string>
     <string name="login_by_otp">Đăng nhập bằng OTP</string>
     <string name="login_by_pass">Đăng nhập bằng mật khẩu</string>
+    <string name="enter_form_login_by_otp">Trong trường hợp bạn quên mật khẩu bạn có thể đăng nhập bằng OTP</string>
+
 </resources>

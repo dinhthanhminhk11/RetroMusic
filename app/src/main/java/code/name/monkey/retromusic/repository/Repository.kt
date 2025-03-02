@@ -17,6 +17,9 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.network.model.LastFmArtist
+import code.name.monkey.retromusic.network.model.request.auth.REQLogin
+import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
+import okhttp3.RequestBody
 
 interface Repository {
 
@@ -85,4 +88,12 @@ interface Repository {
     fun getSongByGenre(genreId: Long): Song
     fun checkPlaylistExists(playListId: Long): LiveData<Boolean>
     fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs>
+    suspend fun login(reqLogin: REQLogin): Result<LoginResponseNative>
+    suspend fun register(reqLogin: REQLogin): Result<LoginResponseNative>
+    suspend fun verifyOtp(reqLogin: REQLogin): Result<LoginResponseNative>
+    suspend fun reSentOtp(reqLogin: REQLogin): Result<LoginResponseNative>
+    suspend fun setPassword(reqLogin: REQLogin): Result<LoginResponseNative>
+    suspend fun checkAccount(reqLogin: REQLogin): Result<LoginResponseNative>
+    suspend fun loginByToken(token: String): Result<LoginResponseNative>
+    suspend fun fakeLogin(contact: RequestBody): Result<LoginResponseNative>
 }

@@ -12,33 +12,33 @@
         tools:layout="@layout/fragment_splash" />
     <fragment
         android:id="@+id/loginFragment"
-        android:name="code.name.monkey.retromusic.fragments.auth.LoginFragment"
+        android:name="code.name.monkey.retromusic.fragments.auth.login.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" />
     <fragment
         android:id="@+id/registerFragment"
-        android:name="code.name.monkey.retromusic.fragments.auth.RegisterFragment"
+        android:name="code.name.monkey.retromusic.fragments.auth.register.RegisterFragment"
         android:label="fragment_register"
         tools:layout="@layout/fragment_register" />
     <fragment
         android:id="@+id/homeLoginFragment"
-        android:name="code.name.monkey.retromusic.fragments.auth.HomeLoginFragment"
+        android:name="code.name.monkey.retromusic.fragments.auth.login.HomeLoginFragment"
         android:label="fragment_home_login"
         tools:layout="@layout/fragment_home_login" />
     <fragment
         android:id="@+id/homeRegisterFragment"
-        android:name="code.name.monkey.retromusic.fragments.auth.HomeRegisterFragment"
+        android:name="code.name.monkey.retromusic.fragments.auth.register.HomeRegisterFragment"
         android:label="fragment_home_register"
         tools:layout="@layout/fragment_home_register" />
     <fragment
         android:id="@+id/otpFragment"
-        android:name="code.name.monkey.retromusic.fragments.auth.OtpFragment"
+        android:name="code.name.monkey.retromusic.fragments.auth.otp.OtpFragment"
         android:label="fragment_otp"
         tools:layout="@layout/fragment_otp" />
 
     <fragment
         android:id="@+id/setPassFragment"
-        android:name="code.name.monkey.retromusic.fragments.auth.SetPassFragment"
+        android:name="code.name.monkey.retromusic.fragments.auth.setpass.SetPassFragment"
         android:label="fragment_set_pass"
         tools:layout="@layout/fragment_set_pass" />
 </navigation>

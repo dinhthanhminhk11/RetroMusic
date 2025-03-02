@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.auth.LoginFragment">
+    tools:context=".fragments.auth.login.LoginFragment">
 
 
     <com.google.android.material.appbar.AppBarLayout
@@ -33,6 +33,7 @@
         android:layout_below="@+id/appBarLayout"
         android:layout_marginHorizontal="@dimen/_16sdp"
         android:layout_marginTop="@dimen/_20sdp"
+        android:animateLayoutChanges="true"
         android:orientation="vertical">
 
 
@@ -46,9 +47,12 @@
             android:textStyle="bold" />
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/subTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_5sdp"
+            android:lines="2"
+            android:maxLines="2"
             android:text="@string/enter_form"
             tools:maxLines="@string/grid_size_1" />
 
@@ -57,7 +61,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             app:hintAnimationEnabled="true"
             app:hintEnabled="true"
             app:layout_constraintBottom_toBottomOf="@+id/userImage"

@@ -30,6 +30,7 @@ import code.name.monkey.retromusic.repository.data_source.RoomRepository
 import code.name.monkey.retromusic.repository.data_source.SearchRepository
 import code.name.monkey.retromusic.repository.data_source.SongRepository
 import code.name.monkey.retromusic.repository.data_source.TopPlayedRepository
+import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
 import code.name.monkey.retromusic.repository.data_source_impl.AlbumRepositoryImpl
 import code.name.monkey.retromusic.repository.data_source_impl.ArtistRepositoryImpl
 import code.name.monkey.retromusic.repository.data_source_impl.GenreRepositoryImpl
@@ -40,6 +41,7 @@ import code.name.monkey.retromusic.repository.data_source_impl.RoomRepositoryImp
 import code.name.monkey.retromusic.repository.data_source_impl.SearchRepositoryImpl
 import code.name.monkey.retromusic.repository.data_source_impl.SongRepositoryImpl
 import code.name.monkey.retromusic.repository.data_source_impl.TopPlayedRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.network.AuthRepositoryImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.bind
@@ -136,6 +138,7 @@ private val dataModule = module {
             get(),
             get(),
             get(),
+            get()
         )
     } bind Repository::class
 
@@ -182,6 +185,10 @@ private val dataModule = module {
     single {
         LocalDataRepositoryImpl(get())
     } bind LocalDataRepository::class
+
+    single {
+        AuthRepositoryImpl(get())
+    } bind AuthRepository::class
 }
 
 private val viewModules = module {

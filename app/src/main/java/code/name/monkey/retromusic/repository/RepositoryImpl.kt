@@ -18,6 +18,7 @@ import code.name.monkey.retromusic.db.PlaylistWithSongs
 import code.name.monkey.retromusic.db.SongEntity
 import code.name.monkey.retromusic.db.fromHistoryToSongs
 import code.name.monkey.retromusic.db.toSong
+import code.name.monkey.retromusic.extensions.responseToResource
 import code.name.monkey.retromusic.fragments.search.Filter
 import code.name.monkey.retromusic.model.AbsCustomPlaylist
 import code.name.monkey.retromusic.model.Album
@@ -32,6 +33,8 @@ import code.name.monkey.retromusic.network.LastFMService
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.network.model.LastFmArtist
+import code.name.monkey.retromusic.network.model.request.auth.REQLogin
+import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import code.name.monkey.retromusic.repository.data_source.AlbumRepository
 import code.name.monkey.retromusic.repository.data_source.ArtistRepository
 import code.name.monkey.retromusic.repository.data_source.GenreRepository
@@ -42,9 +45,11 @@ import code.name.monkey.retromusic.repository.data_source.RoomRepository
 import code.name.monkey.retromusic.repository.data_source.SearchRepository
 import code.name.monkey.retromusic.repository.data_source.SongRepository
 import code.name.monkey.retromusic.repository.data_source.TopPlayedRepository
+import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
 import code.name.monkey.retromusic.util.logE
+import okhttp3.RequestBody
 
-class RepositoryImpl (
+class RepositoryImpl(
     private val context: Context,
     private val lastFMService: LastFMService,
     private val songRepository: SongRepository,
@@ -57,6 +62,7 @@ class RepositoryImpl (
     private val topPlayedRepository: TopPlayedRepository,
     private val roomRepository: RoomRepository,
     private val localDataRepository: LocalDataRepository,
+    private val authRepository: AuthRepository
 ) : Repository {
 
     override suspend fun deleteSongs(songs: List<Song>) = roomRepository.deleteSongs(songs)
@@ -160,13 +166,37 @@ class RepositoryImpl (
     }
 
 
-    override suspend fun playlist(playlistId: Long) =
-        playlistRepository.playlist(playlistId)
+    override suspend fun playlist(playlistId: Long) = playlistRepository.playlist(playlistId)
 
     override suspend fun fetchPlaylistWithSongs(): List<PlaylistWithSongs> =
         roomRepository.playlistWithSongs()
 
-    override fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs> = roomRepository.getPlaylist(playlistId)
+    override fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs> =
+        roomRepository.getPlaylist(playlistId)
+
+    override suspend fun login(reqLogin: REQLogin): Result<LoginResponseNative> =
+        responseToResource(authRepository.login(reqLogin))
+
+    override suspend fun register(reqLogin: REQLogin): Result<LoginResponseNative> =
+        responseToResource(authRepository.register(reqLogin))
+
+    override suspend fun verifyOtp(reqLogin: REQLogin): Result<LoginResponseNative> =
+        responseToResource(authRepository.verifyOtp(reqLogin))
+
+    override suspend fun reSentOtp(reqLogin: REQLogin): Result<LoginResponseNative> =
+        responseToResource(authRepository.reSentOtp(reqLogin))
+
+    override suspend fun setPassword(reqLogin: REQLogin): Result<LoginResponseNative> =
+        responseToResource(authRepository.setPassword(reqLogin))
+
+    override suspend fun checkAccount(reqLogin: REQLogin): Result<LoginResponseNative> =
+        responseToResource(authRepository.checkAccount(reqLogin))
+
+    override suspend fun loginByToken(token: String): Result<LoginResponseNative> =
+        responseToResource(authRepository.loginByToken(token))
+
+    override suspend fun fakeLogin(contact: RequestBody): Result<LoginResponseNative> =
+        responseToResource(authRepository.fakeLogin(contact))
 
     override suspend fun playlistSongs(playlistWithSongs: PlaylistWithSongs): List<Song> =
         playlistWithSongs.songs.map {
@@ -176,8 +206,7 @@ class RepositoryImpl (
     override fun playlistSongs(playListId: Long): LiveData<List<SongEntity>> =
         roomRepository.getSongs(playListId)
 
-    override suspend fun insertSongs(songs: List<SongEntity>) =
-        roomRepository.insertSongs(songs)
+    override suspend fun insertSongs(songs: List<SongEntity>) = roomRepository.insertSongs(songs)
 
     override suspend fun checkPlaylistExists(playlistName: String): List<PlaylistEntity> =
         roomRepository.checkPlaylistExists(playlistName)
@@ -237,16 +266,14 @@ class RepositoryImpl (
     override suspend fun findSongExistInPlayCount(songId: Long): PlayCountEntity? =
         roomRepository.findSongExistInPlayCount(songId)
 
-    override suspend fun playCountSongs(): List<PlayCountEntity> =
-        roomRepository.playCountSongs()
+    override suspend fun playCountSongs(): List<PlayCountEntity> = roomRepository.playCountSongs()
 
     override fun observableHistorySongs(): LiveData<List<Song>> =
         roomRepository.observableHistorySongs().map {
             it.fromHistoryToSongs()
         }
 
-    override fun historySong(): List<HistoryEntity> =
-        roomRepository.historySongs()
+    override fun historySong(): List<HistoryEntity> = roomRepository.historySongs()
 
     override fun favorites(): LiveData<List<SongEntity>> =
         roomRepository.favoritePlaylistLiveData(context.getString(R.string.favorites))
