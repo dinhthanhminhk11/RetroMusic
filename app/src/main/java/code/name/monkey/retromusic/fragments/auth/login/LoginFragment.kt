@@ -1,10 +1,14 @@
 package code.name.monkey.retromusic.fragments.auth.login
 
+import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.activities.MainActivity
 import code.name.monkey.retromusic.databinding.FragmentLoginBinding
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
@@ -12,8 +16,6 @@ import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.request.auth.REQLogin
-import code.name.monkey.retromusic.util.logD
-import code.name.monkey.retromusic.util.logE
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBinding::inflate) {
@@ -56,9 +58,11 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
         })
 
         binding.btnContinue.setOnClickListener {
+            if (!binding.btnContinue.isEnabled) return@setOnClickListener
+            binding.btnContinue.isEnabled = false
+
             val email = binding.username.text.toString()
             if (validateEmail(email)) {
-                binding.root.isEnabled = false
                 binding.progressBar.visibility = View.VISIBLE
                 var textencrpt: String
                 if (isLoginByPass) {
@@ -67,13 +71,16 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                     val textEntryPoint = Login.encryptData(textencrpt)
                     loginViewModel.login(REQLogin(textEntryPoint))
                 } else {
-                    textencrpt =
-                        "{\"email\" : \"${binding.username.text.toString()}\"}"
+                    textencrpt = "{\"email\" : \"${binding.username.text.toString()}\"}"
                     val textEntryPoint = Login.encryptData(textencrpt)
                     loginViewModel.checkAccount(REQLogin(textEntryPoint))
                 }
-
             }
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.btnContinue.isEnabled = true
+                binding.progressBar.visibility = View.GONE
+            }, 2000)
         }
     }
 
@@ -81,16 +88,44 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
         loginViewModel.authState.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
-                    logD("Loading")
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.btnContinue.isEnabled = true
                 }
 
                 is Result.Error -> {
-                    logE("Error: ${result.error?.message}")
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnContinue.isEnabled = true
+                }
+
+                is Result.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnContinue.isEnabled = true
+                    //todo save info user
+                    val intent = Intent(requireContext(), MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    startActivity(intent)
+                    requireActivity().finish()
+                }
+            }
+        }
+
+        loginViewModel.accountState.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.btnContinue.isEnabled = true
+                }
+
+                is Result.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnContinue.isEnabled = true
 
                 }
 
                 is Result.Success -> {
-
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnContinue.isEnabled = true
+                    // todo start otp
                 }
             }
         }

@@ -89,7 +89,16 @@ android {
         create("private") {
             dimension = "environment"
             manifestPlaceholders["appLabel"] = "Retro Music Private"
-            buildConfigField("String", "BASE_URL", "\"https://reqres.in/api/\"")
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://e0a6-113-160-45-182.ngrok-free.app/api/v1/\""
+            )
+            buildConfigField(
+                "String",
+                "BASE_URL_IMAGE_CATEGORY",
+                "\"https://mms.img.susercontent.com/\""
+            )
             buildConfigField(
                 "String",
                 "KEY_128",

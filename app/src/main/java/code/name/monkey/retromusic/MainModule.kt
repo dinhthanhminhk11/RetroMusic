@@ -8,6 +8,7 @@ import code.name.monkey.retromusic.db.RetroDatabase
 import code.name.monkey.retromusic.fragments.LibraryViewModel
 import code.name.monkey.retromusic.fragments.albums.AlbumDetailsViewModel
 import code.name.monkey.retromusic.fragments.artists.ArtistDetailsViewModel
+import code.name.monkey.retromusic.fragments.auth.login.LoginViewModel
 import code.name.monkey.retromusic.fragments.genres.GenreDetailsViewModel
 import code.name.monkey.retromusic.fragments.playlists.PlaylistDetailsViewModel
 import code.name.monkey.retromusic.model.Genre
@@ -223,6 +224,12 @@ private val viewModules = module {
         GenreDetailsViewModel(
             get(),
             genre
+        )
+    }
+
+    viewModel {
+        LoginViewModel(
+            get()
         )
     }
 }
