@@ -11,6 +11,7 @@ import code.name.monkey.retromusic.fragments.artists.ArtistDetailsViewModel
 import code.name.monkey.retromusic.fragments.auth.login.LoginViewModel
 import code.name.monkey.retromusic.fragments.auth.otp.OtpViewModel
 import code.name.monkey.retromusic.fragments.auth.register.RegisterViewModel
+import code.name.monkey.retromusic.fragments.auth.setpass.SetPassViewModel
 import code.name.monkey.retromusic.fragments.genres.GenreDetailsViewModel
 import code.name.monkey.retromusic.fragments.playlists.PlaylistDetailsViewModel
 import code.name.monkey.retromusic.model.Genre
@@ -239,6 +240,10 @@ private val viewModules = module {
 
     viewModel {
         OtpViewModel(get())
+    }
+
+    viewModel {
+        SetPassViewModel(get())
     }
 }
 
