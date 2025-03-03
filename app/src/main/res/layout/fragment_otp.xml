@@ -48,6 +48,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
+            android:id="@+id/subtitle"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="@string/content_otp_text_view"
@@ -65,7 +66,7 @@
             android:textSize="@dimen/_20sdp"
             app:OtpHideLineWhenFilled="false"
             app:OtpItemCount="6"
-            app:OtpItemRadius="@dimen/_8sdp"
+            app:OtpItemRadius="@dimen/_5sdp"
             app:OtpState_filled="true"
             app:OtpViewType="rectangle"
             tools:ignore="ObsoleteLayoutParam" />
@@ -85,7 +86,7 @@
                 tools:maxLines="@string/grid_size_1" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/loginTextView"
+                android:id="@+id/resent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

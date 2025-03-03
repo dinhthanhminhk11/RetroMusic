@@ -35,7 +35,7 @@ fun validateEmail(email: String): Boolean {
     return emailPattern.matcher(email).matches()
 }
 
-fun MaterialTextView.animatedTextChange(newText: String, duration: Long = 200) {
+fun MaterialTextView.animatedTextChange(newText: CharSequence, duration: Long = 200) {
     if (this.text == newText) return
 
     this.animate()
