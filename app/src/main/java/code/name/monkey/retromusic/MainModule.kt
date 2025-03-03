@@ -9,6 +9,7 @@ import code.name.monkey.retromusic.fragments.LibraryViewModel
 import code.name.monkey.retromusic.fragments.albums.AlbumDetailsViewModel
 import code.name.monkey.retromusic.fragments.artists.ArtistDetailsViewModel
 import code.name.monkey.retromusic.fragments.auth.login.LoginViewModel
+import code.name.monkey.retromusic.fragments.auth.register.RegisterViewModel
 import code.name.monkey.retromusic.fragments.genres.GenreDetailsViewModel
 import code.name.monkey.retromusic.fragments.playlists.PlaylistDetailsViewModel
 import code.name.monkey.retromusic.model.Genre
@@ -228,9 +229,11 @@ private val viewModules = module {
     }
 
     viewModel {
-        LoginViewModel(
-            get()
-        )
+        LoginViewModel(get())
+    }
+
+    viewModel {
+        RegisterViewModel(get())
     }
 }
 

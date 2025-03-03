@@ -57,31 +57,7 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        binding.btnContinue.setOnClickListener {
-            if (!binding.btnContinue.isEnabled) return@setOnClickListener
-            binding.btnContinue.isEnabled = false
-
-            val email = binding.username.text.toString()
-            if (validateEmail(email)) {
-                binding.progressBar.visibility = View.VISIBLE
-                var textencrpt: String
-                if (isLoginByPass) {
-                    textencrpt =
-                        "{\"email\" : \"${binding.username.text.toString()}\" , \"password\" : \"${binding.password.text.toString()}\"}"
-                    val textEntryPoint = Login.encryptData(textencrpt)
-                    loginViewModel.login(REQLogin(textEntryPoint))
-                } else {
-                    textencrpt = "{\"email\" : \"${binding.username.text.toString()}\"}"
-                    val textEntryPoint = Login.encryptData(textencrpt)
-                    loginViewModel.checkAccount(REQLogin(textEntryPoint))
-                }
-            }
-
-            Handler(Looper.getMainLooper()).postDelayed({
-                binding.btnContinue.isEnabled = true
-                binding.progressBar.visibility = View.GONE
-            }, 2000)
-        }
+        binding.btnContinue.setOnClickListener(this)
     }
 
     override fun initObserver() {
@@ -145,6 +121,32 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                 binding.passwordContainer.visibility =
                     if (isLoginByPass) View.VISIBLE else View.GONE
                 updateButtonState()
+            }
+
+            binding.btnContinue -> {
+                if (!binding.btnContinue.isEnabled) return
+                binding.btnContinue.isEnabled = false
+
+                val email = binding.username.text.toString()
+                if (validateEmail(email)) {
+                    binding.progressBar.visibility = View.VISIBLE
+                    var textencrpt: String
+                    if (isLoginByPass) {
+                        textencrpt =
+                            "{\"email\" : \"${binding.username.text.toString()}\" , \"password\" : \"${binding.password.text.toString()}\"}"
+                        val textEntryPoint = Login.encryptData(textencrpt)
+                        loginViewModel.login(REQLogin(textEntryPoint))
+                    } else {
+                        textencrpt = "{\"email\" : \"${binding.username.text.toString()}\"}"
+                        val textEntryPoint = Login.encryptData(textencrpt)
+                        loginViewModel.checkAccount(REQLogin(textEntryPoint))
+                    }
+                }
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    binding.btnContinue.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                }, 2000)
             }
         }
     }

@@ -1,5 +1,7 @@
 package code.name.monkey.retromusic.fragments.auth.register
 
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -10,11 +12,14 @@ import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
+import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.network.model.request.auth.REQLogin
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class RegisterFragment :
     BaseNormalFragment<FragmentRegisterBinding>(FragmentRegisterBinding::inflate) {
-
+    private val viewModel by viewModel<RegisterViewModel>()
     private var isNetworkConnected = false;
     private var isEmailValid = false;
 
@@ -42,26 +47,54 @@ class RegisterFragment :
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        binding.btnContinue.setOnClickListener {
-            val email = binding.username.text.toString()
-            if (validateEmail(email)) {
-                binding.btnContinue.isEnabled = false
-                binding.progressBar.visibility = View.VISIBLE
-                val text =
-                    "{\"email\" : \"${binding.username.text.toString()}\"}"
-                val textEntryPoint = Login.encryptData(text)
-            }
-        }
+        binding.btnContinue.setOnClickListener(this)
     }
 
     override fun initObserver() {
+        viewModel.authState.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.btnContinue.isEnabled = true
+                }
+
+                is Result.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnContinue.isEnabled = true
+                }
+
+                is Result.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnContinue.isEnabled = true
+                    //todo START OTP
+
+                }
+            }
+        }
     }
 
     override fun getData() {
     }
 
     override fun onViewClicked(view: View?) {
-
+        when (view) {
+            binding.btnContinue -> {
+                if (!binding.btnContinue.isEnabled) return
+                val email = binding.username.text.toString()
+                if (validateEmail(email)) {
+                    binding.btnContinue.isEnabled = false
+                    binding.progressBar.visibility = View.VISIBLE
+                    val text =
+                        "{\"email\" : \"${binding.username.text.toString()}\"}"
+                    val textEntryPoint = Login.encryptData(text)
+                    viewModel.register(REQLogin(textEntryPoint))
+                }
+                Handler(Looper.getMainLooper()).postDelayed({
+                    binding.btnContinue.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                }, 2000)
+            }
+        }
     }
 
     private fun updateButtonState() {
