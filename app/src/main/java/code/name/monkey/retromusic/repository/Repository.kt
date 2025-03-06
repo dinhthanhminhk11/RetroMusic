@@ -1,6 +1,7 @@
 package code.name.monkey.retromusic.repository
 
 import androidx.lifecycle.LiveData
+import code.name.monkey.retromusic.SuccessResponse
 import code.name.monkey.retromusic.db.HistoryEntity
 import code.name.monkey.retromusic.db.PlayCountEntity
 import code.name.monkey.retromusic.db.PlaylistEntity
@@ -89,7 +90,7 @@ interface Repository {
     fun checkPlaylistExists(playListId: Long): LiveData<Boolean>
     fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs>
     suspend fun login(reqLogin: REQLogin): Result<LoginResponseNative>
-    suspend fun register(reqLogin: REQLogin): Result<LoginResponseNative>
+    suspend fun register(requestBody: RequestBody): Result<SuccessResponse>
     suspend fun verifyOtp(reqLogin: REQLogin): Result<LoginResponseNative>
     suspend fun reSentOtp(reqLogin: REQLogin): Result<LoginResponseNative>
     suspend fun setPassword(reqLogin: REQLogin): Result<LoginResponseNative>

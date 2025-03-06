@@ -1,5 +1,6 @@
 package code.name.monkey.retromusic.repository.data_source_impl.network
 
+import code.name.monkey.retromusic.SuccessResponse
 import code.name.monkey.retromusic.network.AuthService
 import code.name.monkey.retromusic.network.model.request.auth.REQLogin
 import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
@@ -11,8 +12,8 @@ class AuthRepositoryImpl(private val authService: AuthService) : AuthRepository 
     override suspend fun login(reqLogin: REQLogin): Response<LoginResponseNative> =
         authService.login(reqLogin)
 
-    override suspend fun register(reqLogin: REQLogin): Response<LoginResponseNative> =
-        authService.register(reqLogin)
+    override suspend fun register(requestBody: RequestBody): Response<SuccessResponse> =
+        authService.register(requestBody)
 
     override suspend fun verifyOtp(reqLogin: REQLogin): Response<LoginResponseNative> =
         authService.verifyOtp(reqLogin)

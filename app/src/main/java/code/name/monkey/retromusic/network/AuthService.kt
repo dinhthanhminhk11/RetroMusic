@@ -1,5 +1,6 @@
 package code.name.monkey.retromusic.network
 
+import code.name.monkey.retromusic.SuccessResponse
 import code.name.monkey.retromusic.network.model.request.auth.REQLogin
 import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import okhttp3.RequestBody
@@ -17,8 +18,8 @@ interface AuthService {
 
     @POST(Endpoint.REGISTER)
     suspend fun register(
-        @Body reqRegister: REQLogin
-    ): Response<LoginResponseNative>
+        @Body requestBody: RequestBody
+    ): Response<SuccessResponse>
 
 
     @POST(Endpoint.VERIFY_OTP)

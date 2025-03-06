@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import code.name.monkey.retromusic.AuthRequest
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.FragmentRegisterBinding
 import code.name.monkey.retromusic.encryption.Login
@@ -13,7 +14,8 @@ import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
-import code.name.monkey.retromusic.network.model.request.auth.REQLogin
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -87,7 +89,12 @@ class RegisterFragment :
                     val text =
                         "{\"email\" : \"${binding.username.text.toString()}\"}"
                     val textEntryPoint = Login.encryptData(text)
-                    viewModel.register(REQLogin(textEntryPoint))
+
+                    val authRequest = AuthRequest(textEntryPoint)
+                    val byteArray = authRequest.encode()
+                    val requestBody =
+                        RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
+                    viewModel.register(requestBody)
                 }
                 Handler(Looper.getMainLooper()).postDelayed({
                     binding.btnContinue.isEnabled = true

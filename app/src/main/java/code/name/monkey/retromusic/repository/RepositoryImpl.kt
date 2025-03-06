@@ -9,6 +9,7 @@ import code.name.monkey.retromusic.PLAYLISTS
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.RECENT_ALBUMS
 import code.name.monkey.retromusic.RECENT_ARTISTS
+import code.name.monkey.retromusic.SuccessResponse
 import code.name.monkey.retromusic.TOP_ALBUMS
 import code.name.monkey.retromusic.TOP_ARTISTS
 import code.name.monkey.retromusic.db.HistoryEntity
@@ -177,8 +178,8 @@ class RepositoryImpl(
     override suspend fun login(reqLogin: REQLogin): Result<LoginResponseNative> =
         responseToResource(authRepository.login(reqLogin))
 
-    override suspend fun register(reqLogin: REQLogin): Result<LoginResponseNative> =
-        responseToResource(authRepository.register(reqLogin))
+    override suspend fun register(requestBody: RequestBody): Result<SuccessResponse> =
+        responseToResource(authRepository.register(requestBody))
 
     override suspend fun verifyOtp(reqLogin: REQLogin): Result<LoginResponseNative> =
         responseToResource(authRepository.verifyOtp(reqLogin))

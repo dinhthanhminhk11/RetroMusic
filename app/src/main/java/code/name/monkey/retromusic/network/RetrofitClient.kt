@@ -88,8 +88,6 @@ fun headerInterceptorLoginProtobuf(
     return Interceptor { chain ->
         val request = chain.request()
             .newBuilder().apply {
-                header("Content-Type", "application/x-protobuf")
-                header("Accept-Encoding", "gzip")
                 header("xinternalgatewayauthnotrequired", "true")
                 header("user-agent", getUserAgent("Retro-Android", "8.79.1732129784"))
                 header("Device-ID", deviceId)
