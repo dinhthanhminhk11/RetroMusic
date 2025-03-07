@@ -1,21 +1,20 @@
 package code.name.monkey.retromusic.fragments.auth.otp
 
-import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Html
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import code.name.monkey.retromusic.OTP_TYPE
+import code.name.monkey.retromusic.AuthRequest
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.FragmentOtpBinding
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
-import code.name.monkey.retromusic.fragments.albums.AlbumDetailsFragmentArgs
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
-import code.name.monkey.retromusic.network.model.request.auth.REQLogin
 import code.name.monkey.retromusic.views.custom.otp.OnOtpCompletionListener
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -110,7 +109,12 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
                 val text =
                     "{\"email\" : \"${arguments.email}\" , \"type\" : \"${arguments.otptype}\"}"
                 val textEntryPoint = Login.encryptData(text)
-                viewModel.reSentOtp(REQLogin(textEntryPoint))
+
+                val authRequest = AuthRequest(textEntryPoint)
+                val byteArray = authRequest.encode()
+                val requestBody =
+                    RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
+                viewModel.reSentOtp(requestBody)
             }
         }
     }
@@ -142,7 +146,12 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
         val text =
             "{\"email\" : \"${arguments.email}\" , \"otp\" : \"${otp}\" , \"type\" : \"${arguments.otptype}\"}"
         val textEntryPoint = Login.encryptData(text)
-        viewModel.verifyOtp(REQLogin(textEntryPoint))
+
+        val authRequest = AuthRequest(textEntryPoint)
+        val byteArray = authRequest.encode()
+        val requestBody =
+            RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
+        viewModel.verifyOtp(requestBody)
     }
 
 }

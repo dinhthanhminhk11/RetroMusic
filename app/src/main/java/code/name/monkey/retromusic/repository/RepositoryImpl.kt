@@ -176,24 +176,24 @@ class RepositoryImpl(
     override fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs> =
         roomRepository.getPlaylist(playlistId)
 
-    override suspend fun login(reqLogin: REQLogin): Result<LoginResponseNative> =
-        responseToResource(authRepository.login(reqLogin))
+    override suspend fun login(reqLogin: RequestBody): Result<SuccessResponse> =
+        responseToResourceProtobuf(authRepository.login(reqLogin), SuccessResponse.ADAPTER)
 
     override suspend fun register(requestBody: RequestBody): Result<SuccessResponse> {
         val response = authRepository.register(requestBody)
         return responseToResourceProtobuf(response, SuccessResponse.ADAPTER)
     }
-    override suspend fun verifyOtp(reqLogin: REQLogin): Result<LoginResponseNative> =
-        responseToResource(authRepository.verifyOtp(reqLogin))
+    override suspend fun verifyOtp(reqLogin: RequestBody): Result<SuccessResponse> =
+        responseToResourceProtobuf(authRepository.verifyOtp(reqLogin), SuccessResponse.ADAPTER)
 
-    override suspend fun reSentOtp(reqLogin: REQLogin): Result<LoginResponseNative> =
-        responseToResource(authRepository.reSentOtp(reqLogin))
+    override suspend fun reSentOtp(reqLogin: RequestBody): Result<SuccessResponse> =
+        responseToResourceProtobuf(authRepository.reSentOtp(reqLogin), SuccessResponse.ADAPTER)
 
-    override suspend fun setPassword(reqLogin: REQLogin): Result<LoginResponseNative> =
-        responseToResource(authRepository.setPassword(reqLogin))
+    override suspend fun setPassword(reqLogin: RequestBody): Result<SuccessResponse> =
+        responseToResourceProtobuf(authRepository.setPassword(reqLogin), SuccessResponse.ADAPTER)
 
-    override suspend fun checkAccount(reqLogin: REQLogin): Result<LoginResponseNative> =
-        responseToResource(authRepository.checkAccount(reqLogin))
+    override suspend fun checkAccount(reqLogin: RequestBody): Result<SuccessResponse> =
+        responseToResourceProtobuf(authRepository.checkAccount(reqLogin), SuccessResponse.ADAPTER)
 
     override suspend fun loginByToken(token: String): Result<LoginResponseNative> =
         responseToResource(authRepository.loginByToken(token))

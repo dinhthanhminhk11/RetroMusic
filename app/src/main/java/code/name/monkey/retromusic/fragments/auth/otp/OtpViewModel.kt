@@ -4,20 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import code.name.monkey.retromusic.SuccessResponse
 import code.name.monkey.retromusic.network.Result
-import code.name.monkey.retromusic.network.model.request.auth.REQLogin
-import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import code.name.monkey.retromusic.repository.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody
 
 class OtpViewModel(private val repository: Repository) : ViewModel() {
-    private val _verifyOtpState = MutableLiveData<Result<LoginResponseNative>>()
-    private val _reSentState = MutableLiveData<Result<LoginResponseNative>>()
-    val verifyOtpState: LiveData<Result<LoginResponseNative>> get() = _verifyOtpState
-    val reSentOtpState: LiveData<Result<LoginResponseNative>> get() = _reSentState
+    private val _verifyOtpState = MutableLiveData<Result<SuccessResponse>>()
+    private val _reSentState = MutableLiveData<Result<SuccessResponse>>()
+    val verifyOtpState: LiveData<Result<SuccessResponse>> get() = _verifyOtpState
+    val reSentOtpState: LiveData<Result<SuccessResponse>> get() = _reSentState
 
-    fun verifyOtp(reqLogin: REQLogin) {
+    fun verifyOtp(reqLogin: RequestBody) {
         viewModelScope.launch(Dispatchers.IO) {
             _verifyOtpState.postValue(Result.Loading)
             try {
@@ -29,7 +29,7 @@ class OtpViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
-    fun reSentOtp(reqLogin: REQLogin) {
+    fun reSentOtp(reqLogin: RequestBody) {
         viewModelScope.launch(Dispatchers.IO) {
             _reSentState.postValue(Result.Loading)
             try {

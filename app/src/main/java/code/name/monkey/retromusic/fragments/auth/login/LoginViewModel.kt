@@ -3,21 +3,20 @@ package code.name.monkey.retromusic.fragments.auth.login
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import code.name.monkey.retromusic.network.model.request.auth.REQLogin
-import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
+import code.name.monkey.retromusic.SuccessResponse
+import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.repository.Repository
 import kotlinx.coroutines.Dispatchers
-import code.name.monkey.retromusic.network.Result
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody
 
 class LoginViewModel(private val repository: Repository) : ViewModel() {
-    private val _authState = MutableLiveData<Result<LoginResponseNative>>()
-    private val _accountstate = MutableLiveData<Result<LoginResponseNative>>()
-    val authState: LiveData<Result<LoginResponseNative>> get() = _authState
-    val accountState: LiveData<Result<LoginResponseNative>> get() = _accountstate
-    fun login(reqLogin: REQLogin) {
+    private val _authState = MutableLiveData<Result<SuccessResponse>>()
+    private val _accountstate = MutableLiveData<Result<SuccessResponse>>()
+    val authState: LiveData<Result<SuccessResponse>> get() = _authState
+    val accountState: LiveData<Result<SuccessResponse>> get() = _accountstate
+    fun login(reqLogin: RequestBody) {
         viewModelScope.launch(Dispatchers.IO) {
             _authState.postValue(Result.Loading)
             try {
@@ -29,7 +28,7 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
-    fun checkAccount(reqLogin: REQLogin) {
+    fun checkAccount(reqLogin: RequestBody) {
         viewModelScope.launch(Dispatchers.IO) {
             _accountstate.postValue(Result.Loading)
             try {

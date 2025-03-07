@@ -7,6 +7,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import code.name.monkey.retromusic.AuthRequest
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.MainActivity
 import code.name.monkey.retromusic.databinding.FragmentLoginBinding
@@ -15,7 +16,8 @@ import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
-import code.name.monkey.retromusic.network.model.request.auth.REQLogin
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBinding::inflate) {
@@ -135,11 +137,20 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                         textencrpt =
                             "{\"email\" : \"${binding.username.text.toString()}\" , \"password\" : \"${binding.password.text.toString()}\"}"
                         val textEntryPoint = Login.encryptData(textencrpt)
-                        loginViewModel.login(REQLogin(textEntryPoint))
+
+                        val authRequest = AuthRequest(textEntryPoint)
+                        val byteArray = authRequest.encode()
+                        val requestBody =
+                            RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
+                        loginViewModel.login(requestBody)
                     } else {
                         textencrpt = "{\"email\" : \"${binding.username.text.toString()}\"}"
                         val textEntryPoint = Login.encryptData(textencrpt)
-                        loginViewModel.checkAccount(REQLogin(textEntryPoint))
+                        val authRequest = AuthRequest(textEntryPoint)
+                        val byteArray = authRequest.encode()
+                        val requestBody =
+                            RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
+                        loginViewModel.checkAccount(requestBody)
                     }
                 }
 

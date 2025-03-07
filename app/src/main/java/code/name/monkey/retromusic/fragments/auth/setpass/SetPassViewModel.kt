@@ -4,20 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import code.name.monkey.retromusic.SuccessResponse
 import code.name.monkey.retromusic.network.Result
-import code.name.monkey.retromusic.network.model.request.auth.REQLogin
-import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import code.name.monkey.retromusic.repository.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody
 
 class SetPassViewModel(private val repository: Repository) : ViewModel() {
-    private val _authState = MutableLiveData<Result<LoginResponseNative>>()
-    private val _setPassState = MutableLiveData<Result<LoginResponseNative>>()
-    val authState: LiveData<Result<LoginResponseNative>> get() = _authState
-    val setPassState: LiveData<Result<LoginResponseNative>> get() = _setPassState
+    private val _authState = MutableLiveData<Result<SuccessResponse>>()
+    private val _setPassState = MutableLiveData<Result<SuccessResponse>>()
+    val authState: LiveData<Result<SuccessResponse>> get() = _authState
+    val setPassState: LiveData<Result<SuccessResponse>> get() = _setPassState
 
-    fun login(reqLogin: REQLogin) {
+    fun login(reqLogin: RequestBody) {
         viewModelScope.launch(Dispatchers.IO) {
             _authState.postValue(Result.Loading)
             try {
@@ -29,14 +29,14 @@ class SetPassViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
-    fun setPassword(reqLogin: REQLogin) {
+    fun setPassword(reqLogin: RequestBody) {
         viewModelScope.launch(Dispatchers.IO) {
             _setPassState.postValue(Result.Loading)
             try {
                 val response = repository.setPassword(reqLogin)
                 _setPassState.postValue(response)
             } catch (e: Exception) {
-                _setPassState.postValue(Result.Error(error =  e))
+                _setPassState.postValue(Result.Error(error = e))
             }
         }
     }

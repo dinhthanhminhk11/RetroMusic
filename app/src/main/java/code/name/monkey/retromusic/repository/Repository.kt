@@ -90,12 +90,12 @@ interface Repository {
     fun getSongByGenre(genreId: Long): Song
     fun checkPlaylistExists(playListId: Long): LiveData<Boolean>
     fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs>
-    suspend fun login(reqLogin: REQLogin): Result<LoginResponseNative>
+    suspend fun login(reqLogin: RequestBody): Result<SuccessResponse>
     suspend fun register(requestBody: RequestBody): Result<SuccessResponse>
-    suspend fun verifyOtp(reqLogin: REQLogin): Result<LoginResponseNative>
-    suspend fun reSentOtp(reqLogin: REQLogin): Result<LoginResponseNative>
-    suspend fun setPassword(reqLogin: REQLogin): Result<LoginResponseNative>
-    suspend fun checkAccount(reqLogin: REQLogin): Result<LoginResponseNative>
+    suspend fun verifyOtp(reqLogin: RequestBody): Result<SuccessResponse>
+    suspend fun reSentOtp(reqLogin: RequestBody): Result<SuccessResponse>
+    suspend fun setPassword(reqLogin: RequestBody): Result<SuccessResponse>
+    suspend fun checkAccount(reqLogin: RequestBody): Result<SuccessResponse>
     suspend fun loginByToken(token: String): Result<LoginResponseNative>
     suspend fun fakeLogin(contact: RequestBody): Result<LoginResponseNative>
 }
