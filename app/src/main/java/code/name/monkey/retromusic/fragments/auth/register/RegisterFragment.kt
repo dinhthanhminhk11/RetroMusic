@@ -103,6 +103,7 @@ class RegisterFragment :
     }
 
     override fun onViewClicked(view: View?) {
+        if (!isAdded || binding == null) return
         when (view) {
             binding.btnContinue -> {
                 if (!binding.btnContinue.isEnabled) return

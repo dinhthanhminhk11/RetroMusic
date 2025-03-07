@@ -40,11 +40,6 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
     private val otpValidityDurationInMillis: Long = 60_000
     private val arguments by navArgs<OtpFragmentArgs>()
 
-
-    override fun initArgs() {
-        super.initArgs()
-    }
-
     override fun onNetworkChanged(isConnected: Boolean) {
         isNetworkConnected = isConnected
         val otpMessage = getString(R.string.content_otp_text_view, arguments.email)
@@ -161,6 +156,11 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
 
     override fun getData() {
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        countdownTimer.cancel()
     }
 
     override fun onViewClicked(view: View?) {

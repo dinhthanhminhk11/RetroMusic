@@ -172,6 +172,7 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
     }
 
     override fun onViewClicked(view: View?) {
+        if (!isAdded || binding == null) return
         when (view) {
             binding.loginTextView -> {
                 isLoginByPass = !isLoginByPass
