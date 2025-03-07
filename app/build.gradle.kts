@@ -116,7 +116,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://83bd-123-25-30-77.ngrok-free.app/api/v1/\""
+                "\"https://2ac2-27-72-98-102.ngrok-free.app/api/v1/\""
             )
             buildConfigField(
                 "String",
@@ -176,6 +176,7 @@ dependencies {
 
     implementation(libs.wire.runtime)
     implementation(libs.wire.moshi.adapter)
+    implementation (libs.converter.wire)
 
     // testing
     testImplementation(libs.junit)
@@ -262,6 +263,5 @@ dependencies {
     implementation(libs.slidableactivity)
     implementation(libs.dhaval2404.imagepicker)
     implementation(libs.keyboardvisibilityevent)
-
 
 }

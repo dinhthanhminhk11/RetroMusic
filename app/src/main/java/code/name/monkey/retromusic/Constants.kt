@@ -1,4 +1,3 @@
-
 package code.name.monkey.retromusic
 
 import android.provider.BaseColumns
@@ -149,4 +148,36 @@ const val SWIPE_ANYWHERE_NOW_PLAYING = "swipe_anywhere_now_playing"
 const val PAUSE_HISTORY = "pause_history"
 const val MANAGE_AUDIO_FOCUS = "manage_audio_focus"
 const val SWIPE_DOWN_DISMISS = "swipe_to_dismiss"
-const val ENABLE_SEARCH_PLAYLIST= "enable_search_playlist"
+const val ENABLE_SEARCH_PLAYLIST = "enable_search_playlist"
+const val OTP_TYPE = "OTP_TYPE"
+const val EMAIL = "EMAIL"
+const val TYPE_REGISTER = "register"
+
+const val INVALID_PROTOBUF = "INVALID_PROTOBUF"
+const val DATA_MISSING = "DATA_MISSING"
+const val DATA_NOT_DECRYPT = "DATA_NOT_DECRYPT"
+const val EMAIL_MISSING = "EMAIL_MISSING"
+const val EMAIL_NOT_FORMAT = "EMAIL_NOT_FORMAT"
+const val EMAIL_ALREADY_EXISTS = "EMAIL_ALREADY_EXISTS"
+const val OTP_SEND_FAIL = "OTP_SEND_FAIL"
+const val ACCOUNT_LOCKED = "ACCOUNT_LOCKED"
+const val OTP_LIMIT = "OTP_LIMIT"
+const val EMAIL_DOSE_NOT_EXISTS = "EMAIL_DOSE_NOT_EXISTS"
+const val OTP_NOT_VALID = "OTP_NOT_VALID"
+const val OTP_EXPIRED = "OTP_EXPIRED"
+const val SERVER_ERROR = "SERVER_ERROR"
+const val PASSWORD_NOT_SET = "PASSWORD_NOT_SET"
+const val LOGIN_ERROR = "LOGIN_ERROR"
+const val OTP_NOT_VERIFIED = "OTP_NOT_VERIFIED"
+
+
+
+
+
+const val USER_REGISTER_SUCCESS = "USER_REGISTER_SUCCESS"
+const val OTP_RECENT_SUCCESS = "OTP_RECENT_SUCCESS"
+const val LOGIN_SUCCESS = "LOGIN_SUCCESS"
+const val OTP_CONFIRMED = "OTP_CONFIRMED"
+const val ACCOUNT_CAN_LOGIN = "ACCOUNT_CAN_LOGIN"
+const val ACCOUNT_CAN_NOT_LOGIN = "ACCOUNT_CAN_NOT_LOGIN"
+const val SET_PASS_SUCCESS = "SET_PASS_SUCCESS"

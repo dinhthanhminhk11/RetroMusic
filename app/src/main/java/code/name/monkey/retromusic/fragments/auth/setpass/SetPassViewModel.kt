@@ -24,7 +24,7 @@ class SetPassViewModel(private val repository: Repository) : ViewModel() {
                 val response = repository.login(reqLogin)
                 _authState.postValue(response)
             } catch (e: Exception) {
-                _authState.postValue(Result.Error(e))
+                _authState.postValue(Result.Error(error = e))
             }
         }
     }
@@ -36,7 +36,7 @@ class SetPassViewModel(private val repository: Repository) : ViewModel() {
                 val response = repository.setPassword(reqLogin)
                 _setPassState.postValue(response)
             } catch (e: Exception) {
-                _setPassState.postValue(Result.Error(e))
+                _setPassState.postValue(Result.Error(error =  e))
             }
         }
     }

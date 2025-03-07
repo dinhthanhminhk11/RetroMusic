@@ -1,5 +1,6 @@
 package code.name.monkey.retromusic.fragments.auth.register
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,7 +25,7 @@ class RegisterViewModel(private val repository: Repository) : ViewModel() {
                 val response = repository.register(requestBody)
                 _authState.postValue(response)
             } catch (e: Exception) {
-                _authState.postValue(Result.Error(e))
+                _authState.postValue(Result.Error(error = e))
             }
         }
     }

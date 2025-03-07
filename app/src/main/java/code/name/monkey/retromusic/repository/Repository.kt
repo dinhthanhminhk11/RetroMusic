@@ -21,6 +21,7 @@ import code.name.monkey.retromusic.network.model.LastFmArtist
 import code.name.monkey.retromusic.network.model.request.auth.REQLogin
 import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 
 interface Repository {
 

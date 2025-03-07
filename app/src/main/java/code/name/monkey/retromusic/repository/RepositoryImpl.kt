@@ -20,6 +20,7 @@ import code.name.monkey.retromusic.db.SongEntity
 import code.name.monkey.retromusic.db.fromHistoryToSongs
 import code.name.monkey.retromusic.db.toSong
 import code.name.monkey.retromusic.extensions.responseToResource
+import code.name.monkey.retromusic.extensions.responseToResourceProtobuf
 import code.name.monkey.retromusic.fragments.search.Filter
 import code.name.monkey.retromusic.model.AbsCustomPlaylist
 import code.name.monkey.retromusic.model.Album
@@ -132,7 +133,7 @@ class RepositoryImpl(
             Result.Success(lastFMService.artistInfo(name, lang, cache))
         } catch (e: Exception) {
             logE(e)
-            Result.Error(e)
+            Result.Error(error = e)
         }
     }
 
@@ -145,7 +146,7 @@ class RepositoryImpl(
             Result.Success(lastFmAlbum)
         } catch (e: Exception) {
             logE(e)
-            Result.Error(e)
+            Result.Error(error = e)
         }
     }
 
@@ -178,9 +179,10 @@ class RepositoryImpl(
     override suspend fun login(reqLogin: REQLogin): Result<LoginResponseNative> =
         responseToResource(authRepository.login(reqLogin))
 
-    override suspend fun register(requestBody: RequestBody): Result<SuccessResponse> =
-        responseToResource(authRepository.register(requestBody))
-
+    override suspend fun register(requestBody: RequestBody): Result<SuccessResponse> {
+        val response = authRepository.register(requestBody)
+        return responseToResourceProtobuf(response, SuccessResponse.ADAPTER)
+    }
     override suspend fun verifyOtp(reqLogin: REQLogin): Result<LoginResponseNative> =
         responseToResource(authRepository.verifyOtp(reqLogin))
 

@@ -34,7 +34,16 @@
         android:id="@+id/otpFragment"
         android:name="code.name.monkey.retromusic.fragments.auth.otp.OtpFragment"
         android:label="fragment_otp"
-        tools:layout="@layout/fragment_otp" />
+        tools:layout="@layout/fragment_otp">
+        <argument
+            android:name="OTP_TYPE"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="EMAIL"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/setPassFragment"

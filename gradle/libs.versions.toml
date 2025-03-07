@@ -1,4 +1,5 @@
 [versions]
+converterWire = "2.9.0"
 customactivityoncrash = "2.4.0"
 gridlayout = "1.0.0"
 lottie = "4.1.0"
@@ -127,6 +128,7 @@ androidx-test-espresso = "androidx.test.espresso:espresso-core:3.5.1"
 chucker = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
 chucker-release = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
 
+converter-wire = { module = "com.squareup.retrofit2:converter-wire", version.ref = "converterWire" }
 customactivityoncrash = { module = "cat.ereza:customactivityoncrash", version.ref = "customactivityoncrash" }
 dotsindicator = { module = "com.tbuonomo:dotsindicator", version.ref = "dotsindicator" }
 circleindicator = { module = "me.relex:circleindicator", version.ref = "circleindicator" }

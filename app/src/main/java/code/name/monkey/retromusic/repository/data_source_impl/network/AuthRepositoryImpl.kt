@@ -6,13 +6,14 @@ import code.name.monkey.retromusic.network.model.request.auth.REQLogin
 import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 
 class AuthRepositoryImpl(private val authService: AuthService) : AuthRepository {
     override suspend fun login(reqLogin: REQLogin): Response<LoginResponseNative> =
         authService.login(reqLogin)
 
-    override suspend fun register(requestBody: RequestBody): Response<SuccessResponse> =
+    override suspend fun register(requestBody: RequestBody): Response<ResponseBody> =
         authService.register(requestBody)
 
     override suspend fun verifyOtp(reqLogin: REQLogin): Response<LoginResponseNative> =

@@ -5,10 +5,13 @@ import android.os.CountDownTimer
 import android.text.Html
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import code.name.monkey.retromusic.OTP_TYPE
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.FragmentOtpBinding
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
+import code.name.monkey.retromusic.fragments.albums.AlbumDetailsFragmentArgs
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.request.auth.REQLogin
@@ -24,31 +27,16 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
     private lateinit var countdownTimer: CountDownTimer
     private var countResent: Int = 1;
     private val otpValidityDurationInMillis: Long = 60_000
-    private var otpType: String? = null
-    private var email: String? = null;
+    private val arguments by navArgs<OtpFragmentArgs>()
 
-    companion object {
-        const val OTP_TYPE = "OTP_TYPE"
-        const val EMAIL = "EMAIL"
-        fun newInstance(otpType: String? = null, email: String? = null): OtpFragment {
-            val fragment = OtpFragment()
-            val args = Bundle()
-            args.putString(EMAIL, email)
-            args.putString(OTP_TYPE, otpType)
-            fragment.arguments = args
-            return fragment
-        }
-    }
 
     override fun initArgs() {
         super.initArgs()
-        email = "dinhthanhminhk11@gmail.com"
-        otpType = arguments?.getString(OTP_TYPE)
     }
 
     override fun onNetworkChanged(isConnected: Boolean) {
         isNetworkConnected = isConnected
-        val otpMessage = getString(R.string.content_otp_text_view, email)
+        val otpMessage = getString(R.string.content_otp_text_view, arguments.email)
         binding.subtitle.animatedTextChange(
             if (isNetworkConnected) Html.fromHtml(
                 otpMessage,
@@ -67,7 +55,7 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
             findNavController().popBackStack()
         }
         binding.resent.setOnClickListener(this)
-        val otpMessage = getString(R.string.content_otp_text_view, email)
+        val otpMessage = getString(R.string.content_otp_text_view, arguments.email)
         binding.subtitle.text = Html.fromHtml(otpMessage, Html.FROM_HTML_MODE_LEGACY)
         startCountdownTimer()
     }
@@ -120,7 +108,7 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
                 countdownTimer.cancel()
 
                 val text =
-                    "{\"email\" : \"${email}\" , \"type\" : \"${otpType}\"}"
+                    "{\"email\" : \"${arguments.email}\" , \"type\" : \"${arguments.otptype}\"}"
                 val textEntryPoint = Login.encryptData(text)
                 viewModel.reSentOtp(REQLogin(textEntryPoint))
             }
@@ -152,7 +140,7 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
     override fun onOtpCompleted(otp: String?) {
         binding.progressBar.visibility = View.VISIBLE
         val text =
-            "{\"email\" : \"${email}\" , \"otp\" : \"${otp}\" , \"type\" : \"${otpType}\"}"
+            "{\"email\" : \"${arguments.email}\" , \"otp\" : \"${otp}\" , \"type\" : \"${arguments.otptype}\"}"
         val textEntryPoint = Login.encryptData(text)
         viewModel.verifyOtp(REQLogin(textEntryPoint))
     }

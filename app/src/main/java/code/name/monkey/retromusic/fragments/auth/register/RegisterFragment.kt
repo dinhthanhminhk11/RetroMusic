@@ -5,12 +5,20 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.getSystemService
+import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import code.name.monkey.retromusic.AuthRequest
+import code.name.monkey.retromusic.EMAIL
+import code.name.monkey.retromusic.OTP_TYPE
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.TYPE_REGISTER
 import code.name.monkey.retromusic.databinding.FragmentRegisterBinding
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
+import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
+import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
@@ -57,19 +65,34 @@ class RegisterFragment :
             when (result) {
                 is Result.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
-                    binding.btnContinue.isEnabled = true
+                    binding.btnContinue.isEnabled = false
                 }
 
                 is Result.Error -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
+                    result.code?.let {
+                        handErrorServerProtobuf(binding.root, it)
+                    }
                 }
 
                 is Result.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
-                    //todo START OTP
-
+//                    result.data.data_.code.let {
+//                        showSuccessLoginProtobuf(binding.root, it)
+//                    }
+                    result.data.data_.details?.let {
+                        if (result.data.data_.details.verified == false) {
+                            findNavController().navigate(
+                                R.id.otpFragment,
+                                bundleOf(
+                                    OTP_TYPE to TYPE_REGISTER,
+                                    EMAIL to binding.username.text.toString()
+                                )
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -82,6 +105,7 @@ class RegisterFragment :
         when (view) {
             binding.btnContinue -> {
                 if (!binding.btnContinue.isEnabled) return
+                hideKeyboard(view)
                 val email = binding.username.text.toString()
                 if (validateEmail(email)) {
                     binding.btnContinue.isEnabled = false
@@ -106,5 +130,13 @@ class RegisterFragment :
 
     private fun updateButtonState() {
         binding.btnContinue.isEnabled = isNetworkConnected && isEmailValid
+    }
+
+    private fun hideKeyboard(view: View?) {
+        if (view != null) {
+            val imm =
+                requireContext().getSystemService<InputMethodManager>()
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
     }
 }

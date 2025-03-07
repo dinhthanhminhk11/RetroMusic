@@ -24,7 +24,7 @@ class OtpViewModel(private val repository: Repository) : ViewModel() {
                 val response = repository.verifyOtp(reqLogin)
                 _verifyOtpState.postValue(response)
             } catch (e: Exception) {
-                _verifyOtpState.postValue(Result.Error(e))
+                _verifyOtpState.postValue(Result.Error(error = e))
             }
         }
     }
@@ -36,7 +36,7 @@ class OtpViewModel(private val repository: Repository) : ViewModel() {
                 val response = repository.reSentOtp(reqLogin)
                 _reSentState.postValue(response)
             } catch (e: Exception) {
-                _reSentState.postValue(Result.Error(e))
+                _reSentState.postValue(Result.Error(error = e))
             }
         }
     }
