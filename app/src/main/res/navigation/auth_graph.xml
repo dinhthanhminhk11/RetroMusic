@@ -49,5 +49,10 @@
         android:id="@+id/setPassFragment"
         android:name="code.name.monkey.retromusic.fragments.auth.setpass.SetPassFragment"
         android:label="fragment_set_pass"
-        tools:layout="@layout/fragment_set_pass" />
+        tools:layout="@layout/fragment_set_pass" >
+        <argument
+            android:name="EMAIL"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
 </navigation>

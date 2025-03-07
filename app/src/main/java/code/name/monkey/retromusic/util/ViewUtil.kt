@@ -11,6 +11,7 @@ import android.widget.ProgressBar
 import android.widget.SeekBar
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat.SRC_IN
+import androidx.navigation.NavOptions
 import androidx.navigation.navOptions
 import code.name.monkey.appthemehelper.util.ATHUtil
 import code.name.monkey.appthemehelper.util.ColorUtil
@@ -131,6 +132,21 @@ object ViewUtil {
                     })
                     alpha(0f).setDuration(150).start()
                 }
+            }
+        }
+    }
+
+    fun createNavOptions(replace: Boolean, popUpToId: Int? = null): NavOptions {
+        return navOptions {
+            launchSingleTop = false
+            anim {
+                enter = R.anim.retro_fragment_open_enter
+                exit = R.anim.retro_fragment_open_exit
+                popEnter = R.anim.retro_fragment_close_enter
+                popExit = R.anim.retro_fragment_close_exit
+            }
+            if (replace && popUpToId != null) {
+                popUpTo(popUpToId) { inclusive = true }
             }
         }
     }

@@ -1,17 +1,29 @@
 package code.name.monkey.retromusic.fragments.auth.otp
 
+import android.content.Intent
 import android.os.CountDownTimer
 import android.text.Html
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import code.name.monkey.retromusic.ACCOUNT_LOCKED
 import code.name.monkey.retromusic.AuthRequest
+import code.name.monkey.retromusic.EMAIL
+import code.name.monkey.retromusic.LOGIN_SUCCESS
+import code.name.monkey.retromusic.OTP_CONFIRMED
+import code.name.monkey.retromusic.OTP_EXPIRED
+import code.name.monkey.retromusic.OTP_NOT_VALID
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.activities.MainActivity
 import code.name.monkey.retromusic.databinding.FragmentOtpBinding
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
+import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
+import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.util.ViewUtil
 import code.name.monkey.retromusic.views.custom.otp.OnOtpCompletionListener
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
@@ -68,11 +80,53 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
 
                 is Result.Error -> {
                     binding.progressBar.visibility = View.GONE
+                    result.code?.let {
+                        handErrorServerProtobuf(binding.root, it) { errorCode ->
+                            when (errorCode) {
+                                ACCOUNT_LOCKED -> {
+                                    findNavController().popBackStack()
+                                }
+
+                                OTP_NOT_VALID, OTP_EXPIRED -> {
+                                    binding.otp.setLineColor(resources.getColor(code.name.monkey.appthemehelper.R.color.md_red_500))
+                                    binding.otp.setTextColor(resources.getColor(code.name.monkey.appthemehelper.R.color.md_red_500))
+                                }
+                            }
+                        }
+                    }
                 }
 
                 is Result.Success -> {
                     binding.progressBar.visibility = View.GONE
-                    //todo confirm otp
+                    result.data.let {
+                        if (result.data.success) {
+                            result.data.data_.let {
+                                when (result.data.data_.code) {
+                                    LOGIN_SUCCESS -> {
+                                        showSuccessLoginProtobuf(binding.root, LOGIN_SUCCESS)
+                                        // TODO: save info user
+                                        val intent =
+                                            Intent(requireContext(), MainActivity::class.java)
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                        startActivity(intent)
+                                        requireActivity().finish()
+                                    }
+
+                                    OTP_CONFIRMED -> {
+                                        val navOptions =
+                                            ViewUtil.createNavOptions(true, R.id.otpFragment)
+                                        findNavController().navigate(
+                                            R.id.setPassFragment,
+                                            bundleOf(
+                                                EMAIL to arguments.email
+                                            ),
+                                            navOptions
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -85,7 +139,15 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
 
                 is Result.Error -> {
                     binding.progressBar.visibility = View.GONE
-                    //todo fail resent
+                    result.code?.let {
+                        handErrorServerProtobuf(binding.root, it) { errorCode ->
+                            when (errorCode) {
+                                ACCOUNT_LOCKED -> {
+                                    findNavController().popBackStack()
+                                }
+                            }
+                        }
+                    }
                 }
 
                 is Result.Success -> {

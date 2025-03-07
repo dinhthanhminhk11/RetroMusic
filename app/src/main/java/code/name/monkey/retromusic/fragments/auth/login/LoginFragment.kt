@@ -6,16 +6,28 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
+import code.name.monkey.retromusic.ACCOUNT_CAN_LOGIN
+import code.name.monkey.retromusic.ACCOUNT_CAN_NOT_LOGIN
+import code.name.monkey.retromusic.ACCOUNT_LOCKED
 import code.name.monkey.retromusic.AuthRequest
+import code.name.monkey.retromusic.EMAIL
+import code.name.monkey.retromusic.LOGIN_SUCCESS
+import code.name.monkey.retromusic.OTP_CONFIRMED
+import code.name.monkey.retromusic.OTP_TYPE
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.TYPE_REGISTER
 import code.name.monkey.retromusic.activities.MainActivity
 import code.name.monkey.retromusic.databinding.FragmentLoginBinding
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
+import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
+import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.util.ViewUtil
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -67,22 +79,37 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
             when (result) {
                 is Result.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
-                    binding.btnContinue.isEnabled = true
+                    binding.btnContinue.isEnabled = false
                 }
 
                 is Result.Error -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
+                    result.code?.let {
+                        handErrorServerProtobuf(binding.root, it)
+                    }
                 }
 
                 is Result.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
-                    //todo save info user
-                    val intent = Intent(requireContext(), MainActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    startActivity(intent)
-                    requireActivity().finish()
+                    result.data.let {
+                        if (result.data.success) {
+                            result.data.data_.let {
+                                when (result.data.data_.code) {
+                                    LOGIN_SUCCESS -> {
+                                        showSuccessLoginProtobuf(binding.root, LOGIN_SUCCESS)
+                                        // TODO: save info user
+                                        val intent =
+                                            Intent(requireContext(), MainActivity::class.java)
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                        startActivity(intent)
+                                        requireActivity().finish()
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -97,13 +124,44 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                 is Result.Error -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
-
+                    result.code?.let {
+                        handErrorServerProtobuf(binding.root, it) { errorCode ->
+                            when (errorCode) {
+                                ACCOUNT_CAN_NOT_LOGIN -> {
+                                    findNavController().navigate(
+                                        R.id.otpFragment,
+                                        bundleOf(
+                                            OTP_TYPE to TYPE_REGISTER,
+                                            EMAIL to binding.username.text.toString()
+                                        ),
+                                        ViewUtil.navOptions
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
                 is Result.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
-                    // todo start otp
+                    result.data.let {
+                        if (result.data.success) {
+                            result.data.data_.let {
+                                when (result.data.data_.code) {
+                                    ACCOUNT_CAN_LOGIN -> {
+                                        showSuccessLoginProtobuf(binding.root, LOGIN_SUCCESS)
+                                        // TODO: save info user
+                                        val intent =
+                                            Intent(requireContext(), MainActivity::class.java)
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                        startActivity(intent)
+                                        requireActivity().finish()
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

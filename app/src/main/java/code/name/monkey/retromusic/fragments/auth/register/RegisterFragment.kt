@@ -18,10 +18,10 @@ import code.name.monkey.retromusic.databinding.FragmentRegisterBinding
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
-import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.util.ViewUtil.navOptions
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -89,7 +89,8 @@ class RegisterFragment :
                                 bundleOf(
                                     OTP_TYPE to TYPE_REGISTER,
                                     EMAIL to binding.username.text.toString()
-                                )
+                                ),
+                                navOptions
                             )
                         }
                     }

@@ -1,12 +1,12 @@
 package code.name.monkey.retromusic.fragments.auth.setpass
 
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import code.name.monkey.retromusic.AuthRequest
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.FragmentSetPassBinding
@@ -24,23 +24,7 @@ class SetPassFragment :
     private val viewModel by viewModel<SetPassViewModel>()
     private var isNetworkConnected = false;
     private var isPasswordValid = false;
-    private var email: String? = null;
-
-    companion object {
-        const val EMAIL = "EMAIL"
-        fun newInstance(email: String? = null): SetPassFragment {
-            val fragment = SetPassFragment()
-            val args = Bundle()
-            args.putString(EMAIL, email)
-            fragment.arguments = args
-            return fragment
-        }
-    }
-
-    override fun initArgs() {
-        super.initArgs()
-        email = arguments?.getString(EMAIL)
-    }
+    private val arguments by navArgs<SetPassFragmentArgs>()
 
     override fun onNetworkChanged(isConnected: Boolean) {
         isNetworkConnected = isConnected
@@ -77,7 +61,7 @@ class SetPassFragment :
             when (result) {
                 is Result.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
-                    binding.btnContinue.isEnabled = true
+                    binding.btnContinue.isEnabled = false
                 }
 
                 is Result.Error -> {
@@ -125,7 +109,7 @@ class SetPassFragment :
                 binding.progressBar.visibility = View.VISIBLE
                 binding.btnContinue.isEnabled = false
                 val text =
-                    "{\"email\" : \"${email}\" , \"password\" : \"${binding.password.text.toString()}\"}"
+                    "{\"email\" : \"${arguments.email}\" , \"password\" : \"${binding.password.text.toString()}\"}"
                 val textEntryPoint = Login.encryptData(text)
 
                 val authRequest = AuthRequest(textEntryPoint)
