@@ -11,6 +11,9 @@ class AuthRepositoryImpl(private val authService: AuthService) : AuthRepository 
     override suspend fun login(reqLogin: RequestBody): Response<ResponseBody> =
         authService.login(reqLogin)
 
+    override suspend fun logout(reqLogin: RequestBody): Response<ResponseBody> =
+        authService.logout(reqLogin)
+
     override suspend fun register(requestBody: RequestBody): Response<ResponseBody> =
         authService.register(requestBody)
 

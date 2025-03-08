@@ -91,6 +91,7 @@ interface Repository {
     fun checkPlaylistExists(playListId: Long): LiveData<Boolean>
     fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs>
     suspend fun login(reqLogin: RequestBody): Result<SuccessResponse>
+    suspend fun logout(reqLogin: RequestBody): Result<SuccessResponse>
     suspend fun register(requestBody: RequestBody): Result<SuccessResponse>
     suspend fun verifyOtp(reqLogin: RequestBody): Result<SuccessResponse>
     suspend fun reSentOtp(reqLogin: RequestBody): Result<SuccessResponse>

@@ -1,4 +1,3 @@
-
 package code.name.monkey.retromusic.fragments.home
 
 import android.os.Bundle
@@ -25,6 +24,7 @@ import code.name.monkey.retromusic.dialogs.ImportPlaylistDialog
 import code.name.monkey.retromusic.extensions.accentColor
 import code.name.monkey.retromusic.extensions.dip
 import code.name.monkey.retromusic.extensions.elevatedAccentColor
+import code.name.monkey.retromusic.extensions.loadImageAvatar
 import code.name.monkey.retromusic.extensions.setUpMediaRouteButton
 import code.name.monkey.retromusic.fragments.ReloadType
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
@@ -36,6 +36,7 @@ import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.IScrollHelper
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.PreferenceUtil.userClient
 import code.name.monkey.retromusic.util.PreferenceUtil.userName
 import com.bumptech.glide.Glide
 import com.google.android.material.transition.MaterialFadeThrough
@@ -54,7 +55,10 @@ class HomeFragment :
         mainActivity.setSupportActionBar(binding.toolbar)
         mainActivity.supportActionBar?.title = null
         setupListeners()
-        binding.titleWelcome.text = String.format("%s", userName)
+        binding.titleWelcome.text = String.format(
+            "%s",
+            if (userClient.fullName.isNullOrEmpty()) userClient.email else userClient.fullName
+        )
 
         enterTransition = MaterialFadeThrough().addTarget(binding.contentContainer)
         reenterTransition = MaterialFadeThrough().addTarget(binding.contentContainer)
@@ -158,15 +162,9 @@ class HomeFragment :
 
     private fun loadProfile() {
         binding.bannerImage?.let {
-            Glide.with(requireContext())
-                .load(RetroGlideExtension.getBannerModel())
-                .profileBannerOptions(RetroGlideExtension.getBannerModel())
-                .into(it)
+            loadImageAvatar(requireActivity(), userClient.imageBanner, it)
         }
-        Glide.with(requireActivity())
-            .load(RetroGlideExtension.getUserModel())
-            .userProfileOptions(RetroGlideExtension.getUserModel(), requireContext())
-            .into(binding.userImage)
+        loadImageAvatar(requireActivity(), userClient.image, binding.userImage)
     }
 
     fun colorButtons() {

@@ -21,6 +21,7 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.FragmentUserInfoBinding
 import code.name.monkey.retromusic.extensions.accentColor
 import code.name.monkey.retromusic.extensions.applyToolbar
+import code.name.monkey.retromusic.extensions.loadImageAvatar
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.fragments.LibraryViewModel
 import code.name.monkey.retromusic.glide.RetroGlideExtension
@@ -146,16 +147,10 @@ class UserInfoFragment : Fragment() {
     }
 
     private fun loadProfile() {
-        binding.bannerImage.let {
-            Glide.with(this)
-                .load(RetroGlideExtension.getBannerModel())
-                .profileBannerOptions(RetroGlideExtension.getBannerModel())
-                .into(it)
+        binding.bannerImage?.let {
+            loadImageAvatar(requireActivity(), userClient.imageBanner, it)
         }
-        Glide.with(this)
-            .load(RetroGlideExtension.getUserModel())
-            .userProfileOptions(RetroGlideExtension.getUserModel(), requireContext())
-            .into(binding.userImage)
+        loadImageAvatar(requireActivity(), userClient.image, binding.userImage)
     }
 
     private fun selectBannerImage() {

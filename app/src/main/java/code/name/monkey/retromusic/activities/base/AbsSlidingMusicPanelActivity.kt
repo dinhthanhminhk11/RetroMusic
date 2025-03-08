@@ -88,6 +88,7 @@ import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.CategoryInfo
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.PreferenceUtil.isTokenNullOrEmpty
+import code.name.monkey.retromusic.util.PreferenceUtil.userClient
 import code.name.monkey.retromusic.util.ViewUtil
 import code.name.monkey.retromusic.util.logD
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -205,6 +206,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
         } else {
+            userClient.accessToken
             if (!hasPermissions()) {
                 startActivity(Intent(this, PermissionActivity::class.java))
                 finish()

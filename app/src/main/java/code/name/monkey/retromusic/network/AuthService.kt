@@ -16,6 +16,11 @@ interface AuthService {
         @Body requestBody: RequestBody
     ): Response<ResponseBody>
 
+    @POST(Endpoint.LOGOUT)
+    suspend fun logout(
+        @Body requestBody: RequestBody
+    ): Response<ResponseBody>
+
     @POST(Endpoint.REGISTER)
     suspend fun register(
         @Body requestBody: RequestBody

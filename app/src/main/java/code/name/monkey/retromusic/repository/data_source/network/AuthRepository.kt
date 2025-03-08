@@ -7,6 +7,7 @@ import retrofit2.Response
 
 interface AuthRepository {
     suspend fun login(reqLogin: RequestBody): Response<ResponseBody>
+    suspend fun logout(reqLogin: RequestBody): Response<ResponseBody>
     suspend fun register(requestBody: RequestBody): Response<ResponseBody>
     suspend fun verifyOtp(reqLogin: RequestBody): Response<ResponseBody>
     suspend fun reSentOtp(reqLogin: RequestBody): Response<ResponseBody>
