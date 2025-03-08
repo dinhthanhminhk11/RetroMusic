@@ -10,12 +10,18 @@ import code.name.monkey.retromusic.repository.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
+import timber.log.Timber
 
 class LoginViewModel(private val repository: Repository) : ViewModel() {
-    private val _authState = MutableLiveData<Result<SuccessResponse>>()
-    private val _accountstate = MutableLiveData<Result<SuccessResponse>>()
-    val authState: LiveData<Result<SuccessResponse>> get() = _authState
-    val accountState: LiveData<Result<SuccessResponse>> get() = _accountstate
+    private val _authState = MutableLiveData<Result<SuccessResponse>?>()
+    private val _accountstate = MutableLiveData<Result<SuccessResponse>?>()
+    val authState: LiveData<Result<SuccessResponse>?> get() = _authState
+    val accountState: LiveData<Result<SuccessResponse>?> get() = _accountstate
+
+    init {
+        Timber.d("LoginViewModel created")
+    }
+
     fun login(reqLogin: RequestBody) {
         viewModelScope.launch(Dispatchers.IO) {
             _authState.postValue(Result.Loading)
@@ -61,4 +67,9 @@ class LoginViewModel(private val repository: Repository) : ViewModel() {
                 emit(Result.Error(e))
             }
         }*/
+
+    fun clearState() {
+        _authState.value = null
+        _accountstate.value = null
+    }
 }

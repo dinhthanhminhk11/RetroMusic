@@ -1,24 +1,28 @@
 package code.name.monkey.retromusic.fragments.auth.setpass
 
 import android.content.Intent
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import code.name.monkey.retromusic.AuthRequest
+import code.name.monkey.retromusic.Constants.ON_OFF_SETTING_TOAST_SUCCESS
 import code.name.monkey.retromusic.LOGIN_SUCCESS
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.MainActivity
 import code.name.monkey.retromusic.databinding.FragmentSetPassBinding
+import code.name.monkey.retromusic.dialogs.DialogConfirmCustom
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
+import code.name.monkey.retromusic.extensions.hideKeyboard
 import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
+import code.name.monkey.retromusic.model.auth.UserClient
 import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.util.PreferenceUtil
+import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -45,7 +49,14 @@ class SetPassFragment :
 
     override fun initView() {
         binding.toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            DialogConfirmCustom.create(
+                context = requireActivity(),
+                content = getString(R.string.text_confirm_setPass),
+                onLogoutClick = {
+                    findNavController().navigateUp()
+
+                }
+            ).show()
         }
         binding.btnContinue.isEnabled = false
         binding.password.addTextChangedListener(object : TextWatcher {
@@ -80,13 +91,30 @@ class SetPassFragment :
                 is Result.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
+
+                    if (ON_OFF_SETTING_TOAST_SUCCESS) {
+                        result.data.data_.code.let {
+                            showSuccessLoginProtobuf(binding.root, it)
+                        }
+                    }
+
                     result.data.let {
                         if (result.data.success) {
                             result.data.data_.let {
                                 when (result.data.data_.code) {
                                     LOGIN_SUCCESS -> {
                                         showSuccessLoginProtobuf(binding.root, LOGIN_SUCCESS)
-                                        // TODO: save info user
+
+                                        result.data.data_.details?.data_.let { dataLogin ->
+                                            val gson = Gson()
+                                            val userClient: UserClient =
+                                                gson.fromJson(
+                                                    Login.decryptData(dataLogin.toString()),
+                                                    UserClient::class.java
+                                                )
+                                            PreferenceUtil.userClient = userClient
+                                        }
+
                                         val intent =
                                             Intent(requireContext(), MainActivity::class.java)
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -105,7 +133,7 @@ class SetPassFragment :
             when (result) {
                 is Result.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
-                    binding.btnContinue.isEnabled = true
+                    binding.btnContinue.isEnabled = false
                 }
 
                 is Result.Error -> {
@@ -121,15 +149,35 @@ class SetPassFragment :
                     binding.btnContinue.isEnabled = true
                     //todo START login
 
-                    val textencrpt =
-                        "{\"email\" : \"${arguments.email}\" , \"password\" : \"${binding.password.text.toString()}\"}"
-                    val textEntryPoint = Login.encryptData(textencrpt)
+                    if (ON_OFF_SETTING_TOAST_SUCCESS) {
+                        result.data.data_.code.let {
+                            showSuccessLoginProtobuf(binding.root, it)
+                        }
+                    }
 
-                    val authRequest = AuthRequest(textEntryPoint)
-                    val byteArray = authRequest.encode()
-                    val requestBody =
-                        RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
-                    viewModel.login(requestBody)
+                    DialogConfirmCustom.create(
+                        context = requireActivity(),
+                        content = getString(R.string.text_confirm_setPass_login),
+                        textConfirm = getString(R.string.agree),
+                        onLogoutClick = {
+                            val textencrpt =
+                                "{\"email\" : \"${arguments.email}\" , \"password\" : \"${binding.password.text.toString()}\"}"
+                            val textEntryPoint = Login.encryptData(textencrpt)
+
+                            val authRequest = AuthRequest(textEntryPoint)
+                            val byteArray = authRequest.encode()
+                            val requestBody =
+                                RequestBody.create(
+                                    "application/x-protobuf".toMediaType(),
+                                    byteArray
+                                )
+                            viewModel.login(requestBody)
+                        },
+                        onCancelClick = {
+                            findNavController().navigateUp()
+                        }
+                    ).show()
+
                 }
             }
         }
@@ -139,10 +187,9 @@ class SetPassFragment :
     }
 
     override fun onViewClicked(view: View?) {
-        if (!isAdded || binding == null) return
         when (view) {
             binding.btnContinue -> {
-                if (!binding.btnContinue.isEnabled) return
+                hideKeyboard(requireContext(), view)
                 binding.progressBar.visibility = View.VISIBLE
                 binding.btnContinue.isEnabled = false
                 val text =
@@ -154,10 +201,6 @@ class SetPassFragment :
                 val requestBody =
                     RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
                 viewModel.setPassword(requestBody)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    binding.btnContinue.isEnabled = true
-                    binding.progressBar.visibility = View.GONE
-                }, 2000)
             }
         }
     }

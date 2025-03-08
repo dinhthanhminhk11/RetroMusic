@@ -87,6 +87,7 @@ import code.name.monkey.retromusic.fragments.queue.PlayingQueueFragment
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.CategoryInfo
 import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.PreferenceUtil.isTokenNullOrEmpty
 import code.name.monkey.retromusic.util.ViewUtil
 import code.name.monkey.retromusic.util.logD
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -200,15 +201,15 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val checkLogin: Boolean = true
-        if (checkLogin) {
+        if (isTokenNullOrEmpty) {
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
-        }
-
-        if (!hasPermissions()) {
-            startActivity(Intent(this, PermissionActivity::class.java))
-            finish()
+        } else {
+            if (!hasPermissions()) {
+                startActivity(Intent(this, PermissionActivity::class.java))
+                finish()
+            }
+            loginByToken()
         }
         binding = SlidingMusicPanelLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -598,5 +599,22 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
         playerFragment = whichFragment(R.id.playerFragmentContainer)
         miniPlayerFragment = whichFragment<MiniPlayerFragment>(R.id.miniPlayerFragment)
         miniPlayerFragment?.view?.setOnClickListener { expandPanel() }
+    }
+
+    private fun loginByToken() {
+//        libraryViewModel.loginByToken("token").observe(this) { result ->
+//            UserClient.setUserFromUser(
+//                User(
+//                    _id = result.data._id,
+//                    fullName = result.data.fullName,
+//                    email = result.data.email,
+//                    phone = result.data.phone,
+//                    image = result.data.image
+//                )
+//            )
+//            userName = result.data.fullName
+//            image = result.data.image
+//            imageBanner = result.data.imageBanner
+//        }
     }
 }

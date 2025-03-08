@@ -1,15 +1,12 @@
 package code.name.monkey.retromusic.fragments.auth.register
 
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.InputMethodManager
-import androidx.core.content.getSystemService
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import code.name.monkey.retromusic.AuthRequest
+import code.name.monkey.retromusic.Constants
 import code.name.monkey.retromusic.EMAIL
 import code.name.monkey.retromusic.OTP_TYPE
 import code.name.monkey.retromusic.R
@@ -18,10 +15,12 @@ import code.name.monkey.retromusic.databinding.FragmentRegisterBinding
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
+import code.name.monkey.retromusic.extensions.hideKeyboard
+import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
-import code.name.monkey.retromusic.util.ViewUtil.navOptions
+import code.name.monkey.retromusic.util.ViewUtil.navOptionsByMinh
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -43,7 +42,7 @@ class RegisterFragment :
 
     override fun initView() {
         binding.toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            findNavController().navigateUp()
         }
         binding.btnContinue.isEnabled = false
         binding.username.addTextChangedListener(object : TextWatcher {
@@ -79,9 +78,13 @@ class RegisterFragment :
                 is Result.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
-//                    result.data.data_.code.let {
-//                        showSuccessLoginProtobuf(binding.root, it)
-//                    }
+
+                    if (Constants.ON_OFF_SETTING_TOAST_SUCCESS) {
+                        result.data.data_.code.let {
+                            showSuccessLoginProtobuf(binding.root, it)
+                        }
+                    }
+
                     result.data.data_.details?.let {
                         if (result.data.data_.details.verified == false) {
                             findNavController().navigate(
@@ -90,11 +93,13 @@ class RegisterFragment :
                                     OTP_TYPE to TYPE_REGISTER,
                                     EMAIL to binding.username.text.toString()
                                 ),
-                                navOptions
+                                navOptionsByMinh
                             )
                         }
                     }
                 }
+
+                else -> {}
             }
         }
     }
@@ -103,11 +108,9 @@ class RegisterFragment :
     }
 
     override fun onViewClicked(view: View?) {
-        if (!isAdded || binding == null) return
         when (view) {
             binding.btnContinue -> {
-                if (!binding.btnContinue.isEnabled) return
-                hideKeyboard(view)
+                hideKeyboard(requireContext(), view)
                 val email = binding.username.text.toString()
                 if (validateEmail(email)) {
                     binding.btnContinue.isEnabled = false
@@ -122,10 +125,6 @@ class RegisterFragment :
                         RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
                     viewModel.register(requestBody)
                 }
-                Handler(Looper.getMainLooper()).postDelayed({
-                    binding.btnContinue.isEnabled = true
-                    binding.progressBar.visibility = View.GONE
-                }, 2000)
             }
         }
     }
@@ -134,11 +133,8 @@ class RegisterFragment :
         binding.btnContinue.isEnabled = isNetworkConnected && isEmailValid
     }
 
-    private fun hideKeyboard(view: View?) {
-        if (view != null) {
-            val imm =
-                requireContext().getSystemService<InputMethodManager>()
-            imm?.hideSoftInputFromWindow(view.windowToken, 0)
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clearState()
     }
 }

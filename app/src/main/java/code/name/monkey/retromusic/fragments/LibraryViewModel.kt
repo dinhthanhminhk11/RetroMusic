@@ -1,4 +1,3 @@
-
 package code.name.monkey.retromusic.fragments
 
 import android.animation.ValueAnimator
@@ -46,6 +45,10 @@ class LibraryViewModel(
 
     init {
         loadLibraryContent()
+    }
+
+    fun loginByToken(token: String) {
+
     }
 
     private fun loadLibraryContent() {

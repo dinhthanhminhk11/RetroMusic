@@ -20,6 +20,7 @@ import code.name.monkey.retromusic.fragments.NowPlayingScreen
 import code.name.monkey.retromusic.fragments.folder.FoldersFragment
 import code.name.monkey.retromusic.helper.SortOrder.*
 import code.name.monkey.retromusic.model.CategoryInfo
+import code.name.monkey.retromusic.model.auth.UserClient
 import code.name.monkey.retromusic.transform.*
 import code.name.monkey.retromusic.util.theme.ThemeMode
 import code.name.monkey.retromusic.views.TopAppBarLayout
@@ -111,6 +112,39 @@ object PreferenceUtil {
         )
         set(value) = sharedPreferences.edit {
             putBoolean(LOCALE_AUTO_STORE_ENABLED, value)
+        }
+
+    var tokenLogin: String?
+        get() = sharedPreferences.getString(USER_ACCESS_TOKEN, null)
+        set(value) = sharedPreferences.edit {
+            putString(USER_ACCESS_TOKEN, value)
+        }
+
+    val isTokenNullOrEmpty: Boolean
+        get() = userClient.accessToken.isNullOrEmpty()
+
+    var userClient: UserClient
+        get() = UserClient(
+            id = sharedPreferences.getString(
+                USER_ID, null
+            ),
+            fullName = sharedPreferences.getString(
+                USER_FULL_NAME, null
+            ),
+            email = sharedPreferences.getString(USER_EMAIL, null),
+            phone = sharedPreferences.getString(USER_PHONE, null),
+            image = sharedPreferences.getString(USER_IMAGE, null),
+            imageBanner = sharedPreferences.getString(USER_IMAGE_BANNER, null),
+            accessToken = sharedPreferences.getString(USER_ACCESS_TOKEN, null)
+        )
+        set(value) = sharedPreferences.edit {
+            value.id?.let { putString(USER_ID, it) }
+            value.fullName?.let { putString(USER_FULL_NAME, it) }
+            value.email?.let { putString(USER_EMAIL, it) }
+            value.phone?.let { putString(USER_PHONE, it) }
+            value.image?.let { putString(USER_IMAGE, it) }
+            value.imageBanner?.let { putString(USER_IMAGE_BANNER, it) }
+            value.accessToken?.let { putString(USER_ACCESS_TOKEN, it) }
         }
 
     var Fragment.userName

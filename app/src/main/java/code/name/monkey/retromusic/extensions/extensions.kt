@@ -7,6 +7,8 @@ import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.view.Menu
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.getSystemService
 import androidx.fragment.app.FragmentActivity
 import code.name.monkey.retromusic.ACCOUNT_CAN_LOGIN
 import code.name.monkey.retromusic.ACCOUNT_CAN_NOT_LOGIN
@@ -126,6 +128,7 @@ fun handErrorServerProtobuf(view: View, errorCode: String, action: ((String) -> 
         PASSWORD_NOT_SET -> R.string.password_not_set
         LOGIN_ERROR -> R.string.login_error
         OTP_NOT_VERIFIED -> R.string.otp_not_verified
+        ACCOUNT_CAN_NOT_LOGIN -> R.string.unverified_account_require_authentication
 
         else -> R.string.unknow_error
     }
@@ -148,5 +151,13 @@ fun showSuccessLoginProtobuf(view: View, successCode: String) {
     }
 
     view.showSnackBar(message = view.context.getString(message))
+}
+
+fun hideKeyboard(context: Context, view: View?) {
+    if (view != null) {
+        val imm =
+            context.getSystemService<InputMethodManager>()
+        imm?.hideSoftInputFromWindow(view.windowToken, 0)
+    }
 }
 

@@ -1,4 +1,3 @@
-
 package code.name.monkey.retromusic.fragments.other
 
 import android.app.Activity
@@ -28,6 +27,8 @@ import code.name.monkey.retromusic.glide.RetroGlideExtension
 import code.name.monkey.retromusic.glide.RetroGlideExtension.profileBannerOptions
 import code.name.monkey.retromusic.glide.RetroGlideExtension.userProfileOptions
 import code.name.monkey.retromusic.util.ImageUtil
+import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.PreferenceUtil.userClient
 import code.name.monkey.retromusic.util.PreferenceUtil.userName
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -74,7 +75,7 @@ class UserInfoFragment : Fragment() {
 
         binding.nameContainer.accentColor()
         binding.next.accentColor()
-        binding.name.setText(userName)
+        binding.name.setText(if (userClient.fullName.isNullOrEmpty()) userClient.email else userClient.fullName)
 
         binding.userImage.setOnClickListener {
             showUserImageOptions()

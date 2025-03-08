@@ -4,6 +4,7 @@ import android.provider.BaseColumns
 import android.provider.MediaStore
 
 object Constants {
+    const val ON_OFF_SETTING_TOAST_SUCCESS = true
     const val PRO_VERSION_PRODUCT_ID = "pro_version"
     const val RATE_ON_GOOGLE_PLAY =
         "https://play.google.com/store/apps/details?id=code.name.monkey.retromusic"
@@ -152,6 +153,15 @@ const val ENABLE_SEARCH_PLAYLIST = "enable_search_playlist"
 const val OTP_TYPE = "OTP_TYPE"
 const val EMAIL = "EMAIL"
 const val TYPE_REGISTER = "register"
+const val TYPE_LOGIN = "LOGIN"
+const val USER_ACCESS_TOKEN = "USER_ACCESS_TOKEN"
+const val USER_IMAGE_BANNER = "USER_IMAGE_BANNER"
+const val USER_IMAGE = "USER_IMAGE"
+const val USER_PHONE = "USER_PHONE"
+const val USER_EMAIL = "USER_EMAIL"
+const val USER_FULL_NAME = "USER_FULL_NAME"
+const val USER_ID = "USER_ID"
+
 
 const val INVALID_PROTOBUF = "INVALID_PROTOBUF"
 const val DATA_MISSING = "DATA_MISSING"

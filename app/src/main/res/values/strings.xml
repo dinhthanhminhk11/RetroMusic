@@ -622,6 +622,7 @@
     <string name="password_not_set">Mật khẩu chưa được thiết lập cho tài khoản này.</string>
     <string name="login_error">Tài khoản hoặc mật khẩu không đúng.</string>
     <string name="otp_not_verified">Vui lòng xác minh OTP trước khi đặt mật khẩu.</string>
+    <string name="unverified_account_require_authentication">Tài khoản chưa được xác minh cần phải xác thực.</string>
 
 
     <string name="user_register_success">Đăng kí thành công.</string>
@@ -631,6 +632,12 @@
     <string name="account_can_login">Tài khoản có thể login.</string>
     <string name="account_can_not_login">Tài khoản không thể login.</string>
     <string name="set_pass_success">Đặt mật khẩu thành công.</string>
+    <string name="cancel">Hủy</string>
+    <string name="out">Thoát</string>
+    <string name="text_confirm_otp">Bạn có chắc chắn muốn thoát</string>
+    <string name="text_confirm_setPass_login">Hoàn thành việc đăng kí tài khoản. Bạn có muốn đăng nhập luôn?</string>
+    <string name="agree">Đồng ý</string>
+    <string name="text_confirm_setPass">Còn một bước cuối để hoàn thành việc đăng kí. Bạn có chắc muốn thoát</string>
 
 
 </resources>

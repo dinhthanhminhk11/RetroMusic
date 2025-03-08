@@ -138,12 +138,12 @@ object ViewUtil {
 
     fun createNavOptions(replace: Boolean, popUpToId: Int? = null): NavOptions {
         return navOptions {
-            launchSingleTop = false
+            launchSingleTop = true
             anim {
-                enter = R.anim.retro_fragment_open_enter
-                exit = R.anim.retro_fragment_open_exit
-                popEnter = R.anim.retro_fragment_close_enter
-                popExit = R.anim.retro_fragment_close_exit
+                enter = R.anim.fragment_slide_left_enter
+                exit = R.anim.fragment_slide_left_exit
+                popEnter = R.anim.fragment_slide_right_enter
+                popExit = R.anim.fragment_slide_right_exit
             }
             if (replace && popUpToId != null) {
                 popUpTo(popUpToId) { inclusive = true }
