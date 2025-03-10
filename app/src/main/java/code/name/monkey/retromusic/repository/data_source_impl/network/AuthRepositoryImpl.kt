@@ -1,7 +1,6 @@
 package code.name.monkey.retromusic.repository.data_source_impl.network
 
 import code.name.monkey.retromusic.network.AuthService
-import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
 import okhttp3.RequestBody
 import okhttp3.ResponseBody

@@ -8,6 +8,7 @@ import android.content.Context
 import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.getSystemService
 import androidx.fragment.app.FragmentActivity
 import code.name.monkey.retromusic.ACCOUNT_CAN_LOGIN
@@ -22,6 +23,7 @@ import code.name.monkey.retromusic.EMAIL_NOT_FORMAT
 import code.name.monkey.retromusic.INVALID_PROTOBUF
 import code.name.monkey.retromusic.LOGIN_ERROR
 import code.name.monkey.retromusic.LOGIN_SUCCESS
+import code.name.monkey.retromusic.LOGOUT_SUCCESS
 import code.name.monkey.retromusic.OTP_CONFIRMED
 import code.name.monkey.retromusic.OTP_EXPIRED
 import code.name.monkey.retromusic.OTP_LIMIT
@@ -146,7 +148,7 @@ fun showSuccessLoginProtobuf(view: View, successCode: String) {
         ACCOUNT_CAN_LOGIN -> R.string.account_can_login
         ACCOUNT_CAN_NOT_LOGIN -> R.string.account_can_not_login
         SET_PASS_SUCCESS -> R.string.set_pass_success
-
+        LOGOUT_SUCCESS -> R.string.logout_successs
         else -> R.string.unknow_success
     }
 
@@ -160,4 +162,25 @@ fun hideKeyboard(context: Context, view: View?) {
         imm?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
+
+fun showConfirmDialog(
+    context: Context,
+    title: String,
+    message: String,
+    textPositiveButton: String,
+    textNegativeButton: String,
+    onConfirm: () -> Unit,
+    onCancel: (() -> Unit)? = null
+) {
+    AlertDialog.Builder(context, com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
+        .setTitle(title)
+        .setMessage(message)
+        .setPositiveButton(textPositiveButton) { _, _ -> onConfirm() }
+        .setNegativeButton(textNegativeButton) { dialog, _ ->
+            onCancel?.invoke()
+            dialog.dismiss()
+        }
+        .show()
+}
+
 

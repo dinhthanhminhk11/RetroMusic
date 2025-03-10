@@ -123,6 +123,11 @@ object PreferenceUtil {
     val isTokenNullOrEmpty: Boolean
         get() = userClient.accessToken.isNullOrEmpty()
 
+    val isProAccount: Boolean
+        get() = userClient.role?.let {
+            it != 0
+        } ?: false
+
     var userClient: UserClient
         get() = UserClient(
             id = sharedPreferences.getString(
@@ -146,6 +151,18 @@ object PreferenceUtil {
             value.imageBanner?.let { putString(USER_IMAGE_BANNER, it) }
             value.accessToken?.let { putString(USER_ACCESS_TOKEN, it) }
         }
+
+    fun clearUser() {
+        sharedPreferences.edit {
+            remove(USER_ID)
+            remove(USER_FULL_NAME)
+            remove(USER_EMAIL)
+            remove(USER_PHONE)
+            remove(USER_IMAGE)
+            remove(USER_IMAGE_BANNER)
+            remove(USER_ACCESS_TOKEN)
+        }
+    }
 
     var Fragment.userName
         get() = sharedPreferences.getString(
@@ -396,6 +413,7 @@ object PreferenceUtil {
                     netInfo != null && netInfo.type == ConnectivityManager.TYPE_WIFI && netInfo.isConnectedOrConnecting
                 }
             }
+
             "never" -> false
             else -> false
         }

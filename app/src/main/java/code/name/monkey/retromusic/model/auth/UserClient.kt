@@ -7,5 +7,6 @@ data class UserClient(
     val phone: String? = null,
     val image: String? = null,
     val imageBanner: String? = null,
-    val accessToken: String? = null
+    val accessToken: String? = null,
+    val role: Int? = null
 )

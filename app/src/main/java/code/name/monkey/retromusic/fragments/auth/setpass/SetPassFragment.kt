@@ -12,11 +12,11 @@ import code.name.monkey.retromusic.LOGIN_SUCCESS
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.MainActivity
 import code.name.monkey.retromusic.databinding.FragmentSetPassBinding
-import code.name.monkey.retromusic.dialogs.DialogConfirmCustom
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
 import code.name.monkey.retromusic.extensions.hideKeyboard
+import code.name.monkey.retromusic.extensions.showConfirmDialog
 import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.model.auth.UserClient
@@ -49,14 +49,15 @@ class SetPassFragment :
 
     override fun initView() {
         binding.toolbar.setNavigationOnClickListener {
-            DialogConfirmCustom.create(
-                context = requireActivity(),
-                content = getString(R.string.text_confirm_setPass),
-                onLogoutClick = {
+            showConfirmDialog(context = requireActivity(),
+                title = getString(R.string.notification),
+                message = getString(R.string.text_confirm_setPass),
+                textPositiveButton = getString(R.string.out),
+                textNegativeButton = getString(R.string.cancel),
+                onConfirm = {
                     findNavController().navigateUp()
-
                 }
-            ).show()
+            )
         }
         binding.btnContinue.isEnabled = false
         binding.password.addTextChangedListener(object : TextWatcher {
@@ -154,12 +155,12 @@ class SetPassFragment :
                             showSuccessLoginProtobuf(binding.root, it)
                         }
                     }
-
-                    DialogConfirmCustom.create(
-                        context = requireActivity(),
-                        content = getString(R.string.text_confirm_setPass_login),
-                        textConfirm = getString(R.string.agree),
-                        onLogoutClick = {
+                    showConfirmDialog(context = requireActivity(),
+                        title = getString(R.string.notification),
+                        message = getString(R.string.text_confirm_setPass_login),
+                        textPositiveButton = getString(R.string.agree),
+                        textNegativeButton = getString(R.string.cancel),
+                        onConfirm = {
                             val textencrpt =
                                 "{\"email\" : \"${arguments.email}\" , \"password\" : \"${binding.password.text.toString()}\"}"
                             val textEntryPoint = Login.encryptData(textencrpt)
@@ -173,11 +174,10 @@ class SetPassFragment :
                                 )
                             viewModel.login(requestBody)
                         },
-                        onCancelClick = {
+                        onCancel = {
                             findNavController().navigateUp()
                         }
-                    ).show()
-
+                    )
                 }
             }
         }

@@ -3,7 +3,6 @@ package code.name.monkey.retromusic.fragments.auth.login
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
@@ -226,11 +225,11 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                 if (validateEmail(email)) {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.btnContinue.isEnabled = false
-                    var textencrpt: String
+                    var textEncrypt: String
                     if (isLoginByPass) {
-                        textencrpt =
+                        textEncrypt =
                             "{\"email\" : \"${binding.username.text.toString()}\" , \"password\" : \"${binding.password.text.toString()}\"}"
-                        val textEntryPoint = Login.encryptData(textencrpt)
+                        val textEntryPoint = Login.encryptData(textEncrypt)
 
                         val authRequest = AuthRequest(textEntryPoint)
                         val byteArray = authRequest.encode()
@@ -238,8 +237,8 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                             RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
                         loginViewModel.login(requestBody)
                     } else {
-                        textencrpt = "{\"email\" : \"${binding.username.text.toString()}\"}"
-                        val textEntryPoint = Login.encryptData(textencrpt)
+                        textEncrypt = "{\"email\" : \"${binding.username.text.toString()}\"}"
+                        val textEntryPoint = Login.encryptData(textEncrypt)
                         val authRequest = AuthRequest(textEntryPoint)
                         val byteArray = authRequest.encode()
                         val requestBody =

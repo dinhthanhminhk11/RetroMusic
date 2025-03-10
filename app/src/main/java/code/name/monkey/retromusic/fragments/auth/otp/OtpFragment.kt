@@ -18,11 +18,11 @@ import code.name.monkey.retromusic.OTP_NOT_VALID
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.MainActivity
 import code.name.monkey.retromusic.databinding.FragmentOtpBinding
-import code.name.monkey.retromusic.dialogs.DialogConfirmCustom
 import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
 import code.name.monkey.retromusic.extensions.hideKeyboard
+import code.name.monkey.retromusic.extensions.showConfirmDialog
 import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.model.auth.UserClient
@@ -64,14 +64,16 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
         binding.otp.requestFocus()
         binding.otp.setOtpCompletionListener(this)
         binding.toolbar.setNavigationOnClickListener {
-            DialogConfirmCustom.create(
-                context = requireActivity(),
-                content = getString(R.string.text_confirm_otp),
-                onLogoutClick = {
+            showConfirmDialog(context = requireActivity(),
+                title = getString(R.string.notification),
+                message = getString(R.string.text_confirm_otp),
+                textPositiveButton = getString(R.string.out),
+                textNegativeButton = getString(R.string.cancel),
+                onConfirm = {
                     countdownTimer.cancel()
                     findNavController().navigateUp()
                 }
-            ).show()
+            )
         }
         binding.resent.setOnClickListener(this)
         val otpMessage = getString(R.string.content_otp_text_view, arguments.email)

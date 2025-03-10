@@ -178,7 +178,7 @@ class RepositoryImpl(
         responseToResourceProtobuf(authRepository.login(reqLogin), SuccessResponse.ADAPTER)
 
     override suspend fun logout(reqLogin: RequestBody): Result<SuccessResponse> =
-        responseToResourceProtobuf(authRepository.login(reqLogin), SuccessResponse.ADAPTER)
+        responseToResourceProtobuf(authRepository.logout(reqLogin), SuccessResponse.ADAPTER)
 
     override suspend fun register(requestBody: RequestBody): Result<SuccessResponse> {
         val response = authRepository.register(requestBody)

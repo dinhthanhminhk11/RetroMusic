@@ -139,5 +139,5 @@ class AlbumCoverStylePreferenceDialog : DialogFragment(),
 }
 
 private fun isAlbumCoverStyle(style: AlbumCoverStyle): Boolean {
-    return (!App.isProVersion() && (style == Circle || style == Card || style == FullCard))
+    return (!PreferenceUtil.isProAccount && (style == Circle || style == Card || style == FullCard))
 }

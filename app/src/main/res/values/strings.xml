@@ -632,12 +632,16 @@
     <string name="account_can_login">Tài khoản có thể login.</string>
     <string name="account_can_not_login">Tài khoản không thể login.</string>
     <string name="set_pass_success">Đặt mật khẩu thành công.</string>
+    <string name="logout_successs">Đăng xuất thành công.</string>
     <string name="cancel">Hủy</string>
     <string name="out">Thoát</string>
     <string name="text_confirm_otp">Bạn có chắc chắn muốn thoát</string>
     <string name="text_confirm_setPass_login">Hoàn thành việc đăng kí tài khoản. Bạn có muốn đăng nhập luôn?</string>
     <string name="agree">Đồng ý</string>
     <string name="text_confirm_setPass">Còn một bước cuối để hoàn thành việc đăng kí. Bạn có chắc muốn thoát</string>
+    <string name="text_logout">Bạn có chắc chắn muốn đăng xuất</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="logout_text">Đăng xuất tài khoản của bạn</string>
 
 
 </resources>

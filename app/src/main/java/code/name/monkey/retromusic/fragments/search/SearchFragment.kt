@@ -1,18 +1,24 @@
 package code.name.monkey.retromusic.fragments.search
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.getSystemService
-import androidx.core.view.*
+import androidx.core.view.children
+import androidx.core.view.doOnPreDraw
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -22,11 +28,14 @@ import androidx.transition.TransitionManager
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.adapter.SearchAdapter
 import code.name.monkey.retromusic.databinding.FragmentSearchBinding
-import code.name.monkey.retromusic.extensions.*
+import code.name.monkey.retromusic.extensions.accentColor
+import code.name.monkey.retromusic.extensions.addAlpha
+import code.name.monkey.retromusic.extensions.dip
+import code.name.monkey.retromusic.extensions.focusAndShowKeyboard
+import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.ViewUtil.animateEmptyVisibility
-import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -34,7 +43,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.transition.MaterialFadeThrough
 import kotlinx.coroutines.Job
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
-import java.util.*
+import java.util.Locale
 
 
 class SearchFragment : AbsMainActivityFragment(R.layout.fragment_search),

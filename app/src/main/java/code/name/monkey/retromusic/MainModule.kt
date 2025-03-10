@@ -14,6 +14,7 @@ import code.name.monkey.retromusic.fragments.auth.register.RegisterViewModel
 import code.name.monkey.retromusic.fragments.auth.setpass.SetPassViewModel
 import code.name.monkey.retromusic.fragments.genres.GenreDetailsViewModel
 import code.name.monkey.retromusic.fragments.playlists.PlaylistDetailsViewModel
+import code.name.monkey.retromusic.fragments.settings.MainSettingsViewModel
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.network.provideAuthService
 import code.name.monkey.retromusic.network.provideDefaultCache
@@ -244,6 +245,9 @@ private val viewModules = module {
 
     viewModel {
         SetPassViewModel(get())
+    }
+    viewModel {
+        MainSettingsViewModel(get())
     }
 }
 
