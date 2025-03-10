@@ -140,7 +140,8 @@ object PreferenceUtil {
             phone = sharedPreferences.getString(USER_PHONE, null),
             image = sharedPreferences.getString(USER_IMAGE, null),
             imageBanner = sharedPreferences.getString(USER_IMAGE_BANNER, null),
-            accessToken = sharedPreferences.getString(USER_ACCESS_TOKEN, null)
+            accessToken = sharedPreferences.getString(USER_ACCESS_TOKEN, null),
+            role = sharedPreferences.getInt(USER_ROLE, 0),
         )
         set(value) = sharedPreferences.edit {
             value.id?.let { putString(USER_ID, it) }
@@ -150,6 +151,7 @@ object PreferenceUtil {
             value.image?.let { putString(USER_IMAGE, it) }
             value.imageBanner?.let { putString(USER_IMAGE_BANNER, it) }
             value.accessToken?.let { putString(USER_ACCESS_TOKEN, it) }
+            value.role?.let { putInt(USER_ROLE, it) }
         }
 
     fun clearUser() {
@@ -161,6 +163,7 @@ object PreferenceUtil {
             remove(USER_IMAGE)
             remove(USER_IMAGE_BANNER)
             remove(USER_ACCESS_TOKEN)
+            remove(USER_ROLE)
         }
     }
 

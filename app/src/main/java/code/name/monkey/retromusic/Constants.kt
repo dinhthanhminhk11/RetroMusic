@@ -161,6 +161,7 @@ const val USER_PHONE = "USER_PHONE"
 const val USER_EMAIL = "USER_EMAIL"
 const val USER_FULL_NAME = "USER_FULL_NAME"
 const val USER_ID = "USER_ID"
+const val USER_ROLE = "USER_ROLE"
 
 
 const val INVALID_PROTOBUF = "INVALID_PROTOBUF"
