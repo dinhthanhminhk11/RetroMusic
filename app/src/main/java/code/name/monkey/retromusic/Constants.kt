@@ -4,7 +4,7 @@ import android.provider.BaseColumns
 import android.provider.MediaStore
 
 object Constants {
-    const val ON_OFF_SETTING_TOAST_SUCCESS = true
+    const val ON_OFF_SETTING_TOAST_SUCCESS = false
     const val PRO_VERSION_PRODUCT_ID = "pro_version"
     const val RATE_ON_GOOGLE_PLAY =
         "https://play.google.com/store/apps/details?id=code.name.monkey.retromusic"

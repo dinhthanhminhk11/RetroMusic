@@ -18,13 +18,9 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.network.model.LastFmArtist
-import code.name.monkey.retromusic.network.model.request.auth.REQLogin
-import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 
 interface Repository {
-
     fun historySong(): List<HistoryEntity>
     fun favorites(): LiveData<List<SongEntity>>
     fun observableHistorySongs(): LiveData<List<Song>>
@@ -97,6 +93,5 @@ interface Repository {
     suspend fun reSentOtp(reqLogin: RequestBody): Result<SuccessResponse>
     suspend fun setPassword(reqLogin: RequestBody): Result<SuccessResponse>
     suspend fun checkAccount(reqLogin: RequestBody): Result<SuccessResponse>
-    suspend fun loginByToken(token: String): Result<LoginResponseNative>
-    suspend fun fakeLogin(contact: RequestBody): Result<LoginResponseNative>
+    suspend fun loginByToken(token: String): Result<SuccessResponse>
 }

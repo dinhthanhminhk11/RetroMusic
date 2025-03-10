@@ -3,15 +3,41 @@ package code.name.monkey.retromusic.fragments
 import android.animation.ValueAnimator
 import android.content.Context
 import androidx.core.animation.doOnEnd
-import androidx.lifecycle.*
-import code.name.monkey.retromusic.*
-import code.name.monkey.retromusic.db.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
+import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.RECENT_ALBUMS
+import code.name.monkey.retromusic.RECENT_ARTISTS
+import code.name.monkey.retromusic.SuccessResponse
+import code.name.monkey.retromusic.TOP_ALBUMS
+import code.name.monkey.retromusic.TOP_ARTISTS
+import code.name.monkey.retromusic.db.HistoryEntity
+import code.name.monkey.retromusic.db.PlaylistEntity
+import code.name.monkey.retromusic.db.PlaylistWithSongs
+import code.name.monkey.retromusic.db.SongEntity
+import code.name.monkey.retromusic.db.toSong
+import code.name.monkey.retromusic.db.toSongEntity
 import code.name.monkey.retromusic.extensions.showToast
-import code.name.monkey.retromusic.fragments.ReloadType.*
+import code.name.monkey.retromusic.fragments.ReloadType.Albums
+import code.name.monkey.retromusic.fragments.ReloadType.Artists
+import code.name.monkey.retromusic.fragments.ReloadType.Genres
+import code.name.monkey.retromusic.fragments.ReloadType.HomeSections
+import code.name.monkey.retromusic.fragments.ReloadType.Playlists
+import code.name.monkey.retromusic.fragments.ReloadType.Songs
+import code.name.monkey.retromusic.fragments.ReloadType.Suggestions
 import code.name.monkey.retromusic.fragments.search.Filter
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.IMusicServiceEventListener
-import code.name.monkey.retromusic.model.*
+import code.name.monkey.retromusic.model.Album
+import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.Contributor
+import code.name.monkey.retromusic.model.Genre
+import code.name.monkey.retromusic.model.Home
+import code.name.monkey.retromusic.model.Playlist
+import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.util.DensityUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
@@ -47,9 +73,15 @@ class LibraryViewModel(
         loadLibraryContent()
     }
 
-    fun loginByToken(token: String) {
-
-    }
+    fun loginByToken(token: String): LiveData<code.name.monkey.retromusic.network.Result<SuccessResponse>> =
+        liveData(IO) {
+            try {
+                val loginResponse = repository.loginByToken(token)
+                emit(loginResponse)
+            } catch (e: Exception) {
+                emit(code.name.monkey.retromusic.network.Result.Error(error = e))
+            }
+        }
 
     private fun loadLibraryContent() {
         viewModelScope.launch(IO) {

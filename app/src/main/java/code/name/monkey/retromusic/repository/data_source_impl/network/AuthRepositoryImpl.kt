@@ -29,10 +29,7 @@ class AuthRepositoryImpl(private val authService: AuthService) : AuthRepository 
     override suspend fun checkAccount(reqLogin: RequestBody): Response<ResponseBody> =
         authService.checkAccount(reqLogin)
 
-    override suspend fun loginByToken(token: String): Response<LoginResponseNative> =
+    override suspend fun loginByToken(token: String): Response<ResponseBody> =
         authService.loginByToken(token)
-
-    override suspend fun fakeLogin(contact: RequestBody): Response<LoginResponseNative> =
-        authService.fakeLogin(contact)
 
 }

@@ -35,8 +35,6 @@ import code.name.monkey.retromusic.network.LastFMService
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.network.model.LastFmArtist
-import code.name.monkey.retromusic.network.model.request.auth.REQLogin
-import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import code.name.monkey.retromusic.repository.data_source.AlbumRepository
 import code.name.monkey.retromusic.repository.data_source.ArtistRepository
 import code.name.monkey.retromusic.repository.data_source.GenreRepository
@@ -199,11 +197,9 @@ class RepositoryImpl(
     override suspend fun checkAccount(reqLogin: RequestBody): Result<SuccessResponse> =
         responseToResourceProtobuf(authRepository.checkAccount(reqLogin), SuccessResponse.ADAPTER)
 
-    override suspend fun loginByToken(token: String): Result<LoginResponseNative> =
-        responseToResource(authRepository.loginByToken(token))
+    override suspend fun loginByToken(token: String): Result<SuccessResponse> =
+        responseToResourceProtobuf(authRepository.loginByToken(token), SuccessResponse.ADAPTER)
 
-    override suspend fun fakeLogin(contact: RequestBody): Result<LoginResponseNative> =
-        responseToResource(authRepository.fakeLogin(contact))
 
     override suspend fun playlistSongs(playlistWithSongs: PlaylistWithSongs): List<Song> =
         playlistWithSongs.songs.map {

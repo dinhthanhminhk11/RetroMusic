@@ -41,6 +41,7 @@ import code.name.monkey.retromusic.TOGGLE_VOLUME
 import code.name.monkey.retromusic.activities.PermissionActivity
 import code.name.monkey.retromusic.activities.auth.AuthActivity
 import code.name.monkey.retromusic.databinding.SlidingMusicPanelLayoutBinding
+import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.currentFragment
 import code.name.monkey.retromusic.extensions.darkAccentColor
 import code.name.monkey.retromusic.extensions.dip
@@ -86,6 +87,8 @@ import code.name.monkey.retromusic.fragments.player.tiny.TinyPlayerFragment
 import code.name.monkey.retromusic.fragments.queue.PlayingQueueFragment
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.CategoryInfo
+import code.name.monkey.retromusic.model.auth.UserClient
+import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.PreferenceUtil.isTokenNullOrEmpty
 import code.name.monkey.retromusic.util.PreferenceUtil.userClient
@@ -100,6 +103,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDE
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_SETTLING
 import com.google.android.material.bottomsheet.BottomSheetBehavior.from
+import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -206,7 +210,6 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
             startActivity(Intent(this, AuthActivity::class.java))
             finish()
         } else {
-            userClient.accessToken
             if (!hasPermissions()) {
                 startActivity(Intent(this, PermissionActivity::class.java))
                 finish()
@@ -604,19 +607,32 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
     }
 
     private fun loginByToken() {
-//        libraryViewModel.loginByToken("token").observe(this) { result ->
-//            UserClient.setUserFromUser(
-//                User(
-//                    _id = result.data._id,
-//                    fullName = result.data.fullName,
-//                    email = result.data.email,
-//                    phone = result.data.phone,
-//                    image = result.data.image
-//                )
-//            )
-//            userName = result.data.fullName
-//            image = result.data.image
-//            imageBanner = result.data.imageBanner
-//        }
+        val tokenEncrypt = Login.encryptData(userClient.accessToken.toString())
+        libraryViewModel.loginByToken(tokenEncrypt)
+            .observe(this) { result ->
+                when (result) {
+                    is Result.Success -> {
+                        result.data.data_.details?.data_.let { dataLogin ->
+                            val gson = Gson()
+                            val userClient: UserClient =
+                                gson.fromJson(
+                                    Login.decryptData(dataLogin.toString()),
+                                    UserClient::class.java
+                                )
+                            PreferenceUtil.userClient = userClient
+                        }
+                    }
+
+                    is Result.Error -> {
+                        startActivity(Intent(this, AuthActivity::class.java))
+                        finish()
+                    }
+
+                    else -> {
+                        startActivity(Intent(this, AuthActivity::class.java))
+                        finish()
+                    }
+                }
+            }
     }
 }

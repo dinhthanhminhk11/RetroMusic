@@ -1,7 +1,5 @@
 package code.name.monkey.retromusic.network
 
-import code.name.monkey.retromusic.network.model.request.auth.REQLogin
-import code.name.monkey.retromusic.network.model.response.auth.LoginResponseNative
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -50,9 +48,7 @@ interface AuthService {
 
     @GET(Endpoint.LOGIN_BY_TOKEN)
     suspend fun loginByToken(
-        @Header("access-token-x") token: String
-    ): Response<LoginResponseNative>
+        @Header(Endpoint.X_ACCESS_TOKEN) token: String
+    ): Response<ResponseBody>
 
-    @POST(Endpoint.FAKE_LOGIN)
-    suspend fun fakeLogin(@Body requestBody: RequestBody): Response<LoginResponseNative>
 }
