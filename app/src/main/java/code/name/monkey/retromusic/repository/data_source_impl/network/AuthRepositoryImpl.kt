@@ -1,7 +1,9 @@
 package code.name.monkey.retromusic.repository.data_source_impl.network
 
 import code.name.monkey.retromusic.network.AuthService
+import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
 import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -30,5 +32,12 @@ class AuthRepositoryImpl(private val authService: AuthService) : AuthRepository 
 
     override suspend fun loginByToken(token: String): Response<ResponseBody> =
         authService.loginByToken(token)
+
+    override suspend fun updateUserInfo(
+        token: String,
+        data: RequestBody?,
+        image: MultipartBody.Part?,
+        imageBanner: MultipartBody.Part?
+    ): Response<ResponseDataAuth> = authService.updateUserInfo(token, data, image, imageBanner)
 
 }

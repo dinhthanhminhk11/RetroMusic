@@ -1,5 +1,7 @@
 package code.name.monkey.retromusic.repository.data_source.network
 
+import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -13,4 +15,10 @@ interface AuthRepository {
     suspend fun setPassword(reqLogin: RequestBody): Response<ResponseBody>
     suspend fun checkAccount(reqLogin: RequestBody): Response<ResponseBody>
     suspend fun loginByToken(token: String): Response<ResponseBody>
+    suspend fun updateUserInfo(
+        token: String,
+        data: RequestBody?,
+        image: MultipartBody.Part?,
+        imageBanner: MultipartBody.Part?
+    ): Response<ResponseDataAuth>
 }

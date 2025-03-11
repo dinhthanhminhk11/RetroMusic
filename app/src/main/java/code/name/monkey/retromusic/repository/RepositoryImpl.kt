@@ -35,6 +35,7 @@ import code.name.monkey.retromusic.network.LastFMService
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.network.model.LastFmArtist
+import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
 import code.name.monkey.retromusic.repository.data_source.AlbumRepository
 import code.name.monkey.retromusic.repository.data_source.ArtistRepository
 import code.name.monkey.retromusic.repository.data_source.GenreRepository
@@ -47,6 +48,7 @@ import code.name.monkey.retromusic.repository.data_source.SongRepository
 import code.name.monkey.retromusic.repository.data_source.TopPlayedRepository
 import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
 import code.name.monkey.retromusic.util.logE
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
 class RepositoryImpl(
@@ -199,6 +201,20 @@ class RepositoryImpl(
 
     override suspend fun loginByToken(token: String): Result<SuccessResponse> =
         responseToResourceProtobuf(authRepository.loginByToken(token), SuccessResponse.ADAPTER)
+
+    override suspend fun updateUserInfo(
+        token: String,
+        data: RequestBody?,
+        image: MultipartBody.Part?,
+        imageBanner: MultipartBody.Part?
+    ): Result<ResponseDataAuth> = responseToResource(
+        authRepository.updateUserInfo(
+            token,
+            data,
+            image,
+            imageBanner
+        )
+    )
 
 
     override suspend fun playlistSongs(playlistWithSongs: PlaylistWithSongs): List<Song> =

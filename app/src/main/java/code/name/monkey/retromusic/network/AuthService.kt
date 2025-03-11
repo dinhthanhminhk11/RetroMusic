@@ -1,12 +1,17 @@
 package code.name.monkey.retromusic.network
 
+import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 
 interface AuthService {
     @POST(Endpoint.LOGIN)
@@ -51,4 +56,12 @@ interface AuthService {
         @Header(Endpoint.X_ACCESS_TOKEN) token: String
     ): Response<ResponseBody>
 
+    @Multipart
+    @PATCH(Endpoint.UPDATE_USER_INFO)
+    suspend fun updateUserInfo(
+        @Header(Endpoint.X_ACCESS_TOKEN) token: String,
+        @Part("data") data: RequestBody?,
+        @Part image: MultipartBody.Part?,
+        @Part imageBanner: MultipartBody.Part?
+    ): Response<ResponseDataAuth>
 }

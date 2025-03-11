@@ -35,6 +35,7 @@ import code.name.monkey.retromusic.PASSWORD_NOT_SET
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.SERVER_ERROR
 import code.name.monkey.retromusic.SET_PASS_SUCCESS
+import code.name.monkey.retromusic.UPDATE_SUCCESS
 import code.name.monkey.retromusic.USER_REGISTER_SUCCESS
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
@@ -149,6 +150,7 @@ fun showSuccessLoginProtobuf(view: View, successCode: String) {
         ACCOUNT_CAN_NOT_LOGIN -> R.string.account_can_not_login
         SET_PASS_SUCCESS -> R.string.set_pass_success
         LOGOUT_SUCCESS -> R.string.logout_successs
+        UPDATE_SUCCESS -> R.string.update_success
         else -> R.string.unknow_success
     }
 

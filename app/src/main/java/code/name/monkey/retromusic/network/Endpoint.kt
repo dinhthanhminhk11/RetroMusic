@@ -11,4 +11,5 @@ object Endpoint {
     const val CHECK_ACCOUNT = "auth/checkAccount"
     const val LOGIN_BY_TOKEN = "auth/getUserByToken"
     const val X_ACCESS_TOKEN = "x-access-token"
+    const val UPDATE_USER_INFO = "auth/updateUser"
 }

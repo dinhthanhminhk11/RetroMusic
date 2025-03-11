@@ -96,6 +96,11 @@ android {
             )
             buildConfigField(
                 "String",
+                "BASE_URL_IMAGE",
+                "\"https://96fc-113-190-246-18.ngrok-free.app/uploads/\""
+            )
+            buildConfigField(
+                "String",
                 "BASE_URL_IMAGE_CATEGORY",
                 "\"https://mms.img.susercontent.com/\""
             )
@@ -116,7 +121,12 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://2ac2-27-72-98-102.ngrok-free.app/api/v1/\""
+                "\"https://96fc-113-190-246-18.ngrok-free.app/api/v1/\""
+            )
+            buildConfigField(
+                "String",
+                "BASE_URL_IMAGE",
+                "\"https://96fc-113-190-246-18.ngrok-free.app/uploads/\""
             )
             buildConfigField(
                 "String",

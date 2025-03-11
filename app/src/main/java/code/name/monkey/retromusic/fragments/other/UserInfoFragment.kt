@@ -5,32 +5,42 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.snapshotFlow
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import code.name.monkey.retromusic.Constants
 import code.name.monkey.retromusic.Constants.USER_BANNER
 import code.name.monkey.retromusic.Constants.USER_PROFILE
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.UPDATE_SUCCESS
 import code.name.monkey.retromusic.databinding.FragmentUserInfoBinding
+import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.accentColor
 import code.name.monkey.retromusic.extensions.applyToolbar
+import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
 import code.name.monkey.retromusic.extensions.loadImageAvatar
+import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.fragments.LibraryViewModel
-import code.name.monkey.retromusic.glide.RetroGlideExtension
-import code.name.monkey.retromusic.glide.RetroGlideExtension.profileBannerOptions
-import code.name.monkey.retromusic.glide.RetroGlideExtension.userProfileOptions
+import code.name.monkey.retromusic.model.auth.UserClient
+import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.util.ImageUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.PreferenceUtil.userClient
-import code.name.monkey.retromusic.util.PreferenceUtil.userName
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -41,10 +51,16 @@ import com.github.dhaval2404.imagepicker.ImagePicker
 import com.github.dhaval2404.imagepicker.constant.ImageProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.transition.MaterialContainerTransform
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import org.json.JSONObject
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
 class UserInfoFragment : Fragment() {
@@ -52,6 +68,9 @@ class UserInfoFragment : Fragment() {
     private var _binding: FragmentUserInfoBinding? = null
     private val binding get() = _binding!!
     private val libraryViewModel: LibraryViewModel by activityViewModel()
+    private var imagePath: Uri? = null
+    private var imagePathBanner: Uri? = null
+    private val viewModel by viewModel<UserInfoViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,11 +92,16 @@ class UserInfoFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
+        binding.email?.isEnabled = false
+        binding.next.visibility = GONE
 
         binding.nameContainer.accentColor()
+        binding.emailContainer?.accentColor()
+        binding.phoneCOntainer?.accentColor()
         binding.next.accentColor()
-        binding.name.setText(if (userClient.fullName.isNullOrEmpty()) userClient.email else userClient.fullName)
-
+        binding.name.setText(if (userClient.fullName.isNullOrEmpty()) "" else userClient.fullName)
+        binding.email?.setText(if (userClient.email.isNullOrEmpty()) "" else userClient.email)
+        binding.phone?.setText(if (userClient.phone.isNullOrEmpty()) "" else userClient.phone)
         binding.userImage.setOnClickListener {
             showUserImageOptions()
         }
@@ -87,13 +111,49 @@ class UserInfoFragment : Fragment() {
         }
 
         binding.next.setOnClickListener {
-            val nameString = binding.name.text.toString().trim { it <= ' ' }
-            if (nameString.isEmpty()) {
-                showToast(R.string.error_empty_name)
-                return@setOnClickListener
+            val dataMap = mutableMapOf<String, String>()
+
+            binding.name.text?.toString()?.takeIf { it.isNotBlank() }?.let {
+                dataMap["fullName"] = it
             }
-            userName = nameString
-            findNavController().navigateUp()
+
+            binding.phone?.text?.toString()?.takeIf { it.isNotBlank() }?.let {
+                dataMap["phone"] = it
+            }
+
+            val textEncrypt = JSONObject(dataMap as Map<*, *>?).toString()
+
+            val dataRequest: RequestBody = RequestBody.create(
+                "text/plain".toMediaTypeOrNull(), Login.encryptData(textEncrypt)
+            )
+            val imageFilePart: MultipartBody.Part? = if (imagePath != null) {
+                val imageFile = File(imagePath?.path.toString())
+                val imageRequestBody = RequestBody.create("image/*".toMediaTypeOrNull(), imageFile)
+                MultipartBody.Part.createFormData("image", imageFile.name, imageRequestBody)
+            } else {
+                null
+            }
+
+            val imageBannerFilePart: MultipartBody.Part? = if (imagePathBanner != null) {
+                val imageBannerFile = File(imagePathBanner?.path.toString())
+                val imageBannerRequestBody = RequestBody.create(
+                    "image/*".toMediaTypeOrNull(),
+                    imageBannerFile
+                )
+                MultipartBody.Part.createFormData(
+                    "imageBanner",
+                    imageBannerFile.name,
+                    imageBannerRequestBody
+                )
+            } else {
+                null
+            }
+            viewModel.updateUserInfo(
+                Login.encryptData(userClient.accessToken.toString()),
+                dataRequest,
+                imageFilePart,
+                imageBannerFilePart
+            )
         }
 
         loadProfile()
@@ -106,6 +166,8 @@ class UserInfoFragment : Fragment() {
                 bottomMargin = it
             }
         }
+        setupInputListeners()
+        initObserver()
     }
 
     private fun showBannerImageOptions() {
@@ -220,7 +282,8 @@ class UserInfoFragment : Fragment() {
                     dataSource: DataSource?,
                     isFirstResource: Boolean,
                 ): Boolean {
-                    resource?.let { saveImage(it, USER_BANNER) }
+                    resource?.let { imagePathBanner = fileUri }
+                    checkEnableNextButton()
                     return false
                 }
 
@@ -266,7 +329,10 @@ class UserInfoFragment : Fragment() {
                     dataSource: DataSource?,
                     isFirstResource: Boolean,
                 ): Boolean {
-                    resource?.let { saveImage(it, USER_PROFILE) }
+                    resource?.let {
+                        imagePath = fileUri
+                    }
+                    checkEnableNextButton()
                     return false
                 }
 
@@ -285,5 +351,82 @@ class UserInfoFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun initObserver() {
+        viewModel.authState.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+
+                }
+
+                is Result.Error -> {
+                    result.code?.let {
+                        handErrorServerProtobuf(binding.root, it)
+                    }
+                }
+
+                is Result.Success -> {
+                    if (Constants.ON_OFF_SETTING_TOAST_SUCCESS) {
+                        result.data.data.code.let {
+                            showSuccessLoginProtobuf(binding.root, it)
+                        }
+                    }
+
+                    result.data.let {
+                        if (result.data.success) {
+                            result.data.data.let {
+                                when (result.data.data.code) {
+                                    UPDATE_SUCCESS -> {
+                                        showSuccessLoginProtobuf(binding.root, UPDATE_SUCCESS)
+                                        result.data.data.details.let { dataLogin ->
+                                            val gson = Gson()
+                                            val userClient: UserClient =
+                                                gson.fromJson(
+                                                    Login.decryptData(dataLogin),
+                                                    UserClient::class.java
+                                                )
+                                            PreferenceUtil.userClient = userClient
+                                        }
+                                        findNavController().navigateUp()
+                                    }
+
+                                    else -> {}
+                                }
+                            }
+                        }
+                    }
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+    private fun setupInputListeners() {
+        val textWatcher = object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                checkEnableNextButton()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        }
+
+        binding.name.addTextChangedListener(textWatcher)
+        binding.phone?.addTextChangedListener(textWatcher)
+    }
+
+    private fun checkEnableNextButton() {
+        val isNameChanged =
+            !binding.name.text.isNullOrBlank() && binding.name.text.toString() != userClient.fullName
+        val isPhoneChanged =
+            !binding.phone?.text.isNullOrBlank() && binding.phone?.text.toString() != userClient.phone
+        val isImageChanged = imagePath != null
+        val isBannerChanged = imagePathBanner != null
+
+        binding.next.visibility =
+            if (isNameChanged || isPhoneChanged || isImageChanged || isBannerChanged) VISIBLE else GONE
+
     }
 }

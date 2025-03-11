@@ -18,6 +18,8 @@ import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.network.model.LastFmArtist
+import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
 interface Repository {
@@ -94,4 +96,10 @@ interface Repository {
     suspend fun setPassword(reqLogin: RequestBody): Result<SuccessResponse>
     suspend fun checkAccount(reqLogin: RequestBody): Result<SuccessResponse>
     suspend fun loginByToken(token: String): Result<SuccessResponse>
+    suspend fun updateUserInfo(
+        token: String,
+        data: RequestBody?,
+        image: MultipartBody.Part?,
+        imageBanner: MultipartBody.Part?
+    ): Result<ResponseDataAuth>
 }

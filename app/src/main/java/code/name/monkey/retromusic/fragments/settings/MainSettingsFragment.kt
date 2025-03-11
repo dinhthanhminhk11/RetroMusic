@@ -88,7 +88,6 @@ class MainSettingsFragment : Fragment(), View.OnClickListener {
                     mainSettingsViewModel.logout(requestBody)
                 }
             )
-
         }
 
         binding.buyProContainer.apply {
@@ -98,7 +97,15 @@ class MainSettingsFragment : Fragment(), View.OnClickListener {
             }
         }
         binding.buyPremium.setOnClickListener {
-            requireContext().goToProVersion()
+            showConfirmDialog(context = requireActivity(),
+                title = getString(R.string.notification),
+                message = getString(R.string.text_primeum),
+                textPositiveButton = getString(R.string.confirm),
+                textNegativeButton = getString(R.string.cancel),
+                onConfirm = {
+
+                }
+            )
         }
         ThemeStore.accentColor(requireContext()).let {
             binding.buyPremium.setTextColor(it)

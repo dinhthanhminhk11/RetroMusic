@@ -116,10 +116,15 @@ fun provideOkHttpLoginProtobuf(context: Context, cache: Cache): OkHttpClient {
 }
 
 fun provideRetrofitLoginProtobuf(client: OkHttpClient): Retrofit {
+    val gson = GsonBuilder()
+        .setLenient()
+        .create()
     return Retrofit.Builder()
         .baseUrl(BuildConfig.BASE_URL)
         .client(client)
         .addConverterFactory(WireConverterFactory.create())
+        .addConverterFactory(ScalarsConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
 }
 
