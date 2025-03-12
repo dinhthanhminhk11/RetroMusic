@@ -18,20 +18,22 @@ abstract class BaseNormalFragment<T : ViewBinding>(private val bindingInflater: 
     var _binding: T? = null
     protected val binding get() = _binding!!
     var TAG: String = this.javaClass.simpleName
-
+    var isNetworkConnected = true
     private var connectivityManager: ConnectivityManager? = null
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
             requireActivity().runOnUiThread {
-                onNetworkChanged(true)
+                isNetworkConnected = true
+                onNetworkChanged()
             }
         }
 
         override fun onLost(network: Network) {
             super.onLost(network)
             requireActivity().runOnUiThread {
-                onNetworkChanged(false)
+                isNetworkConnected = false
+                onNetworkChanged()
             }
         }
     }
@@ -85,7 +87,7 @@ abstract class BaseNormalFragment<T : ViewBinding>(private val bindingInflater: 
         connectivityManager?.unregisterNetworkCallback(networkCallback)
     }
 
-    protected abstract fun onNetworkChanged(isConnected: Boolean)
+    protected abstract fun onNetworkChanged()
 
     open fun initArgs() {}
     abstract fun initView()

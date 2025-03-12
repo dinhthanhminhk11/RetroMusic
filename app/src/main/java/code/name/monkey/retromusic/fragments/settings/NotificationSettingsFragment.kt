@@ -12,10 +12,6 @@ import code.name.monkey.retromusic.COLORED_NOTIFICATION
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.util.PreferenceUtil
 
-/**
- * @author Hemanth S (h4h13).
- */
-
 class NotificationSettingsFragment : AbsSettingsFragment(),
     SharedPreferences.OnSharedPreferenceChangeListener {
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {

@@ -24,9 +24,7 @@ import code.name.monkey.retromusic.util.ViewUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import code.name.monkey.retromusic.views.DrawableGradient
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 class MaterialFragment : AbsPlayerFragment(R.layout.fragment_material) {
 
     override fun playerToolbar(): Toolbar {

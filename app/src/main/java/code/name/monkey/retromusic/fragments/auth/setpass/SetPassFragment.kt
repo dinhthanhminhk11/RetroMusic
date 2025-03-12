@@ -31,12 +31,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class SetPassFragment :
     BaseNormalFragment<FragmentSetPassBinding>(FragmentSetPassBinding::inflate) {
     private val viewModel by viewModel<SetPassViewModel>()
-    private var isNetworkConnected = false;
     private var isPasswordValid = false;
     private val arguments by navArgs<SetPassFragmentArgs>()
 
-    override fun onNetworkChanged(isConnected: Boolean) {
-        isNetworkConnected = isConnected
+    override fun onNetworkChanged() {
         updateButtonState()
         binding.subTitle.animatedTextChange(
             if (isNetworkConnected) getString(R.string.set_password_content) else getString(R.string.disconnect_internet)

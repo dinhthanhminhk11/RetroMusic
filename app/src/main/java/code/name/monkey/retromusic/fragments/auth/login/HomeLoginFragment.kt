@@ -8,14 +8,13 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.FragmentHomeLoginBinding
 import code.name.monkey.retromusic.extensions.accentColor
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
-import code.name.monkey.retromusic.util.ViewUtil
 import code.name.monkey.retromusic.util.ViewUtil.navOptionsByMinh
 import com.google.android.material.snackbar.Snackbar
 
 
 class HomeLoginFragment :
     BaseNormalFragment<FragmentHomeLoginBinding>(FragmentHomeLoginBinding::inflate) {
-    override fun onNetworkChanged(isConnected: Boolean) {
+    override fun onNetworkChanged() {
 
     }
 

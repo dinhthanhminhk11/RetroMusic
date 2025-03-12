@@ -7,9 +7,7 @@ import androidx.viewpager.widget.ViewPager
 import kotlin.math.abs
 import kotlin.math.max
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 
 class NormalPageTransformer : ViewPager.PageTransformer {
 

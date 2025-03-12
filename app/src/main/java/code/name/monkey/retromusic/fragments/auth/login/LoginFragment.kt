@@ -39,11 +39,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBinding::inflate) {
     private val loginViewModel by viewModel<LoginViewModel>()
     private var isLoginByPass = true
-    private var isNetworkConnected = false
     private var isEmailValid = false
     private var isPasswordValid = false
-    override fun onNetworkChanged(isConnected: Boolean) {
-        isNetworkConnected = isConnected
+    override fun onNetworkChanged() {
         updateButtonState()
         updateSubTitleState()
     }

@@ -16,9 +16,7 @@ import code.name.monkey.retromusic.fragments.ReloadType.HomeSections
 import code.name.monkey.retromusic.util.PreferenceUtil
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 
 class OtherSettingsFragment : AbsSettingsFragment() {
     private val libraryViewModel by activityViewModel<LibraryViewModel>()

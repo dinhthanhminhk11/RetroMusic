@@ -19,9 +19,7 @@ import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import com.google.android.material.slider.Slider
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 
 class PlainPlaybackControlsFragment :
     AbsPlayerControlsFragment(R.layout.fragment_plain_controls_fragment) {

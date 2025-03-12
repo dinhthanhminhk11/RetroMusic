@@ -14,13 +14,9 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.snapshotFlow
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import code.name.monkey.retromusic.Constants
 import code.name.monkey.retromusic.Constants.USER_BANNER
@@ -36,6 +32,7 @@ import code.name.monkey.retromusic.extensions.loadImageAvatar
 import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.fragments.LibraryViewModel
+import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.model.auth.UserClient
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.util.ImageUtil
@@ -63,31 +60,33 @@ import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
-class UserInfoFragment : Fragment() {
-
-    private var _binding: FragmentUserInfoBinding? = null
-    private val binding get() = _binding!!
+class UserInfoFragment :
+    BaseNormalFragment<FragmentUserInfoBinding>(FragmentUserInfoBinding::inflate) {
     private val libraryViewModel: LibraryViewModel by activityViewModel()
     private var imagePath: Uri? = null
     private var imagePathBanner: Uri? = null
     private val viewModel by viewModel<UserInfoViewModel>()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
+        savedInstanceState: Bundle?
+    ): View? {
         sharedElementEnterTransition = MaterialContainerTransform().apply {
             drawingViewId = R.id.fragment_container
             duration = 300L
             scrimColor = Color.TRANSPARENT
         }
-        _binding = FragmentUserInfoBinding.inflate(layoutInflater)
-        return binding.root
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onNetworkChanged() {
+        binding.toolbar.let {
+            it.title =
+                if (isNetworkConnected) getString(R.string.profile) else getString(R.string.disconnect_internet)
+        }
+    }
+
+    override fun initView() {
         applyToolbar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
@@ -102,63 +101,15 @@ class UserInfoFragment : Fragment() {
         binding.name.setText(if (userClient.fullName.isNullOrEmpty()) "" else userClient.fullName)
         binding.email?.setText(if (userClient.email.isNullOrEmpty()) "" else userClient.email)
         binding.phone?.setText(if (userClient.phone.isNullOrEmpty()) "" else userClient.phone)
-        binding.userImage.setOnClickListener {
-            showUserImageOptions()
-        }
+        binding.userImage.setOnClickListener(this)
 
-        binding.bannerImage.setOnClickListener {
-            showBannerImageOptions()
-        }
+        binding.bannerImage.setOnClickListener(this)
 
-        binding.next.setOnClickListener {
-            val dataMap = mutableMapOf<String, String>()
-
-            binding.name.text?.toString()?.takeIf { it.isNotBlank() }?.let {
-                dataMap["fullName"] = it
-            }
-
-            binding.phone?.text?.toString()?.takeIf { it.isNotBlank() }?.let {
-                dataMap["phone"] = it
-            }
-
-            val textEncrypt = JSONObject(dataMap as Map<*, *>?).toString()
-
-            val dataRequest: RequestBody = RequestBody.create(
-                "text/plain".toMediaTypeOrNull(), Login.encryptData(textEncrypt)
-            )
-            val imageFilePart: MultipartBody.Part? = if (imagePath != null) {
-                val imageFile = File(imagePath?.path.toString())
-                val imageRequestBody = RequestBody.create("image/*".toMediaTypeOrNull(), imageFile)
-                MultipartBody.Part.createFormData("image", imageFile.name, imageRequestBody)
-            } else {
-                null
-            }
-
-            val imageBannerFilePart: MultipartBody.Part? = if (imagePathBanner != null) {
-                val imageBannerFile = File(imagePathBanner?.path.toString())
-                val imageBannerRequestBody = RequestBody.create(
-                    "image/*".toMediaTypeOrNull(),
-                    imageBannerFile
-                )
-                MultipartBody.Part.createFormData(
-                    "imageBanner",
-                    imageBannerFile.name,
-                    imageBannerRequestBody
-                )
-            } else {
-                null
-            }
-            viewModel.updateUserInfo(
-                Login.encryptData(userClient.accessToken.toString()),
-                dataRequest,
-                imageFilePart,
-                imageBannerFilePart
-            )
-        }
+        binding.next.setOnClickListener(this)
 
         loadProfile()
         postponeEnterTransition()
-        view.doOnPreDraw {
+        view?.doOnPreDraw {
             startPostponedEnterTransition()
         }
         libraryViewModel.getFabMargin().observe(viewLifecycleOwner) {
@@ -167,7 +118,115 @@ class UserInfoFragment : Fragment() {
             }
         }
         setupInputListeners()
-        initObserver()
+    }
+
+
+    override fun getData() {
+
+    }
+
+    override fun onViewClicked(view: View?) {
+        when (view) {
+            binding.name -> {
+                val dataMap = mutableMapOf<String, String>()
+
+                binding.name.text?.toString()?.takeIf { it.isNotBlank() }?.let {
+                    dataMap["fullName"] = it
+                }
+
+                binding.phone?.text?.toString()?.takeIf { it.isNotBlank() }?.let {
+                    dataMap["phone"] = it
+                }
+
+                val textEncrypt = JSONObject(dataMap as Map<*, *>?).toString()
+
+                val dataRequest: RequestBody = RequestBody.create(
+                    "text/plain".toMediaTypeOrNull(), Login.encryptData(textEncrypt)
+                )
+                val imageFilePart: MultipartBody.Part? = if (imagePath != null) {
+                    val imageFile = File(imagePath?.path.toString())
+                    val imageRequestBody =
+                        RequestBody.create("image/*".toMediaTypeOrNull(), imageFile)
+                    MultipartBody.Part.createFormData("image", imageFile.name, imageRequestBody)
+                } else {
+                    null
+                }
+
+                val imageBannerFilePart: MultipartBody.Part? = if (imagePathBanner != null) {
+                    val imageBannerFile = File(imagePathBanner?.path.toString())
+                    val imageBannerRequestBody = RequestBody.create(
+                        "image/*".toMediaTypeOrNull(),
+                        imageBannerFile
+                    )
+                    MultipartBody.Part.createFormData(
+                        "imageBanner",
+                        imageBannerFile.name,
+                        imageBannerRequestBody
+                    )
+                } else {
+                    null
+                }
+                viewModel.updateUserInfo(
+                    Login.encryptData(userClient.accessToken.toString()),
+                    dataRequest,
+                    imageFilePart,
+                    imageBannerFilePart
+                )
+            }
+
+            binding.bannerImage -> showBannerImageOptions()
+            binding.userImage -> showUserImageOptions()
+        }
+    }
+
+    override fun initObserver() {
+        viewModel.authState.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+
+                }
+
+                is Result.Error -> {
+                    result.code?.let {
+                        handErrorServerProtobuf(binding.root, it)
+                    }
+                }
+
+                is Result.Success -> {
+                    if (Constants.ON_OFF_SETTING_TOAST_SUCCESS) {
+                        result.data.data.code.let {
+                            showSuccessLoginProtobuf(binding.root, it)
+                        }
+                    }
+
+                    result.data.let {
+                        if (result.data.success) {
+                            result.data.data.let {
+                                when (result.data.data.code) {
+                                    UPDATE_SUCCESS -> {
+                                        showSuccessLoginProtobuf(binding.root, UPDATE_SUCCESS)
+                                        result.data.data.details.let { dataLogin ->
+                                            val gson = Gson()
+                                            val userClient: UserClient =
+                                                gson.fromJson(
+                                                    Login.decryptData(dataLogin),
+                                                    UserClient::class.java
+                                                )
+                                            PreferenceUtil.userClient = userClient
+                                        }
+                                        findNavController().navigateUp()
+                                    }
+
+                                    else -> {}
+                                }
+                            }
+                        }
+                    }
+                }
+
+                else -> {}
+            }
+        }
     }
 
     private fun showBannerImageOptions() {
@@ -348,60 +407,6 @@ class UserInfoFragment : Fragment() {
             .into(binding.userImage)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    private fun initObserver() {
-        viewModel.authState.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-
-                }
-
-                is Result.Error -> {
-                    result.code?.let {
-                        handErrorServerProtobuf(binding.root, it)
-                    }
-                }
-
-                is Result.Success -> {
-                    if (Constants.ON_OFF_SETTING_TOAST_SUCCESS) {
-                        result.data.data.code.let {
-                            showSuccessLoginProtobuf(binding.root, it)
-                        }
-                    }
-
-                    result.data.let {
-                        if (result.data.success) {
-                            result.data.data.let {
-                                when (result.data.data.code) {
-                                    UPDATE_SUCCESS -> {
-                                        showSuccessLoginProtobuf(binding.root, UPDATE_SUCCESS)
-                                        result.data.data.details.let { dataLogin ->
-                                            val gson = Gson()
-                                            val userClient: UserClient =
-                                                gson.fromJson(
-                                                    Login.decryptData(dataLogin),
-                                                    UserClient::class.java
-                                                )
-                                            PreferenceUtil.userClient = userClient
-                                        }
-                                        findNavController().navigateUp()
-                                    }
-
-                                    else -> {}
-                                }
-                            }
-                        }
-                    }
-                }
-
-                else -> {}
-            }
-        }
-    }
 
     private fun setupInputListeners() {
         val textWatcher = object : TextWatcher {

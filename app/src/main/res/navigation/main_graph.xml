@@ -126,4 +126,8 @@
     <fragment
         android:id="@+id/lyrics_fragment"
         android:name="code.name.monkey.retromusic.fragments.lyrics.LyricsFragment" />
+    <fragment
+        android:id="@+id/upload_fragment"
+        android:name="code.name.monkey.retromusic.fragments.upload.UploadFragment"
+        android:label="UploadFragment" />
 </navigation>

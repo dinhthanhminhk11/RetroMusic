@@ -29,11 +29,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class RegisterFragment :
     BaseNormalFragment<FragmentRegisterBinding>(FragmentRegisterBinding::inflate) {
     private val viewModel by viewModel<RegisterViewModel>()
-    private var isNetworkConnected = false;
     private var isEmailValid = false;
 
-    override fun onNetworkChanged(isConnected: Boolean) {
-        isNetworkConnected = isConnected
+    override fun onNetworkChanged() {
         updateButtonState()
         binding.subTitle.animatedTextChange(
             if (isNetworkConnected) getString(R.string.message_verify_account) else getString(R.string.disconnect_internet)

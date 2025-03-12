@@ -18,10 +18,6 @@ import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.preferences.*
 import dev.chrisbanes.insetter.applyInsetter
 
-/**
- * @author Hemanth S (h4h13).
- */
-
 abstract class AbsSettingsFragment : ATEPreferenceFragmentCompat() {
 
     internal fun showProToastAndNavigate(message: String) {

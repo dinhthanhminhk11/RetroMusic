@@ -15,10 +15,6 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.activities.base.AbsBaseActivity.Companion.BLUETOOTH_PERMISSION_REQUEST
 import code.name.monkey.retromusic.util.NavigationUtil
 
-/**
- * @author Hemanth S (h4h13).
- */
-
 class AudioSettings : AbsSettingsFragment() {
     override fun invalidateSettings() {
         val eqPreference: Preference? = findPreference(EQUALIZER)

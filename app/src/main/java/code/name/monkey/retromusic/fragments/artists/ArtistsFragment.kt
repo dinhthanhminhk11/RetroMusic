@@ -142,6 +142,7 @@ class ArtistsFragment : AbsRecyclerViewCustomGridSizeFragment<ArtistAdapter, Gri
 
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateMenu(menu, inflater)
+        menu.removeItem(R.id.action_upload)
         val gridSizeItem: MenuItem = menu.findItem(R.id.action_grid_size)
         if (RetroUtil.isLandscape) {
             gridSizeItem.setTitle(R.string.action_grid_size_land)

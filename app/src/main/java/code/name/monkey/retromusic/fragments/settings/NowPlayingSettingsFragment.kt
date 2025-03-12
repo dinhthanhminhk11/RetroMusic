@@ -9,9 +9,7 @@ import androidx.preference.TwoStatePreference
 import code.name.monkey.retromusic.*
 import code.name.monkey.retromusic.util.PreferenceUtil
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 
 class NowPlayingSettingsFragment : AbsSettingsFragment(),
     SharedPreferences.OnSharedPreferenceChangeListener {

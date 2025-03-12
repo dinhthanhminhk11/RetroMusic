@@ -1,5 +1,6 @@
 package code.name.monkey.retromusic.repository.data_source_impl.network
 
+import androidx.annotation.WorkerThread
 import code.name.monkey.retromusic.network.AuthService
 import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
 import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
@@ -33,6 +34,7 @@ class AuthRepositoryImpl(private val authService: AuthService) : AuthRepository 
     override suspend fun loginByToken(token: String): Response<ResponseBody> =
         authService.loginByToken(token)
 
+    @WorkerThread
     override suspend fun updateUserInfo(
         token: String,
         data: RequestBody?,

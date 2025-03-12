@@ -2,12 +2,8 @@ package code.name.monkey.retromusic.fragments.settings
 
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isGone
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.retromusic.AuthRequest
@@ -23,6 +19,7 @@ import code.name.monkey.retromusic.extensions.goToProVersion
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
 import code.name.monkey.retromusic.extensions.showConfirmDialog
 import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
+import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.PreferenceUtil.clearUser
@@ -30,39 +27,15 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainSettingsFragment : Fragment(), View.OnClickListener {
-
-    private var _binding: FragmentMainSettingsBinding? = null
-    private val binding get() = _binding!!
-
+class MainSettingsFragment :
+    BaseNormalFragment<FragmentMainSettingsBinding>(FragmentMainSettingsBinding::inflate) {
     private val mainSettingsViewModel by viewModel<MainSettingsViewModel>()
-    override fun onClick(view: View) {
-        findNavController().navigate(
-            when (view.id) {
-                R.id.generalSettings -> R.id.action_mainSettingsFragment_to_themeSettingsFragment
-                R.id.audioSettings -> R.id.action_mainSettingsFragment_to_audioSettings
-                R.id.personalizeSettings -> R.id.action_mainSettingsFragment_to_personalizeSettingsFragment
-                R.id.imageSettings -> R.id.action_mainSettingsFragment_to_imageSettingFragment
-                R.id.notificationSettings -> R.id.action_mainSettingsFragment_to_notificationSettingsFragment
-                R.id.otherSettings -> R.id.action_mainSettingsFragment_to_otherSettingsFragment
-                R.id.nowPlayingSettings -> R.id.action_mainSettingsFragment_to_nowPlayingSettingsFragment
-                else -> R.id.action_mainSettingsFragment_to_themeSettingsFragment
-            }
-        )
+
+    override fun onNetworkChanged() {
+
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentMainSettingsBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun initView() {
         binding.generalSettings.setOnClickListener(this)
         binding.audioSettings.setOnClickListener(this)
         binding.nowPlayingSettings.setOnClickListener(this)
@@ -113,10 +86,9 @@ class MainSettingsFragment : Fragment(), View.OnClickListener {
         }
 
         binding.container.drawAboveSystemBarsWithPadding()
-        initObserver()
     }
 
-    private fun initObserver() {
+    override fun initObserver() {
         mainSettingsViewModel.authState.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -161,8 +133,23 @@ class MainSettingsFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun getData() {
+
     }
+
+    override fun onViewClicked(view: View?) {
+        findNavController().navigate(
+            when (view) {
+                binding.generalSettings -> R.id.action_mainSettingsFragment_to_themeSettingsFragment
+                binding.audioSettings -> R.id.action_mainSettingsFragment_to_audioSettings
+                binding.personalizeSettings -> R.id.action_mainSettingsFragment_to_personalizeSettingsFragment
+                binding.imageSettings -> R.id.action_mainSettingsFragment_to_imageSettingFragment
+                binding.notificationSettings -> R.id.action_mainSettingsFragment_to_notificationSettingsFragment
+                binding.otherSettings -> R.id.action_mainSettingsFragment_to_otherSettingsFragment
+                binding.nowPlayingSettings -> R.id.action_mainSettingsFragment_to_nowPlayingSettingsFragment
+                else -> R.id.action_mainSettingsFragment_to_themeSettingsFragment
+            }
+        )
+    }
+
 }

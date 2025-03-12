@@ -21,9 +21,7 @@ import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import com.bumptech.glide.Glide
 import java.util.*
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 
 class GenreAdapter(
     private val activity: FragmentActivity,

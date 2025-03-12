@@ -40,14 +40,12 @@ class OtpFragment : BaseNormalFragment<FragmentOtpBinding>(FragmentOtpBinding::i
     OnOtpCompletionListener {
 
     private val viewModel by viewModel<OtpViewModel>()
-    private var isNetworkConnected = false;
     private lateinit var countdownTimer: CountDownTimer
     private var countResent: Int = 1;
     private val otpValidityDurationInMillis: Long = 60_000
     private val arguments by navArgs<OtpFragmentArgs>()
 
-    override fun onNetworkChanged(isConnected: Boolean) {
-        isNetworkConnected = isConnected
+    override fun onNetworkChanged() {
         val otpMessage = getString(R.string.content_otp_text_view, arguments.email)
         binding.subtitle.animatedTextChange(
             if (isNetworkConnected) Html.fromHtml(

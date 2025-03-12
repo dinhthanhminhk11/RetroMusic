@@ -16,9 +16,7 @@ import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 
 class SimplePlayerFragment : AbsPlayerFragment(R.layout.fragment_simple_player) {
 

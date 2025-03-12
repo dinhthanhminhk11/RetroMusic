@@ -21,9 +21,7 @@ import code.name.monkey.retromusic.util.PreferenceUtil
 import com.afollestad.materialdialogs.color.colorChooser
 import com.google.android.material.color.DynamicColors
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 
 class ThemeSettingsFragment : AbsSettingsFragment() {
     @SuppressLint("CheckResult")

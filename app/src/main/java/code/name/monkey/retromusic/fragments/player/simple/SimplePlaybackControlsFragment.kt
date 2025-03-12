@@ -23,9 +23,7 @@ import code.name.monkey.retromusic.util.MusicUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 
 class SimplePlaybackControlsFragment :
     AbsPlayerControlsFragment(R.layout.fragment_simple_controls_fragment) {

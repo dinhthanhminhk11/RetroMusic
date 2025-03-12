@@ -40,9 +40,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 
-/**
- * @author Hemanth S (h4h13).
- */
+
 @SuppressLint("RestrictedApi")
 class PlayingNotificationClassic(
     val context: Context,

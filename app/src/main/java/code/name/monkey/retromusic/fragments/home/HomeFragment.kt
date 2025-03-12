@@ -1,8 +1,12 @@
 package code.name.monkey.retromusic.fragments.home
 
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM
+import android.view.View
+import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.os.bundleOf
 import androidx.core.text.parseAsHtml
@@ -16,7 +20,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import code.name.monkey.appthemehelper.common.ATHToolbarActivity
 import code.name.monkey.appthemehelper.util.ColorUtil
 import code.name.monkey.appthemehelper.util.ToolbarContentTintHelper
-import code.name.monkey.retromusic.*
+import code.name.monkey.retromusic.EXTRA_PLAYLIST_TYPE
+import code.name.monkey.retromusic.HISTORY_PLAYLIST
+import code.name.monkey.retromusic.LAST_ADDED_PLAYLIST
+import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.TOP_PLAYED_PLAYLIST
 import code.name.monkey.retromusic.adapter.HomeAdapter
 import code.name.monkey.retromusic.databinding.FragmentHomeBinding
 import code.name.monkey.retromusic.dialogs.CreatePlaylistDialog
@@ -29,15 +37,12 @@ import code.name.monkey.retromusic.extensions.setUpMediaRouteButton
 import code.name.monkey.retromusic.fragments.ReloadType
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
 import code.name.monkey.retromusic.glide.RetroGlideExtension
-import code.name.monkey.retromusic.glide.RetroGlideExtension.profileBannerOptions
 import code.name.monkey.retromusic.glide.RetroGlideExtension.songCoverOptions
-import code.name.monkey.retromusic.glide.RetroGlideExtension.userProfileOptions
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.IScrollHelper
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.PreferenceUtil.userClient
-import code.name.monkey.retromusic.util.PreferenceUtil.userName
 import com.bumptech.glide.Glide
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis
@@ -187,6 +192,7 @@ class HomeFragment :
         menu.removeItem(R.id.action_grid_size)
         menu.removeItem(R.id.action_layout_type)
         menu.removeItem(R.id.action_sort_order)
+        menu.removeItem(R.id.action_cast)
         menu.findItem(R.id.action_settings).setShowAsAction(SHOW_AS_ACTION_IF_ROOM)
         ToolbarContentTintHelper.handleOnCreateOptionsMenu(
             requireContext(),
@@ -285,6 +291,12 @@ class HomeFragment :
             R.id.action_add_to_playlist -> CreatePlaylistDialog.create(emptyList()).show(
                 childFragmentManager,
                 "ShowCreatePlaylistDialog"
+            )
+
+            R.id.action_upload -> findNavController().navigate(
+                R.id.upload_fragment,
+                null,
+                navOptions
             )
         }
         return false

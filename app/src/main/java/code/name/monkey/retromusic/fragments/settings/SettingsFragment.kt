@@ -1,9 +1,6 @@
-
 package code.name.monkey.retromusic.fragments.settings
 
-import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import code.name.monkey.appthemehelper.ThemeStore
@@ -12,21 +9,36 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.appshortcuts.DynamicShortcutManager
 import code.name.monkey.retromusic.databinding.FragmentSettingsBinding
 import code.name.monkey.retromusic.extensions.findNavController
+import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.color.ColorCallback
 
-class SettingsFragment : Fragment(R.layout.fragment_settings), ColorCallback {
-    private var _binding: FragmentSettingsBinding? = null
-    private val binding get() = _binding!!
+class SettingsFragment :
+    BaseNormalFragment<FragmentSettingsBinding>(FragmentSettingsBinding::inflate), ColorCallback {
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        _binding = FragmentSettingsBinding.bind(view)
+    override fun onNetworkChanged() {
+
+    }
+
+    override fun initView() {
         setupToolbar()
+    }
+
+    override fun initObserver() {
+
+    }
+
+    override fun getData() {
+
+    }
+
+    override fun onViewClicked(view: View?) {
+
     }
 
     private fun setupToolbar() {
         val navController: NavController = findNavController(R.id.contentFrame)
-        with (binding.appBarLayout.toolbar) {
+        with(binding.appBarLayout.toolbar) {
             setNavigationIcon(R.drawable.ic_arrow_back)
             isTitleCentered = false
             setNavigationOnClickListener {
@@ -62,11 +74,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings), ColorCallback {
         if (VersionUtils.hasNougatMR())
             DynamicShortcutManager(requireContext()).updateDynamicShortcuts()
         activity?.recreate()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     companion object {

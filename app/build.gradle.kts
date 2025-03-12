@@ -121,12 +121,12 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://96fc-113-190-246-18.ngrok-free.app/api/v1/\""
+                "\"https://6d26-117-4-250-39.ngrok-free.app/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"https://96fc-113-190-246-18.ngrok-free.app/uploads/\""
+                "\"https://6d26-117-4-250-39.ngrok-free.app/uploads/\""
             )
             buildConfigField(
                 "String",
