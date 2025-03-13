@@ -646,5 +646,9 @@
     <string name="logout_text">Đăng xuất tài khoản của bạn</string>
     <string name="phone">Số điện thoại</string>
     <string name="email">Email</string>
+    <string name="genre_title">Thể loại</string>
     <string name="action_upload">Upload</string>
+    <string name="name_file">Tên file</string>
+    <string name="caption">Caption</string>
+    <string name="make_to_public">Đặt làm công khai</string>
 </resources>

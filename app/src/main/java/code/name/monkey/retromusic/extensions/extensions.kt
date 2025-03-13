@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.fragment.app.FragmentActivity
 import code.name.monkey.retromusic.ACCOUNT_CAN_LOGIN
@@ -174,7 +175,7 @@ fun showConfirmDialog(
     onConfirm: () -> Unit,
     onCancel: (() -> Unit)? = null
 ) {
-    AlertDialog.Builder(context, com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
+    val dialog = AlertDialog.Builder(context, com.google.android.material.R.style.ThemeOverlay_Material3_Dialog)
         .setTitle(title)
         .setMessage(message)
         .setPositiveButton(textPositiveButton) { _, _ -> onConfirm() }
@@ -182,7 +183,14 @@ fun showConfirmDialog(
             onCancel?.invoke()
             dialog.dismiss()
         }
-        .show()
+        .create()
+
+    dialog.setOnShowListener {
+        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positiveButton.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
+    }
+
+    dialog.show()
 }
 
 

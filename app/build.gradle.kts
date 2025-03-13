@@ -101,11 +101,6 @@ android {
             )
             buildConfigField(
                 "String",
-                "BASE_URL_IMAGE_CATEGORY",
-                "\"https://mms.img.susercontent.com/\""
-            )
-            buildConfigField(
-                "String",
                 "KEY_128",
                 "\"JGjmWcjUTHDG1o+Z+oUCf6KzzKm/0TKaWc/hEVm+IIy0a22PPPwS38/F/lryy3Cz\""
             )
@@ -121,17 +116,12 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://6d26-117-4-250-39.ngrok-free.app/api/v1/\""
+                "\"https://7561-113-160-45-182.ngrok-free.app/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"https://6d26-117-4-250-39.ngrok-free.app/uploads/\""
-            )
-            buildConfigField(
-                "String",
-                "BASE_URL_IMAGE_CATEGORY",
-                "\"https://mms.img.susercontent.com/\""
+                "\"https://7561-113-160-45-182.ngrok-free.app/uploads/\""
             )
             buildConfigField(
                 "String",

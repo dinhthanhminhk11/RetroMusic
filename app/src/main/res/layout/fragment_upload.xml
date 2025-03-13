@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,7 +13,10 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:fitsSystemWindows="true"
-        app:elevation="0dp">
+        app:elevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -23,13 +26,182 @@
             app:navigationIcon="@drawable/ic_arrow_back"
             app:title=""
             app:titleCentered="true"
-            app:titleTextAppearance="@style/ToolbarTextAppearanceNormal" />
+            app:titleTextAppearance="@style/ToolbarTextAppearanceNormal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/upload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginRight="@dimen/_20sdp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_upload" />
+        </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/albumCoverContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/_60sdp"
+        android:layout_marginBottom="@dimen/_16sdp"
+        app:cardCornerRadius="@dimen/m3_card_large_radius"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_image" />
+
+    </com.google.android.material.card.MaterialCardView>
 
 
+    <code.name.monkey.retromusic.views.RetroShapeAbleImageView
+        android:id="@+id/choseFile"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        android:transitionName="user_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/albumCoverContainer"
+        app:retroCornerSize="36dp"
+        app:srcCompat="@drawable/baseline_audio_file_24" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/nameContainer"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        app:layout_constraintBottom_toBottomOf="@+id/choseFile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/choseFile"
+        app:layout_constraintTop_toTopOf="@id/choseFile">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="title"
+            android:enabled="false"
+            android:hint="@string/name_file"
+            android:importantForAutofill="yes"
+            android:inputType="textPersonName|textCapWords|text"
+            android:textAppearance="@style/TextViewSubtitle1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/genreContainer"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/choseFile">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/genre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="name"
+            android:hint="@string/genre"
+            android:importantForAutofill="yes"
+            android:textAppearance="@style/TextViewSubtitle1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/descriptionContainer"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/genreContainer">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="name"
+            android:hint="@string/description"
+            android:importantForAutofill="yes"
+            android:textAppearance="@style/TextViewSubtitle1" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 
-</RelativeLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/captionContainer"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/descriptionContainer">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="name"
+            android:hint="@string/caption"
+            android:importantForAutofill="yes"
+            android:textAppearance="@style/TextViewSubtitle1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_16sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/captionContainer">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@android:id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/make_to_public"
+            android:textAppearance="@style/TextViewSubtitle1"
+            android:textSize="@dimen/_16sdp"
+            tools:maxLines="@string/grid_size_1" />
+
+
+        <code.name.monkey.appthemehelper.common.views.ATESwitch
+            android:id="@android:id/checkbox"
+            style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:showText="false" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
