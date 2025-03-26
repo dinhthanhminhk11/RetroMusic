@@ -1,4 +1,3 @@
-
 package code.name.monkey.retromusic.fragments.player.normal
 
 import android.animation.ArgbEvaluator
@@ -147,13 +146,7 @@ class PlayerFragment : AbsPlayerFragment(R.layout.fragment_player),
 
     private fun startOrStopSnow(isSnowFalling: Boolean) {
         if (_binding == null) return
-        if (isSnowFalling && !surfaceColor().isColorLight) {
-            binding.snowfallView.isVisible = true
-            binding.snowfallView.restartFalling()
-        } else {
-            binding.snowfallView.isVisible = false
-            binding.snowfallView.stopFalling()
-        }
+        binding.snowfallView.isVisible = isSnowFalling && !surfaceColor().isColorLight
     }
 
     override fun onServiceConnected() {

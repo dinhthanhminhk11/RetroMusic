@@ -25,6 +25,7 @@ import code.name.monkey.retromusic.fragments.search.Filter
 import code.name.monkey.retromusic.model.AbsCustomPlaylist
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.BodyRequest
 import code.name.monkey.retromusic.model.Contributor
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.model.Home
@@ -36,6 +37,7 @@ import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.network.model.LastFmArtist
 import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
+import code.name.monkey.retromusic.network.model.response.file.ResponseFile
 import code.name.monkey.retromusic.repository.data_source.AlbumRepository
 import code.name.monkey.retromusic.repository.data_source.ArtistRepository
 import code.name.monkey.retromusic.repository.data_source.GenreRepository
@@ -47,6 +49,7 @@ import code.name.monkey.retromusic.repository.data_source.SearchRepository
 import code.name.monkey.retromusic.repository.data_source.SongRepository
 import code.name.monkey.retromusic.repository.data_source.TopPlayedRepository
 import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
+import code.name.monkey.retromusic.repository.data_source.network.SongRemoteRepository
 import code.name.monkey.retromusic.util.logE
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -64,7 +67,8 @@ class RepositoryImpl(
     private val topPlayedRepository: TopPlayedRepository,
     private val roomRepository: RoomRepository,
     private val localDataRepository: LocalDataRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val songRemoteRepository: SongRemoteRepository
 ) : Repository {
 
     override suspend fun deleteSongs(songs: List<Song>) = roomRepository.deleteSongs(songs)
@@ -215,6 +219,19 @@ class RepositoryImpl(
             imageBanner
         )
     )
+
+    override suspend fun checkFile(hashFile: String): Result<ResponseFile> =
+        responseToResource(songRemoteRepository.checkFile(hashFile))
+
+    override suspend fun uploadChunk(
+        fileHash: String,
+        chunkIndex: Int,
+        file: MultipartBody.Part
+    ): Result<Unit> =
+        responseToResource(songRemoteRepository.uploadChunk(fileHash, chunkIndex, file))
+
+    override suspend fun mergeFile(fileHash: BodyRequest): Result<Unit> =
+        responseToResource(songRemoteRepository.mergeFile(fileHash))
 
 
     override suspend fun playlistSongs(playlistWithSongs: PlaylistWithSongs): List<Song> =

@@ -651,4 +651,6 @@
     <string name="name_file">Tên file</string>
     <string name="caption">Caption</string>
     <string name="make_to_public">Đặt làm công khai</string>
+    <string name="file_exist">File Đã có</string>
+    <string name="file_not_exist">File chưa có</string>
 </resources>

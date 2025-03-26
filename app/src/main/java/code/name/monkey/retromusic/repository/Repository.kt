@@ -10,6 +10,7 @@ import code.name.monkey.retromusic.db.SongEntity
 import code.name.monkey.retromusic.fragments.search.Filter
 import code.name.monkey.retromusic.model.Album
 import code.name.monkey.retromusic.model.Artist
+import code.name.monkey.retromusic.model.BodyRequest
 import code.name.monkey.retromusic.model.Contributor
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.model.Home
@@ -19,6 +20,7 @@ import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.network.model.LastFmArtist
 import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
+import code.name.monkey.retromusic.network.model.response.file.ResponseFile
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -102,4 +104,20 @@ interface Repository {
         image: MultipartBody.Part?,
         imageBanner: MultipartBody.Part?
     ): Result<ResponseDataAuth>
+
+    suspend fun checkFile(
+        hashFile: String,
+    ): Result<ResponseFile>
+
+
+    suspend fun uploadChunk(
+        fileHash: String,
+        chunkIndex: Int,
+        file: MultipartBody.Part
+    ): Result<Unit>
+
+
+    suspend fun mergeFile(
+        fileHash: BodyRequest
+    ): Result<Unit>
 }

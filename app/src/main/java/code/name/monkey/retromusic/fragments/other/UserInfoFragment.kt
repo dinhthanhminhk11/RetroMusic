@@ -127,7 +127,7 @@ class UserInfoFragment :
 
     override fun onViewClicked(view: View?) {
         when (view) {
-            binding.name -> {
+            binding.next -> {
                 val dataMap = mutableMapOf<String, String>()
 
                 binding.name.text?.toString()?.takeIf { it.isNotBlank() }?.let {
@@ -268,9 +268,7 @@ class UserInfoFragment :
     }
 
     private fun loadProfile() {
-        binding.bannerImage?.let {
-            loadImageAvatar(requireActivity(), userClient.imageBanner, it)
-        }
+        loadImageAvatar(requireActivity(), userClient.imageBanner, binding.bannerImage)
         loadImageAvatar(requireActivity(), userClient.image, binding.userImage)
     }
 
@@ -406,7 +404,6 @@ class UserInfoFragment :
             })
             .into(binding.userImage)
     }
-
 
     private fun setupInputListeners() {
         val textWatcher = object : TextWatcher {

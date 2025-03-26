@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import code.name.monkey.retromusic.SuccessResponse
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
 import code.name.monkey.retromusic.repository.Repository

@@ -16,6 +16,7 @@ import code.name.monkey.retromusic.fragments.genres.GenreDetailsViewModel
 import code.name.monkey.retromusic.fragments.other.UserInfoViewModel
 import code.name.monkey.retromusic.fragments.playlists.PlaylistDetailsViewModel
 import code.name.monkey.retromusic.fragments.settings.MainSettingsViewModel
+import code.name.monkey.retromusic.fragments.upload.UploadViewModel
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.network.provideAuthService
 import code.name.monkey.retromusic.network.provideDefaultCache
@@ -24,6 +25,7 @@ import code.name.monkey.retromusic.network.provideLastFmRetrofit
 import code.name.monkey.retromusic.network.provideOkHttp
 import code.name.monkey.retromusic.network.provideOkHttpLoginProtobuf
 import code.name.monkey.retromusic.network.provideRetrofitLoginProtobuf
+import code.name.monkey.retromusic.network.provideSongRemoteService
 import code.name.monkey.retromusic.repository.Repository
 import code.name.monkey.retromusic.repository.RepositoryImpl
 import code.name.monkey.retromusic.repository.data_source.AlbumRepository
@@ -37,6 +39,7 @@ import code.name.monkey.retromusic.repository.data_source.SearchRepository
 import code.name.monkey.retromusic.repository.data_source.SongRepository
 import code.name.monkey.retromusic.repository.data_source.TopPlayedRepository
 import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
+import code.name.monkey.retromusic.repository.data_source.network.SongRemoteRepository
 import code.name.monkey.retromusic.repository.data_source_impl.AlbumRepositoryImpl
 import code.name.monkey.retromusic.repository.data_source_impl.ArtistRepositoryImpl
 import code.name.monkey.retromusic.repository.data_source_impl.GenreRepositoryImpl
@@ -48,6 +51,7 @@ import code.name.monkey.retromusic.repository.data_source_impl.SearchRepositoryI
 import code.name.monkey.retromusic.repository.data_source_impl.SongRepositoryImpl
 import code.name.monkey.retromusic.repository.data_source_impl.TopPlayedRepositoryImpl
 import code.name.monkey.retromusic.repository.data_source_impl.network.AuthRepositoryImpl
+import code.name.monkey.retromusic.repository.data_source_impl.network.SongRemoteRepositoryImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.bind
@@ -81,6 +85,10 @@ val networkRetroSeverLoginModule = module {
     }
     single {
         provideAuthService(get())
+    }
+
+    single {
+        provideSongRemoteService(get())
     }
 }
 
@@ -144,6 +152,7 @@ private val dataModule = module {
             get(),
             get(),
             get(),
+            get(),
             get()
         )
     } bind Repository::class
@@ -195,6 +204,10 @@ private val dataModule = module {
     single {
         AuthRepositoryImpl(get())
     } bind AuthRepository::class
+
+    single {
+        SongRemoteRepositoryImpl(get())
+    } bind SongRemoteRepository::class
 }
 
 private val viewModules = module {
@@ -254,6 +267,10 @@ private val viewModules = module {
 
     viewModel {
         UserInfoViewModel(get())
+    }
+
+    viewModel {
+        UploadViewModel(get())
     }
 }
 

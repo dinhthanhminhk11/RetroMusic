@@ -8,8 +8,6 @@ import code.name.monkey.retromusic.util.Utility.getCountryCode
 import code.name.monkey.retromusic.util.Utility.getDeviceId
 import code.name.monkey.retromusic.util.Utility.getLanguageCode
 import code.name.monkey.retromusic.util.Utility.getUserAgent
-import com.chuckerteam.chucker.api.ChuckerCollector
-import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.google.gson.GsonBuilder
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -130,6 +128,10 @@ fun provideRetrofitLoginProtobuf(client: OkHttpClient): Retrofit {
 
 fun provideAuthService(retrofit: Retrofit): AuthService {
     return retrofit.create(AuthService::class.java)
+}
+
+fun provideSongRemoteService(retrofit: Retrofit): SongService {
+    return retrofit.create(SongService::class.java)
 }
 
 fun provideDeezerRest(retrofit: Retrofit): DeezerService {

@@ -12,4 +12,11 @@ object Endpoint {
     const val LOGIN_BY_TOKEN = "auth/getUserByToken"
     const val X_ACCESS_TOKEN = "x-access-token"
     const val UPDATE_USER_INFO = "auth/updateUser"
+
+
+    const val SONG_TEST_UPLOAD_CHUNK = "song/testUploadFileChunk"
+    const val SONG_CHECK_FILE = "song/check-file/{fileHash}"
+    const val SONG_UPLOAD_CHUNK = "song/upload-chunk/{fileHash}/{chunkIndex}"
+    const val SONG_MERGE_FILE = "song/merge-file"
+
 }
