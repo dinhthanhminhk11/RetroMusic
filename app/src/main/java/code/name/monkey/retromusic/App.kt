@@ -1,6 +1,10 @@
 package code.name.monkey.retromusic
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import androidx.preference.PreferenceManager
 import cat.ereza.customactivityoncrash.config.CaocConfig
 import code.name.monkey.appthemehelper.ThemeStore
@@ -44,7 +48,7 @@ class App : Application() {
         // setting Error activity
         CaocConfig.Builder.create().errorActivity(ErrorActivity::class.java)
             .restartActivity(MainActivity::class.java).apply()
-
+        createUploadNotificationChannel(this)
         // Set Default values for now playing preferences
         // This will reduce startup time for now playing settings fragment as Preference listener of AbsSlidingMusicPanelActivity won't be called
         PreferenceManager.setDefaultValues(this, R.xml.pref_now_playing_screen, false)
@@ -66,6 +70,18 @@ class App : Application() {
 
         fun isProVersion(): Boolean {
             return BuildConfig.DEBUG || instance?.billingManager!!.isProVersion
+        }
+    }
+
+    fun createUploadNotificationChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                UPLOAD_CHANNEL,
+                "Upload Notifications",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            val manager = context.getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
         }
     }
 }

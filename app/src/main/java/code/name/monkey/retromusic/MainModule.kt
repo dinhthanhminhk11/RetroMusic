@@ -1,5 +1,6 @@
 package code.name.monkey.retromusic
 
+import android.content.Context
 import androidx.room.Room
 import code.name.monkey.retromusic.auto.AutoMusicProvider
 import code.name.monkey.retromusic.cast.RetroWebServer
@@ -16,6 +17,7 @@ import code.name.monkey.retromusic.fragments.genres.GenreDetailsViewModel
 import code.name.monkey.retromusic.fragments.other.UserInfoViewModel
 import code.name.monkey.retromusic.fragments.playlists.PlaylistDetailsViewModel
 import code.name.monkey.retromusic.fragments.settings.MainSettingsViewModel
+import code.name.monkey.retromusic.fragments.upload.FileUploader
 import code.name.monkey.retromusic.fragments.upload.UploadViewModel
 import code.name.monkey.retromusic.model.Genre
 import code.name.monkey.retromusic.network.provideAuthService
@@ -208,6 +210,9 @@ private val dataModule = module {
     single {
         SongRemoteRepositoryImpl(get())
     } bind SongRemoteRepository::class
+
+    factory { (context: Context) -> FileUploader(context, get()) }
+
 }
 
 private val viewModules = module {
@@ -270,7 +275,7 @@ private val viewModules = module {
     }
 
     viewModel {
-        UploadViewModel(get())
+        UploadViewModel(get(), get())
     }
 }
 

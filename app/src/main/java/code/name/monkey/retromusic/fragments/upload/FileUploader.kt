@@ -1,123 +1,183 @@
 package code.name.monkey.retromusic.fragments.upload
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import code.name.monkey.retromusic.model.BodyRequest
+import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.repository.Repository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withContext
-import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import java.io.FileInputStream
-import java.security.MessageDigest
 
-class FileUploader(private val serverUrl: String) {
-    private val client = OkHttpClient()
+class FileUploader(private val context: Context, private val repository: Repository) {
 
-    /**
-     * Kiểm tra file đã tồn tại hay chưa
-     */
-    fun checkFile(file: File): Boolean {
-        val fileHash = calculateFileHash(file)
+    private val CHUNK_SIZE_MOBILE = 1 * 1024 * 1024;// Mobile: 1MB, upload tuần tự
+    private val CHUNK_SIZE_WIFI = 2 * 1024 * 1024;// WiFi: 2MB, tối đa 4 chunk song song
 
-        val requestBody = FormBody.Builder()
-            .add("fileHash", fileHash)
-            .build()
+    private val SIZE_STREAM_CHUNKS_WIFI = 4
+    private val SIZE_STREAM_CHUNKS_MOBILE = 1
+    suspend fun uploadFile(
+        fileHash: String, file: File, fileName: String,
+        onProgress: (Int) -> Unit
+    ): Result<Unit> { // concurrent uploads dùng khi server latency khỏe
+        val networkType = getNetworkType()
 
-        val request = Request.Builder()
-            .url("$serverUrl/check-file")
-            .post(requestBody)
-            .build()
+        val (chunkSize, maxConcurrentUploads) = when (networkType) {
+            NetworkType.WIFI -> Pair(
+                CHUNK_SIZE_WIFI,
+                SIZE_STREAM_CHUNKS_WIFI
+            )
 
-        client.newCall(request).execute().use { response ->
-            return if (response.isSuccessful) {
-                val responseBody = response.body?.string()
-                responseBody?.contains("exists") == true
-            } else {
-                false
-            }
+            NetworkType.MOBILE -> Pair(
+                CHUNK_SIZE_MOBILE,
+                SIZE_STREAM_CHUNKS_MOBILE
+            )
+
+            else -> Pair(CHUNK_SIZE_MOBILE, SIZE_STREAM_CHUNKS_MOBILE)
         }
-    }
 
-    /**
-     * Upload từng chunk lên server
-     */
-    suspend fun uploadChunk(file: File, chunkSize: Int = 5 * 1024 * 1024) {
-        withContext(Dispatchers.IO) {
-            val fileHash = calculateFileHash(file)
-            val totalChunks = (file.length() / chunkSize) + 1
+        val chunks = splitFileIntoChunks(file, chunkSize)
+        val totalChunks = chunks.size
+        val semaphore = Semaphore(maxConcurrentUploads)
 
-            for (chunkIndex in 0 until totalChunks) {
-                val start = chunkIndex * chunkSize
-                val end = minOf((start + chunkSize).toInt(), file.length().toInt())
+        return withContext(Dispatchers.IO) {
+            try {
+                val deferredList = chunks.mapIndexed { index, chunk ->
+                    async {
+                        semaphore.acquire()
+                        try {
+                            val requestFile =
+                                chunk.asRequestBody("application/octet-stream".toMediaTypeOrNull())
+                            val multipartBody =
+                                MultipartBody.Part.createFormData("file", chunk.name, requestFile)
 
-                val chunk = file.readBytes().copyOfRange(start.toInt(), end)
+                            val uploadResponse =
+                                repository.uploadChunk(fileHash, index, multipartBody)
+                            if (uploadResponse is Result.Error) {
+                                return@async uploadResponse
+                            }
 
-                val requestBody = MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart("fileHash", fileHash)
-                    .addFormDataPart("chunkIndex", chunkIndex.toString())
-                    .addFormDataPart(
-                        "chunk", "chunk_$chunkIndex",
-                        RequestBody.create("application/octet-stream".toMediaTypeOrNull(), chunk)
-                    )
-                    .build()
+                            val progress = ((index + 1) * 100) / totalChunks
+                            onProgress(progress)
 
-                val request = Request.Builder()
-                    .url("$serverUrl/upload-chunk")
-                    .post(requestBody)
-                    .build()
-
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
-                        println("❌ Chunk $chunkIndex upload failed: ${response.message}")
-                    } else {
-                        println("✅ Chunk $chunkIndex uploaded successfully")
+                            Result.Success(Unit)
+                        } finally {
+                            semaphore.release()
+                        }
                     }
                 }
-            }
 
-            // Sau khi upload xong, gọi API merge file
-            mergeFile(fileHash, file.name)
-        }
-    }
+                val results = deferredList.awaitAll()
+                if (results.any { it is Result.Error }) {
+                    return@withContext Result.Error(error = Exception("Upload failed"))
+                }
 
-    /**
-     * Gửi request merge file sau khi upload xong
-     */
-    private fun mergeFile(fileHash: String, fileName: String) {
-        val requestBody = FormBody.Builder()
-            .add("fileHash", fileHash)
-            .add("fileName", fileName)
-            .build()
+                val bodyRequest = BodyRequest(
+                    "fileHash", fileHash,
+                    "totalChunks", chunks.size,
+                    "fileName", fileName
+                )
+                return@withContext repository.mergeFile(bodyRequest)
 
-        val request = Request.Builder()
-            .url("$serverUrl/merge-file")
-            .post(requestBody)
-            .build()
-
-        client.newCall(request).execute().use { response ->
-            if (response.isSuccessful) {
-                println("✅ File merged successfully")
-            } else {
-                println("❌ Failed to merge file: ${response.message}")
+            } catch (e: Exception) {
+                return@withContext Result.Error(error = e)
             }
         }
     }
 
-    /**
-     * Hàm tính hash của file (SHA-256)
-     */
-    private fun calculateFileHash(file: File): String {
-        val md = MessageDigest.getInstance("SHA-256")
-        FileInputStream(file).use { fis ->
-            val buffer = ByteArray(1024)
-            var bytesRead: Int
-            while (fis.read(buffer).also { bytesRead = it } != -1) {
-                md.update(buffer, 0, bytesRead)
+    suspend fun uploadFileWithProgress(
+        fileHash: String,
+        file: File,
+        fileName: String,
+        onProgress: (Int) -> Unit
+    ): Result<Unit> { //sequential uploads, dùng khi server latency yếu
+        if (!file.exists() || !file.canRead()) {
+            return Result.Error(error = Exception("Không thể đọc file"))
+        }
+
+        val networkType = getNetworkType()
+
+        val chunkSize = when (networkType) {
+            NetworkType.WIFI -> CHUNK_SIZE_WIFI
+            NetworkType.MOBILE -> CHUNK_SIZE_MOBILE
+            else -> CHUNK_SIZE_MOBILE
+        }
+
+        return withContext(Dispatchers.IO) {
+            try {
+                val chunks = splitFileIntoChunks(file, chunkSize)
+                val totalChunks = chunks.size
+
+                for (index in chunks.indices) {
+                    val chunk = chunks[index]
+                    val requestFile =
+                        chunk.asRequestBody("application/octet-stream".toMediaTypeOrNull())
+                    val multipartBody =
+                        MultipartBody.Part.createFormData("file", chunk.name, requestFile)
+
+                    val uploadResponse = repository.uploadChunk(fileHash, index, multipartBody)
+                    if (uploadResponse is Result.Error) {
+                        return@withContext uploadResponse
+                    }
+
+
+                    val progress = ((index + 1) * 100) / totalChunks
+                    onProgress(progress)
+                }
+
+                val bodyRequest = BodyRequest(
+                    "fileHash", fileHash,
+                    "totalChunks", chunks.size,
+                    "fileName", fileName
+                )
+                return@withContext repository.mergeFile(bodyRequest)
+
+            } catch (e: Exception) {
+                return@withContext Result.Error(error = e)
             }
         }
-        return md.digest().joinToString("") { "%02x".format(it) }
+    }
+
+    private fun splitFileIntoChunks(file: File, chunkSize: Int): List<File> {
+        val chunks = mutableListOf<File>()
+        val buffer = ByteArray(chunkSize)
+        val inputStream = file.inputStream()
+
+        var bytesRead: Int
+        var chunkIndex = 0
+        while (inputStream.read(buffer).also { bytesRead = it } > 0) {
+            val chunkFile = File(file.parent, "${file.name}_chunk_$chunkIndex")
+            chunkFile.outputStream().use { it.write(buffer, 0, bytesRead) }
+            chunks.add(chunkFile)
+            chunkIndex++
+        }
+
+        inputStream.close()
+        return chunks
+    }
+
+    private fun getNetworkType(): NetworkType {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return NetworkType.UNKNOWN
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(network) ?: return NetworkType.UNKNOWN
+
+        return when {
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> NetworkType.WIFI
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> NetworkType.MOBILE
+            else -> NetworkType.UNKNOWN
+        }
+    }
+
+    enum class NetworkType {
+        WIFI, MOBILE, UNKNOWN
     }
 }

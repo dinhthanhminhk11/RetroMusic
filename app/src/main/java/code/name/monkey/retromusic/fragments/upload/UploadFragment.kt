@@ -2,6 +2,7 @@ package code.name.monkey.retromusic.fragments.upload
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,10 +13,13 @@ import android.text.Editable
 import android.view.View
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.FragmentUploadBinding
+import code.name.monkey.retromusic.extensions.showConfirmDialog
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.service.upload.UploadService
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -44,16 +48,16 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
 
     override fun initView() {
         binding.toolbar.setNavigationOnClickListener {
-//            showConfirmDialog(context = requireActivity(),
-//                title = getString(R.string.notification),
-//                message = getString(R.string.text_confirm_otp),
-//                textPositiveButton = getString(R.string.out),
-//                textNegativeButton = getString(R.string.cancel),
-//                onConfirm = {
-//                    requireActivity().onBackPressedDispatcher.onBackPressed()
-//                }
-//            )
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            showConfirmDialog(
+                context = requireActivity(),
+                title = getString(R.string.notification),
+                message = getString(R.string.text_confirm_otp),
+                textPositiveButton = getString(R.string.out),
+                textNegativeButton = getString(R.string.cancel),
+                onConfirm = {
+                    requireActivity().onBackPressedDispatcher.onBackPressed()
+                }
+            )
         }
 
         binding.upload.setOnClickListener(this)
@@ -65,7 +69,6 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
         viewModel.checkFileState.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
-
                 }
 
                 is Result.Success -> {
@@ -254,7 +257,7 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
         val fileName = getFileName(requireContext(), uri)
         file?.let {
             val fileHash = getFileHash(file)
-            viewModel.uploadFile(fileHash, file, fileName)
+            startUploadService(fileHash, file, fileName)
         }
 
     }
@@ -287,5 +290,15 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
             }
         }
         return digest.digest().joinToString("") { "%02x".format(it) }
+    }
+
+
+    private fun startUploadService(fileHash: String, file: File, fileName: String) {
+        val intent = Intent(requireContext(), UploadService::class.java).apply {
+            putExtra("fileUri", file.absolutePath)
+            putExtra("fileHash", fileHash)
+            putExtra("fileName", fileName)
+        }
+        requireContext().startService(intent)
     }
 }

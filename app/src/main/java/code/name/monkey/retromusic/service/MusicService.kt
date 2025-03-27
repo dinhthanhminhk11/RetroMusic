@@ -86,9 +86,6 @@ import org.koin.java.KoinJavaComponent.get
 import java.util.*
 
 
-/**
- * @author Karim Abou Zeid (kabouzeid), Andrew Neal. Modified by Prathamesh More
- */
 class MusicService : MediaBrowserServiceCompat(),
     OnSharedPreferenceChangeListener, PlaybackCallbacks, OnAudioVolumeChangedListener {
     private val musicBind: IBinder = MusicBinder()

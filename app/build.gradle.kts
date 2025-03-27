@@ -92,12 +92,12 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://1208-113-160-73-210.ngrok-free.app/api/v1/\""
+                "\"https://42ec-113-160-45-182.ngrok-free.app/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"https://1208-113-160-73-210.ngrok-free.app/uploads/\""
+                "\"https://42ec-113-160-45-182.ngrok-free.app/uploads/\""
             )
             buildConfigField(
                 "String",
@@ -116,12 +116,12 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://1208-113-160-73-210.ngrok-free.app/api/v1/\""
+                "\"https://42ec-113-160-45-182.ngrok-free.app/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"https://1208-113-160-73-210.ngrok-free.app/uploads/\""
+                "\"https://42ec-113-160-45-182.ngrok-free.app/uploads/\""
             )
             buildConfigField(
                 "String",
