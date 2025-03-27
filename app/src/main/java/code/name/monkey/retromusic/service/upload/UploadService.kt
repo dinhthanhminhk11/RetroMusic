@@ -9,6 +9,8 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.UPLOAD_CHANNEL
+import code.name.monkey.retromusic.UPLOAD_PROGRESS
+import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
 import code.name.monkey.retromusic.fragments.upload.FileUploader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +40,7 @@ class UploadService : Service() {
         serviceScope.launch {
             uploadManager.uploadFile(fileHash, file, fileName) { progress ->
                 updateNotification(progress)
+                sendUploadProgress(progress)
             }
             stopSelf()
         }
@@ -59,4 +62,10 @@ class UploadService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    private fun sendUploadProgress(progress: Int) {
+        val intent = Intent(UPLOAD_PROGRESS_ACTION)
+        intent.putExtra(UPLOAD_PROGRESS, progress)
+        sendBroadcast(intent)
+    }
 }

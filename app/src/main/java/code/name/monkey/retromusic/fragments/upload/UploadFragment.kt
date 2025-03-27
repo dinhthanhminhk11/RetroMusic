@@ -1,19 +1,26 @@
 package code.name.monkey.retromusic.fragments.upload
 
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Bundle
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.UPLOAD_PROGRESS
+import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
 import code.name.monkey.retromusic.databinding.FragmentUploadBinding
 import code.name.monkey.retromusic.extensions.showConfirmDialog
 import code.name.monkey.retromusic.extensions.showToast
@@ -41,9 +48,27 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
     private var musicPath: Uri? = null
 
     private val viewModel by viewModel<UploadViewModel>()
+    private lateinit var uploadReceiver: BroadcastReceiver
 
     override fun onNetworkChanged() {
 
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        uploadReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val data = intent?.getIntExtra(UPLOAD_PROGRESS, 0) ?: 0
+                showToast("Uploading ... $data% ", Toast.LENGTH_SHORT)
+            }
+        }
+        val intentFilter = IntentFilter(UPLOAD_PROGRESS_ACTION)
+        ContextCompat.registerReceiver(
+            requireContext(),
+            uploadReceiver,
+            intentFilter,
+            ContextCompat.RECEIVER_NOT_EXPORTED // trong app thì dùng thằng ngoài app thì dùng thằng này RECEIVER_EXPORTED
+        )
     }
 
     override fun initView() {
@@ -300,5 +325,10 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
             putExtra("fileName", fileName)
         }
         requireContext().startService(intent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        requireContext().unregisterReceiver(uploadReceiver)
     }
 }
