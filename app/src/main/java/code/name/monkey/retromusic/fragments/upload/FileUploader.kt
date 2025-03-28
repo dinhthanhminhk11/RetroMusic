@@ -3,18 +3,22 @@ package code.name.monkey.retromusic.fragments.upload
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import code.name.monkey.retromusic.model.BodyRequest
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.repository.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 class FileUploader(private val context: Context, private val repository: Repository) {
 
@@ -23,29 +27,29 @@ class FileUploader(private val context: Context, private val repository: Reposit
 
     private val SIZE_STREAM_CHUNKS_WIFI = 4
     private val SIZE_STREAM_CHUNKS_MOBILE = 1
+    private val MAX_TRIES = 3
+
+    private val TAG: String = "FileUploader"
+
+    // chạy đơn giản load những file chunk lên chunk nào lỗi trả ra exception sau khi up hết lên bắn ra upload chưa thành công
     suspend fun uploadFile(
         fileHash: String, file: File, fileName: String,
-        onProgress: (Int) -> Unit
+        onProgress: (Int) -> Unit,
+        onError: (() -> Unit)? = null
     ): Result<Unit> { // concurrent uploads dùng khi server latency khỏe
         val networkType = getNetworkType()
 
         val (chunkSize, maxConcurrentUploads) = when (networkType) {
-            NetworkType.WIFI -> Pair(
-                CHUNK_SIZE_WIFI,
-                SIZE_STREAM_CHUNKS_WIFI
-            )
-
-            NetworkType.MOBILE -> Pair(
-                CHUNK_SIZE_MOBILE,
-                SIZE_STREAM_CHUNKS_MOBILE
-            )
-
+            NetworkType.WIFI -> Pair(CHUNK_SIZE_WIFI, SIZE_STREAM_CHUNKS_WIFI)
+            NetworkType.MOBILE -> Pair(CHUNK_SIZE_MOBILE, SIZE_STREAM_CHUNKS_MOBILE)
             else -> Pair(CHUNK_SIZE_MOBILE, SIZE_STREAM_CHUNKS_MOBILE)
         }
 
         val chunks = splitFileIntoChunks(file, chunkSize)
         val totalChunks = chunks.size
         val semaphore = Semaphore(maxConcurrentUploads)
+        val uploadedChunks = AtomicInteger(0) // dm dùng thằng để ddeems da luong
+        val failedChunks = ConcurrentHashMap<Int, Exception>() // Lưu các chunk bị lỗi
 
         return withContext(Dispatchers.IO) {
             try {
@@ -53,20 +57,46 @@ class FileUploader(private val context: Context, private val repository: Reposit
                     async {
                         semaphore.acquire()
                         try {
-                            val requestFile =
-                                chunk.asRequestBody("application/octet-stream".toMediaTypeOrNull())
-                            val multipartBody =
-                                MultipartBody.Part.createFormData("file", chunk.name, requestFile)
+                            var attempt = 0
+                            var success = false
 
-                            val uploadResponse =
-                                repository.uploadChunk(fileHash, index, multipartBody)
-                            if (uploadResponse is Result.Error) {
-                                return@async uploadResponse
+                            while (attempt < MAX_TRIES && !success) {
+                                attempt++
+                                try {
+                                    val requestFile =
+                                        chunk.asRequestBody("application/octet-stream".toMediaTypeOrNull())
+                                    val multipartBody = MultipartBody.Part.createFormData(
+                                        "file",
+                                        chunk.name,
+                                        requestFile
+                                    )
+
+                                    val uploadResponse =
+                                        repository.uploadChunk(fileHash, index, multipartBody)
+
+                                    if (uploadResponse is Result.Error) {
+                                        Log.d(TAG, "Chunk $index upload failed")
+                                        throw Exception("Chunk $index upload failed")
+                                    }
+                                    if (uploadResponse is Result.Success) {
+                                        val completed = uploadedChunks.incrementAndGet()
+                                        val progress = (completed * 100) / totalChunks
+                                        onProgress(progress)
+                                        Log.i(TAG, "progress  : $progress percent")
+                                        success = true
+
+                                        failedChunks.remove(index)
+                                    }
+
+                                } catch (e: Exception) {
+                                    if (attempt < MAX_TRIES) {
+                                        delay(attempt * 1000L) // suspend 1 second
+                                    } else {
+                                        failedChunks[index] = e
+                                        Log.e(TAG, "Chunk $index failed after $MAX_TRIES retries")
+                                    }
+                                }
                             }
-
-                            val progress = ((index + 1) * 100) / totalChunks
-                            onProgress(progress)
-
                             Result.Success(Unit)
                         } finally {
                             semaphore.release()
@@ -74,9 +104,13 @@ class FileUploader(private val context: Context, private val repository: Reposit
                     }
                 }
 
-                val results = deferredList.awaitAll()
-                if (results.any { it is Result.Error }) {
-                    return@withContext Result.Error(error = Exception("Upload failed"))
+                deferredList.awaitAll()
+                if (failedChunks.isNotEmpty()) {
+                    onError?.invoke()// show error
+                    Log.i(TAG, "Upload failed: Some chunks failed. Retry possible.")
+                    return@withContext Result.Error(
+                        error = Exception("Upload failed: Some chunks failed. Retry possible.")
+                    )
                 }
 
                 val bodyRequest = BodyRequest(

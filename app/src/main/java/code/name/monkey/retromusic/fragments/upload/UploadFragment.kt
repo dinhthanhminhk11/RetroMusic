@@ -1,5 +1,7 @@
 package code.name.monkey.retromusic.fragments.upload
 
+import android.R.attr.data
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -19,6 +21,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.UPLOAD_ACTION_FAILED
 import code.name.monkey.retromusic.UPLOAD_PROGRESS
 import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
 import code.name.monkey.retromusic.databinding.FragmentUploadBinding
@@ -57,12 +60,28 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         uploadReceiver = object : BroadcastReceiver() {
+            @SuppressLint("SetTextI18n")
             override fun onReceive(context: Context?, intent: Intent?) {
-                val data = intent?.getIntExtra(UPLOAD_PROGRESS, 0) ?: 0
-                showToast("Uploading ... $data% ", Toast.LENGTH_SHORT)
+                when (intent?.action) {
+                    UPLOAD_PROGRESS_ACTION -> {
+                        val data = intent.getIntExtra(UPLOAD_PROGRESS, 0)
+                        binding.genre.setText("$data %")
+                    }
+
+                    UPLOAD_ACTION_FAILED -> {
+                        showToast("Upload Failed", Toast.LENGTH_SHORT)
+                    }
+
+                }
+
             }
         }
-        val intentFilter = IntentFilter(UPLOAD_PROGRESS_ACTION)
+        val intentFilter = IntentFilter().apply {
+            addAction(UPLOAD_PROGRESS_ACTION)
+            addAction(UPLOAD_ACTION_FAILED)
+        }
+
+
         ContextCompat.registerReceiver(
             requireContext(),
             uploadReceiver,

@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import code.name.monkey.retromusic.R
+import code.name.monkey.retromusic.UPLOAD_ACTION_FAILED
 import code.name.monkey.retromusic.UPLOAD_CHANNEL
 import code.name.monkey.retromusic.UPLOAD_PROGRESS
 import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
@@ -38,10 +39,19 @@ class UploadService : Service() {
         startForeground(1, createNotification(0))
 
         serviceScope.launch {
-            uploadManager.uploadFile(fileHash, file, fileName) { progress ->
-                updateNotification(progress)
-                sendUploadProgress(progress)
-            }
+            uploadManager.uploadFile(
+                fileHash = fileHash,
+                file = file,
+                fileName = fileName,
+                onProgress = { progress ->
+                    updateNotification(progress)
+                    sendUploadProgress(progress)
+                },
+                onError = {
+                    sendUploadFailed()
+                    stopSelf()
+                }
+            )
             stopSelf()
         }
         return START_STICKY
@@ -66,6 +76,11 @@ class UploadService : Service() {
     private fun sendUploadProgress(progress: Int) {
         val intent = Intent(UPLOAD_PROGRESS_ACTION)
         intent.putExtra(UPLOAD_PROGRESS, progress)
+        sendBroadcast(intent)
+    }
+
+    private fun sendUploadFailed() {
+        val intent = Intent(UPLOAD_ACTION_FAILED)
         sendBroadcast(intent)
     }
 }
