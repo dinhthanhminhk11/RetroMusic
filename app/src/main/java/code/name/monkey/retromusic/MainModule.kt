@@ -275,7 +275,7 @@ private val viewModules = module {
     }
 
     viewModel {
-        UploadViewModel(get(), get())
+        UploadViewModel(get())
     }
 }
 

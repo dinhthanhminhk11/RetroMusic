@@ -7,9 +7,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import code.name.monkey.retromusic.FILE_HASH
+import code.name.monkey.retromusic.FILE_NAME
+import code.name.monkey.retromusic.FILE_SIZE
+import code.name.monkey.retromusic.FILE_URI
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.UPLOAD_ACTION_FAILED
 import code.name.monkey.retromusic.UPLOAD_CHANNEL
+import code.name.monkey.retromusic.UPLOAD_CHUNKS
 import code.name.monkey.retromusic.UPLOAD_PROGRESS
 import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
 import code.name.monkey.retromusic.fragments.upload.FileUploader
@@ -26,9 +31,11 @@ class UploadService : Service() {
     private val notificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val fileUri = intent?.getStringExtra("fileUri") ?: return START_NOT_STICKY
-        val fileHash = intent.getStringExtra("fileHash") ?: return START_NOT_STICKY
-        val fileName = intent.getStringExtra("fileName") ?: return START_NOT_STICKY
+        val fileUri = intent?.getStringExtra(FILE_URI) ?: return START_NOT_STICKY
+        val fileHash = intent.getStringExtra(FILE_HASH) ?: return START_NOT_STICKY
+        val fileName = intent.getStringExtra(FILE_NAME) ?: return START_NOT_STICKY
+        val fileSize = intent.getIntExtra(FILE_SIZE, 0)
+        val uploadedChunks = intent.getIntegerArrayListExtra(UPLOAD_CHUNKS) ?: arrayListOf()
 
         val file = File(fileUri)
         if (!file.exists() || !file.canRead()) {
@@ -42,7 +49,9 @@ class UploadService : Service() {
             uploadManager.uploadFile(
                 fileHash = fileHash,
                 file = file,
+                upLoadedChunks = uploadedChunks,
                 fileName = fileName,
+                fileSize = fileSize.toInt(),
                 onProgress = { progress ->
                     updateNotification(progress)
                     sendUploadProgress(progress)

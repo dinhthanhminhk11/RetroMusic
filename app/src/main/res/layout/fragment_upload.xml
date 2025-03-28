@@ -92,7 +92,7 @@
         app:layout_constraintTop_toTopOf="@id/choseFile">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/title"
+            android:id="@+id/nameFile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="title"

@@ -1,6 +1,5 @@
 package code.name.monkey.retromusic.fragments.upload
 
-import android.R.attr.data
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -20,8 +19,13 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import code.name.monkey.retromusic.FILE_HASH
+import code.name.monkey.retromusic.FILE_NAME
+import code.name.monkey.retromusic.FILE_SIZE
+import code.name.monkey.retromusic.FILE_URI
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.UPLOAD_ACTION_FAILED
+import code.name.monkey.retromusic.UPLOAD_CHUNKS
 import code.name.monkey.retromusic.UPLOAD_PROGRESS
 import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
 import code.name.monkey.retromusic.databinding.FragmentUploadBinding
@@ -48,7 +52,9 @@ import java.security.MessageDigest
 
 class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadBinding::inflate) {
     private var imagePath: Uri? = null
-    private var musicPath: Uri? = null
+    private var fileHash: String? = null
+    private var fileName: String? = null
+    private var file: File? = null
 
     private val viewModel by viewModel<UploadViewModel>()
     private lateinit var uploadReceiver: BroadcastReceiver
@@ -69,6 +75,7 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
                     }
 
                     UPLOAD_ACTION_FAILED -> {
+                        //todo upload fail
                         showToast("Upload Failed", Toast.LENGTH_SHORT)
                     }
 
@@ -116,7 +123,17 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
                 }
 
                 is Result.Success -> {
-
+                    if (result.data.exists == true) {
+                        //todo create song
+                        showToast("FILE exist")
+                    } else {
+                        startUploadService(
+                            fileHash!!,
+                            file!!,
+                            fileName!!,
+                            result.data.uploadedChunks
+                        )
+                    }
                 }
 
                 is Result.Error -> {
@@ -140,8 +157,8 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
             }
 
             binding.upload -> {
-                musicPath?.let {
-                    uploadChunks(it)
+                fileHash?.let {
+                    viewModel.checkFile(it)
                 }
             }
 
@@ -238,12 +255,14 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
     }
 
     private fun handleAudioFile(uri: Uri) {
-        musicPath = uri
+        file = copyFileFromUri(requireContext(), uri)
+        fileName = getFileName(requireContext(), uri)
 
-        val fileName = getFileName(requireContext(), uri)
+        file?.let {
+            fileHash = getFileHash(it)
+        }
         val albumArt = getAlbumArt(requireContext(), uri)
-
-        binding.title.text = Editable.Factory.getInstance().newEditable(fileName)
+        binding.nameFile.text = Editable.Factory.getInstance().newEditable(fileName)
         albumArt?.let {
             binding.choseFile.setImageBitmap(it)
         }
@@ -279,34 +298,7 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
         }
     }
 
-    private fun splitFileIntoChunks(file: File, chunkSize: Int): List<File> {
-        val chunks = mutableListOf<File>()
-        val buffer = ByteArray(chunkSize)
-        val inputStream = FileInputStream(file)
-        var bytesRead: Int
-        var chunkIndex = 0
-
-        while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-            val chunkFile = File(file.parent, "${file.name}.part$chunkIndex")
-            FileOutputStream(chunkFile).use { it.write(buffer, 0, bytesRead) }
-            chunks.add(chunkFile)
-            chunkIndex++
-        }
-        inputStream.close()
-        return chunks
-    }
-
-    fun uploadChunks(uri: Uri) {
-        val file: File? = copyFileFromUri(requireContext(), uri)
-        val fileName = getFileName(requireContext(), uri)
-        file?.let {
-            val fileHash = getFileHash(file)
-            startUploadService(fileHash, file, fileName)
-        }
-
-    }
-
-    fun copyFileFromUri(context: Context, uri: Uri): File? {
+    private fun copyFileFromUri(context: Context, uri: Uri): File? {
         val fileName = getFileName(context, uri)
         val file = File(context.cacheDir, fileName)
 
@@ -324,7 +316,7 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
         return file
     }
 
-    fun getFileHash(file: File, algorithm: String = "SHA-256"): String {
+    private fun getFileHash(file: File, algorithm: String = "SHA-256"): String {
         val digest = MessageDigest.getInstance(algorithm)
         FileInputStream(file).use { inputStream ->
             val buffer = ByteArray(1024)
@@ -337,11 +329,18 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
     }
 
 
-    private fun startUploadService(fileHash: String, file: File, fileName: String) {
+    private fun startUploadService(
+        fileHash: String,
+        file: File,
+        fileName: String,
+        listUploaded: ArrayList<Int>
+    ) {
         val intent = Intent(requireContext(), UploadService::class.java).apply {
-            putExtra("fileUri", file.absolutePath)
-            putExtra("fileHash", fileHash)
-            putExtra("fileName", fileName)
+            putExtra(FILE_URI, file.absolutePath)
+            putExtra(FILE_HASH, fileHash)
+            putExtra(FILE_NAME, fileName)
+            putExtra(FILE_SIZE, file.length() / 1024)
+            putIntegerArrayListExtra(UPLOAD_CHUNKS, listUploaded)
         }
         requireContext().startService(intent)
     }
