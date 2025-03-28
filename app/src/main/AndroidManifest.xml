@@ -309,7 +309,11 @@
             </intent-filter>
         </service>
 
-        <service android:name=".service.upload.UploadService" />
+        <service
+            android:name=".service.upload.UploadService"
+            android:exported="true"
+            android:foregroundServiceType="dataSync"
+            android:label="@string/app_name" />
 
         <meta-data
             android:name="android.max_aspect"

@@ -251,7 +251,7 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
         }
 
     private fun selectAudioFile() {// chose file
-        pickAudioLauncher.launch("audio/*")
+        pickAudioLauncher.launch("video/*")
     }
 
     private fun handleAudioFile(uri: Uri) {

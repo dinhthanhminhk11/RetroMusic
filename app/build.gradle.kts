@@ -86,7 +86,7 @@ android {
 
     flavorDimensions += "environment"
     productFlavors {
-        create("private") {
+        create("company") {
             dimension = "environment"
             manifestPlaceholders["appLabel"] = "Retro Music Private"
             buildConfigField(
@@ -110,28 +110,28 @@ android {
                 "\"AGsyNGA8JCrxVhwjSahHv6fAkcfe3RnM/24JuJz6ogK0a22PPPwS38/F/lryy3Cz\""
             )
         }
-        create("product") {
+        create("house") {
             dimension = "environment"
             manifestPlaceholders["appLabel"] = "Retro Music"
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://42ec-113-160-45-182.ngrok-free.app/api/v1/\""
+                "\"https://b5a9-42-113-220-233.ngrok-free.app/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"https://42ec-113-160-45-182.ngrok-free.app/uploads/\""
+                "\"https://b5a9-42-113-220-233.ngrok-free.app/uploads/\""
             )
             buildConfigField(
                 "String",
                 "KEY_128",
-                "\"JGjmWcjUTHDG1o+Z+oUCf6KzzKm/0TKaWc/hEVm+IIy0a22PPPwS38/F/lryy3Cz\""
+                "\"bT7xwdjJv88tsBaLZgeIoDlslAGMI3GGzMrSGGLQWLqbrdPLyM2dZEbIA8IodEfM\""
             )
             buildConfigField(
                 "String",
                 "IV_128",
-                "\"AGsyNGA8JCrxVhwjSahHv6fAkcfe3RnM/24JuJz6ogK0a22PPPwS38/F/lryy3Cz\""
+                "\"8+stLyjjKVexGQMHGB0OAacknHLoW/julltva2loFEKbrdPLyM2dZEbIA8IodEfM\""
             )
         }
     }
