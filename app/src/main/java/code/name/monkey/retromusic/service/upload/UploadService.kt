@@ -49,7 +49,7 @@ class UploadService : Service() {
             uploadManager.uploadFile(
                 fileHash = fileHash,
                 file = file,
-                upLoadedChunks = uploadedChunks,
+                uploadedChunks = uploadedChunks,
                 fileName = fileName,
                 fileSize = fileSize.toInt(),
                 onProgress = { progress ->
