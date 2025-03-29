@@ -17,6 +17,7 @@ import code.name.monkey.retromusic.UPLOAD_CHANNEL
 import code.name.monkey.retromusic.UPLOAD_CHUNKS
 import code.name.monkey.retromusic.UPLOAD_PROGRESS
 import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
+import code.name.monkey.retromusic.UPLOAD_START_UPLOAD_PROGRESS
 import code.name.monkey.retromusic.fragments.upload.FileUploader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +47,7 @@ class UploadService : Service() {
         startForeground(1, createNotification(0))
 
         serviceScope.launch {
+            sendStart()
             uploadManager.uploadFile(
                 fileHash = fileHash,
                 file = file,
@@ -85,6 +87,11 @@ class UploadService : Service() {
     private fun sendUploadProgress(progress: Int) {
         val intent = Intent(UPLOAD_PROGRESS_ACTION)
         intent.putExtra(UPLOAD_PROGRESS, progress)
+        sendBroadcast(intent)
+    }
+
+    private fun sendStart() {
+        val intent = Intent(UPLOAD_START_UPLOAD_PROGRESS)
         sendBroadcast(intent)
     }
 

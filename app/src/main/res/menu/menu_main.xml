@@ -78,7 +78,7 @@
         android:title="@string/action_settings"
         app:showAsAction="never" />
 
-<!--    option này để đây đã tính sau-->
+    <!--    option này để đây đã tính sau-->
 
     <item
         android:id="@+id/action_cast"
@@ -88,7 +88,8 @@
 
     <item
         android:id="@+id/action_upload"
-        android:icon="@drawable/ic_upload"
         android:title="@string/action_upload"
+        app:actionLayout="@layout/view_upload"
         app:showAsAction="always" />
+
 </menu>

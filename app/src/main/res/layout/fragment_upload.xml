@@ -28,14 +28,17 @@
             app:titleCentered="true"
             app:titleTextAppearance="@style/ToolbarTextAppearanceNormal">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <code.name.monkey.retromusic.views.upload.UploadProgressIcon
                 android:id="@+id/upload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
+                android:layout_gravity="right|center_vertical"
                 android:layout_marginRight="@dimen/_20sdp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_upload" />
+                android:paddingVertical="4dp"
+                android:paddingLeft="-1dp"
+                android:paddingRight="-4dp"
+                tools:ignore="NewApi,RtlHardcoded" />
+
         </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>

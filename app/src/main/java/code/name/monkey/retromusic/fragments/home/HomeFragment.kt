@@ -43,6 +43,7 @@ import code.name.monkey.retromusic.interfaces.IScrollHelper
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.PreferenceUtil.userClient
+import code.name.monkey.retromusic.views.upload.UploadProgressIcon
 import com.bumptech.glide.Glide
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis
@@ -200,7 +201,16 @@ class HomeFragment :
             menu,
             ATHToolbarActivity.getToolbarBackgroundColor(binding.toolbar)
         )
-        //Setting up cast button
+
+        val menuItem = menu.findItem(R.id.action_upload)
+        val actionView = menuItem.actionView as? UploadProgressIcon
+        actionView?.setOnClickListener {
+            findNavController().navigate(
+                R.id.upload_fragment,
+                null,
+                navOptions
+            )
+        }
         requireContext().setUpMediaRouteButton(menu)
     }
 
