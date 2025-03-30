@@ -34,9 +34,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|center_vertical"
                 android:layout_marginRight="@dimen/_20sdp"
-                android:paddingVertical="4dp"
-                android:paddingLeft="-1dp"
+                android:paddingLeft="-3dp"
+                android:paddingTop="-5dp"
                 android:paddingRight="-4dp"
+                android:paddingBottom="4dp"
                 tools:ignore="NewApi,RtlHardcoded" />
 
         </com.google.android.material.appbar.MaterialToolbar>

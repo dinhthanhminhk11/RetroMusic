@@ -1,6 +1,7 @@
 package code.name.monkey.retromusic.views.upload
 
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -29,6 +30,7 @@ class LinearProgressBar @JvmOverloads constructor(
         invalidate()
     }
 
+    @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val width = width.toFloat()
