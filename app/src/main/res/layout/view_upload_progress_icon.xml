@@ -17,7 +17,7 @@
         app:lottie_autoPlay="false"
         app:lottie_loop="true" />
 
-    <code.name.monkey.retromusic.views.upload.LinearProgressBar
+    <code.name.monkey.retromusic.views.custom.upload.LinearProgressBar
         android:id="@+id/progressBar"
         android:layout_width="@dimen/_14sdp"
         android:layout_height="2.5dp"

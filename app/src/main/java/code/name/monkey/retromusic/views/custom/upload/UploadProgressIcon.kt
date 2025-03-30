@@ -1,4 +1,4 @@
-package code.name.monkey.retromusic.views.upload
+package code.name.monkey.retromusic.views.custom.upload
 
 import android.animation.ValueAnimator
 import android.content.BroadcastReceiver

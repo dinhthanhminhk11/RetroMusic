@@ -43,7 +43,7 @@ import code.name.monkey.retromusic.interfaces.IScrollHelper
 import code.name.monkey.retromusic.model.Song
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.PreferenceUtil.userClient
-import code.name.monkey.retromusic.views.upload.UploadProgressIcon
+import code.name.monkey.retromusic.views.custom.upload.UploadProgressIcon
 import com.bumptech.glide.Glide
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis

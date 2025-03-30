@@ -28,7 +28,7 @@
             app:titleCentered="true"
             app:titleTextAppearance="@style/ToolbarTextAppearanceNormal">
 
-            <code.name.monkey.retromusic.views.upload.UploadProgressIcon
+            <code.name.monkey.retromusic.views.custom.upload.UploadProgressIcon
                 android:id="@+id/upload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
