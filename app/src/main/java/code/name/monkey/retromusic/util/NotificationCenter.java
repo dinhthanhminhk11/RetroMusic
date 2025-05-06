@@ -1,5 +1,7 @@
 package code.name.monkey.retromusic.util;
 
+import android.util.SparseArray;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,9 +17,9 @@ public class NotificationCenter {
     public static final int messagesDidLoaded = totalEvents++;
     public static final int mediaCountDidLoaded = totalEvents++;
 
-    private HashMap<Integer, ArrayList<Object>> observers = new HashMap<>();
-    private HashMap<Integer, Object> removeAfterBroadcast = new HashMap<>();
-    private HashMap<Integer, Object> addAfterBroadcast = new HashMap<>();
+    private SparseArray<ArrayList<Object>> observers = new SparseArray<>();
+    private SparseArray<ArrayList<Object>> removeAfterBroadcast = new SparseArray<>();
+    private SparseArray<ArrayList<Object>> addAfterBroadcast = new SparseArray<>();
     private ArrayList<DelayedPost> delayedPosts = new ArrayList<>(10);
 
     private int broadcasting = 0;
@@ -73,32 +75,46 @@ public class NotificationCenter {
     }
 
     public void postNotificationNameInternal(int id, boolean allowDuringAnimation, Object... args) {
+        if (BuildVars.DEBUG_VERSION) {
+            if (Thread.currentThread() != ApplicationLoader.applicationHandler.getLooper().getThread()) {
+                throw new RuntimeException("postNotificationName allowed only from MAIN thread");
+            }
+        }
         if (!allowDuringAnimation && animationInProgress) {
             DelayedPost delayedPost = new DelayedPost(id, args);
             delayedPosts.add(delayedPost);
-            if (BuildConfig.DEBUG) {
-                Timber.tag("NotificationCenter").e("delay post notification " + id + " with args count = " + args.length);
+            if (BuildVars.DEBUG_VERSION) {
+                FileLog.e("tmessages", "delay post notification " + id + " with args count = " + args.length);
             }
             return;
         }
         broadcasting++;
         ArrayList<Object> objects = observers.get(id);
-        if (objects != null) {
-            for (Object obj : objects) {
+        if (objects != null && !objects.isEmpty()) {
+            for (int a = 0; a < objects.size(); a++) {
+                Object obj = objects.get(a);
                 ((NotificationCenterDelegate) obj).didReceivedNotification(id, args);
             }
         }
         broadcasting--;
         if (broadcasting == 0) {
-            if (!removeAfterBroadcast.isEmpty()) {
-                for (HashMap.Entry<Integer, Object> entry : removeAfterBroadcast.entrySet()) {
-                    removeObserver(entry.getValue(), entry.getKey());
+            if (removeAfterBroadcast.size() != 0) {
+                for (int a = 0; a < removeAfterBroadcast.size(); a++) {
+                    int key = removeAfterBroadcast.keyAt(a);
+                    ArrayList<Object> arrayList = removeAfterBroadcast.get(key);
+                    for (int b = 0; b < arrayList.size(); b++) {
+                        removeObserver(arrayList.get(b), key);
+                    }
                 }
                 removeAfterBroadcast.clear();
             }
-            if (!addAfterBroadcast.isEmpty()) {
-                for (HashMap.Entry<Integer, Object> entry : addAfterBroadcast.entrySet()) {
-                    addObserver(entry.getValue(), entry.getKey());
+            if (addAfterBroadcast.size() != 0) {
+                for (int a = 0; a < addAfterBroadcast.size(); a++) {
+                    int key = addAfterBroadcast.keyAt(a);
+                    ArrayList<Object> arrayList = addAfterBroadcast.get(key);
+                    for (int b = 0; b < arrayList.size(); b++) {
+                        addObserver(arrayList.get(b), key);
+                    }
                 }
                 addAfterBroadcast.clear();
             }
@@ -106,9 +122,13 @@ public class NotificationCenter {
     }
 
     public void addObserver(Object observer, int id) {
-
         if (broadcasting != 0) {
-            addAfterBroadcast.put(id, observer);
+            ArrayList<Object> arrayList = addAfterBroadcast.get(id);
+            if (arrayList == null) {
+                arrayList = new ArrayList<>();
+                addAfterBroadcast.put(id, arrayList);
+            }
+            arrayList.add(observer);
             return;
         }
         ArrayList<Object> objects = observers.get(id);
@@ -123,15 +143,17 @@ public class NotificationCenter {
 
     public void removeObserver(Object observer, int id) {
         if (broadcasting != 0) {
-            removeAfterBroadcast.put(id, observer);
+            ArrayList<Object> arrayList = removeAfterBroadcast.get(id);
+            if (arrayList == null) {
+                arrayList = new ArrayList<>();
+                removeAfterBroadcast.put(id, arrayList);
+            }
+            arrayList.add(observer);
             return;
         }
         ArrayList<Object> objects = observers.get(id);
         if (objects != null) {
             objects.remove(observer);
-            if (objects.isEmpty()) {
-                observers.remove(id);
-            }
         }
     }
 }
