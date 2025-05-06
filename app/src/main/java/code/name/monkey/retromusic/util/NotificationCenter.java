@@ -5,12 +5,16 @@ import java.util.HashMap;
 
 public class NotificationCenter {
 
-    final private HashMap<Integer, ArrayList<Object>> observers = new HashMap<Integer, ArrayList<Object>>();
+    private static int totalEvents = 1;
+    public static final int didReceivedNewMessages = totalEvents++;
+    public static final int updateInterfaces = totalEvents++;
 
-    final private HashMap<Integer, Object> removeAfterBroadcast = new HashMap<Integer, Object>();
-    final private HashMap<Integer, Object> addAfterBroadcast = new HashMap<Integer, Object>();
-    public static final int didReceivedNewMessages = 1;
-    public static final int updateInterfaces = 3;
+
+    final private HashMap<Integer, ArrayList<Object>> observers = new HashMap<>();
+
+    final private HashMap<Integer, Object> removeAfterBroadcast = new HashMap<>();
+    final private HashMap<Integer, Object> addAfterBroadcast = new HashMap<>();
+
     private int broadcasting = 0;
 
     private static volatile NotificationCenter Instance = null;
@@ -67,7 +71,7 @@ public class NotificationCenter {
             }
             ArrayList<Object> objects = observers.get(id);
             if (objects == null) {
-                observers.put(id, (objects = new ArrayList<Object>()));
+                observers.put(id, (objects = new ArrayList<>()));
             }
             if (objects.contains(observer)) {
                 return;
@@ -85,7 +89,7 @@ public class NotificationCenter {
             ArrayList<Object> objects = observers.get(id);
             if (objects != null) {
                 objects.remove(observer);
-                if (objects.size() == 0) {
+                if (objects.isEmpty()) {
                     observers.remove(id);
                 }
             }
