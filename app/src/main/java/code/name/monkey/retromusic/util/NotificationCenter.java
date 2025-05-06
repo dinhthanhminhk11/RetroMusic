@@ -21,9 +21,9 @@ public class NotificationCenter {
     public static final int startAllHeavyOperations = totalEvents++;
 
 
-    private SparseArray<ArrayList<Object>> observers = new SparseArray<>();
-    private SparseArray<ArrayList<Object>> removeAfterBroadcast = new SparseArray<>();
-    private SparseArray<ArrayList<Object>> addAfterBroadcast = new SparseArray<>();
+    private SparseArray<ArrayList<NotificationCenterDelegate>> observers = new SparseArray<>();
+    private SparseArray<ArrayList<NotificationCenterDelegate>> removeAfterBroadcast = new SparseArray<>();
+    private SparseArray<ArrayList<NotificationCenterDelegate>> addAfterBroadcast = new SparseArray<>();
     private ArrayList<DelayedPost> delayedPosts = new ArrayList<>(10);
 
     private int broadcasting = 0;
@@ -31,7 +31,7 @@ public class NotificationCenter {
     private int[] allowedNotifications;
 
     public interface NotificationCenterDelegate {
-        void didReceivedNotification(int id, Object... args);
+        void didReceivedNotification(int id, int account, Object... args);
     }
 
     private static class DelayedPost {
@@ -140,11 +140,11 @@ public class NotificationCenter {
             return;
         }
         broadcasting++;
-        ArrayList<Object> objects = observers.get(id);
+        ArrayList<NotificationCenterDelegate> objects = observers.get(id);
         if (objects != null && !objects.isEmpty()) {
             for (int a = 0; a < objects.size(); a++) {
-                Object obj = objects.get(a);
-                ((NotificationCenterDelegate) obj).didReceivedNotification(id, args);
+                NotificationCenterDelegate obj = objects.get(a);
+                obj.didReceivedNotification(id, currentAccount, args);
             }
         }
         broadcasting--;
@@ -152,7 +152,7 @@ public class NotificationCenter {
             if (removeAfterBroadcast.size() != 0) {
                 for (int a = 0; a < removeAfterBroadcast.size(); a++) {
                     int key = removeAfterBroadcast.keyAt(a);
-                    ArrayList<Object> arrayList = removeAfterBroadcast.get(key);
+                    ArrayList<NotificationCenterDelegate> arrayList = removeAfterBroadcast.get(key);
                     for (int b = 0; b < arrayList.size(); b++) {
                         removeObserver(arrayList.get(b), key);
                     }
@@ -162,7 +162,7 @@ public class NotificationCenter {
             if (addAfterBroadcast.size() != 0) {
                 for (int a = 0; a < addAfterBroadcast.size(); a++) {
                     int key = addAfterBroadcast.keyAt(a);
-                    ArrayList<Object> arrayList = addAfterBroadcast.get(key);
+                    ArrayList<NotificationCenterDelegate> arrayList = addAfterBroadcast.get(key);
                     for (int b = 0; b < arrayList.size(); b++) {
                         addObserver(arrayList.get(b), key);
                     }
@@ -172,9 +172,9 @@ public class NotificationCenter {
         }
     }
 
-    public void addObserver(Object observer, int id) {
+    public void addObserver(NotificationCenterDelegate observer, int id) {
         if (broadcasting != 0) {
-            ArrayList<Object> arrayList = addAfterBroadcast.get(id);
+            ArrayList<NotificationCenterDelegate> arrayList = addAfterBroadcast.get(id);
             if (arrayList == null) {
                 arrayList = new ArrayList<>();
                 addAfterBroadcast.put(id, arrayList);
@@ -182,7 +182,7 @@ public class NotificationCenter {
             arrayList.add(observer);
             return;
         }
-        ArrayList<Object> objects = observers.get(id);
+        ArrayList<NotificationCenterDelegate> objects = observers.get(id);
         if (objects == null) {
             observers.put(id, (objects = new ArrayList<>()));
         }
@@ -192,9 +192,9 @@ public class NotificationCenter {
         objects.add(observer);
     }
 
-    public void removeObserver(Object observer, int id) {
+    public void removeObserver(NotificationCenterDelegate observer, int id) {
         if (broadcasting != 0) {
-            ArrayList<Object> arrayList = removeAfterBroadcast.get(id);
+            ArrayList<NotificationCenterDelegate> arrayList = removeAfterBroadcast.get(id);
             if (arrayList == null) {
                 arrayList = new ArrayList<>();
                 removeAfterBroadcast.put(id, arrayList);
@@ -202,7 +202,7 @@ public class NotificationCenter {
             arrayList.add(observer);
             return;
         }
-        ArrayList<Object> objects = observers.get(id);
+        ArrayList<NotificationCenterDelegate> objects = observers.get(id);
         if (objects != null) {
             objects.remove(observer);
         }
