@@ -3,10 +3,10 @@ package code.name.monkey.retromusic.util;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import code.name.monkey.retromusic.BuildConfig;
 import timber.log.Timber;
+
 
 public class NotificationCenter {
 
@@ -23,8 +23,8 @@ public class NotificationCenter {
     private ArrayList<DelayedPost> delayedPosts = new ArrayList<>(10);
 
     private int broadcasting = 0;
-
     private boolean animationInProgress;
+    private int[] allowedNotifications;
 
     public interface NotificationCenterDelegate {
         void didReceivedNotification(int id, Object... args);
@@ -56,6 +56,10 @@ public class NotificationCenter {
         return localInstance;
     }
 
+    public void setAllowedNotificationsDutingAnimation(int notifications[]) {
+        allowedNotifications = notifications;
+    }
+
     public void setAnimationInProgress(boolean value) {
         animationInProgress = value;
         if (!animationInProgress && !delayedPosts.isEmpty()) {
@@ -68,23 +72,23 @@ public class NotificationCenter {
 
     public void postNotificationName(int id, Object... args) {
         boolean allowDuringAnimation = false;
-        if (id == dialogsNeedReload || id == closeChats || id == messagesDidLoaded || id == mediaCountDidLoaded || id == mediaDidLoaded) {
-            allowDuringAnimation = true;
+        if (allowedNotifications != null) {
+            for (int a = 0; a < allowedNotifications.length; a++) {
+                if (allowedNotifications[a] == id) {
+                    allowDuringAnimation = true;
+                    break;
+                }
+            }
         }
         postNotificationNameInternal(id, allowDuringAnimation, args);
     }
 
     public void postNotificationNameInternal(int id, boolean allowDuringAnimation, Object... args) {
-        if (BuildVars.DEBUG_VERSION) {
-            if (Thread.currentThread() != ApplicationLoader.applicationHandler.getLooper().getThread()) {
-                throw new RuntimeException("postNotificationName allowed only from MAIN thread");
-            }
-        }
         if (!allowDuringAnimation && animationInProgress) {
             DelayedPost delayedPost = new DelayedPost(id, args);
             delayedPosts.add(delayedPost);
-            if (BuildVars.DEBUG_VERSION) {
-                FileLog.e("tmessages", "delay post notification " + id + " with args count = " + args.length);
+            if (BuildConfig.DEBUG) {
+                Timber.tag("NotificationCenter").e("delay post notification " + id + " with args count = " + args.length);
             }
             return;
         }
