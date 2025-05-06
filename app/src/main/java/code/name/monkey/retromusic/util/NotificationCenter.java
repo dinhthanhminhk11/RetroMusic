@@ -26,6 +26,9 @@ public class NotificationCenter {
     private SparseArray<ArrayList<NotificationCenterDelegate>> removeAfterBroadcast = new SparseArray<>();
     private SparseArray<ArrayList<NotificationCenterDelegate>> addAfterBroadcast = new SparseArray<>();
     private ArrayList<DelayedPost> delayedPosts = new ArrayList<>(10);
+    private ArrayList<DelayedPost> delayedPostsTmp = new ArrayList<>(10);
+    private ArrayList<PostponeNotificationCallback> postponeCallbackList = new ArrayList<>(10);
+
 
     private int broadcasting = 0;
     private int animationInProgressCount;
@@ -118,14 +121,21 @@ public class NotificationCenter {
             animationInProgressCount--;
             if (animationInProgressCount == 0) {
                 NotificationCenter.getGlobalInstance().postNotificationName(startAllHeavyOperations, 512);
-                if (!delayedPosts.isEmpty()) {
-                    for (int a = 0; a < delayedPosts.size(); a++) {
-                        DelayedPost delayedPost = delayedPosts.get(a);
-                        postNotificationNameInternal(delayedPost.id, true, delayedPost.args);
-                    }
-                    delayedPosts.clear();
-                }
+                runDelayedNotifications();
             }
+        }
+    }
+
+    public void runDelayedNotifications() {
+        if (!delayedPosts.isEmpty()) {
+            delayedPostsTmp.clear();
+            delayedPostsTmp.addAll(delayedPosts);
+            delayedPosts.clear();
+            for (int a = 0; a < delayedPostsTmp.size(); a++) {
+                DelayedPost delayedPost = delayedPostsTmp.get(a);
+                postNotificationNameInternal(delayedPost.id, true, delayedPost.args);
+            }
+            delayedPostsTmp.clear();
         }
     }
 
@@ -142,7 +152,7 @@ public class NotificationCenter {
         if (!allowDuringAnimation && !allowedNotifications.isEmpty()) {
             int size = allowedNotifications.size();
             int allowedCount = 0;
-            for(Integer key : allowedNotifications.keySet()) {
+            for (Integer key : allowedNotifications.keySet()) {
                 int[] allowed = allowedNotifications.get(key);
                 if (allowed != null) {
                     for (int a = 0; a < allowed.length; a++) {
@@ -159,7 +169,7 @@ public class NotificationCenter {
         }
         if (id == startAllHeavyOperations) {
             Integer flags = (Integer) args[0];
-            currentHeavyOperationFlags &=~ flags;
+            currentHeavyOperationFlags &= ~flags;
         } else if (id == stopAllHeavyOperations) {
             Integer flags = (Integer) args[0];
             currentHeavyOperationFlags |= flags;
@@ -176,6 +186,14 @@ public class NotificationCenter {
                 Timber.tag("NotificationCenter").e("delay post notification " + id + " with args count = " + args.length);
             }
             return;
+        }
+        if (!postponeCallbackList.isEmpty()) {
+            for (int i = 0; i < postponeCallbackList.size(); i++) {
+                if (postponeCallbackList.get(i).needPostpone(id, currentAccount, args)) {
+                    delayedPosts.add(new DelayedPost(id, args));
+                    return;
+                }
+            }
         }
         broadcasting++;
         ArrayList<NotificationCenterDelegate> objects = observers.get(id);
@@ -244,5 +262,25 @@ public class NotificationCenter {
         if (objects != null) {
             objects.remove(observer);
         }
+    }
+
+    public boolean hasObservers(int id) {
+        return observers.indexOfKey(id) >= 0;
+    }
+
+    public void addPostponeNotificationsCallback(PostponeNotificationCallback callback) {
+        if (!postponeCallbackList.contains(callback)) {
+            postponeCallbackList.add(callback);
+        }
+    }
+
+    public void removePostponeNotificationsCallback(PostponeNotificationCallback callback) {
+        if (postponeCallbackList.remove(callback)) {
+            runDelayedNotifications();
+        }
+    }
+
+    public interface PostponeNotificationCallback {
+        boolean needPostpone(int id, int currentAccount, Object[] args);
     }
 }
