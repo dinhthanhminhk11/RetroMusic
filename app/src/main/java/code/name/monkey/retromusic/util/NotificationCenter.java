@@ -17,6 +17,9 @@ public class NotificationCenter {
     public static final int mediaDidLoaded = totalEvents++;
     public static final int messagesDidLoaded = totalEvents++;
     public static final int mediaCountDidLoaded = totalEvents++;
+    public static final int stopAllHeavyOperations = totalEvents++;
+    public static final int startAllHeavyOperations = totalEvents++;
+
 
     private SparseArray<ArrayList<Object>> observers = new SparseArray<>();
     private SparseArray<ArrayList<Object>> removeAfterBroadcast = new SparseArray<>();
@@ -43,7 +46,8 @@ public class NotificationCenter {
     }
 
     private int currentAccount;
-    private static volatile NotificationCenter Instance[] = new NotificationCenter[3];
+    private int currentHeavyOperationFlags;
+    private static volatile NotificationCenter[] Instance = new NotificationCenter[3];
     private static volatile NotificationCenter globalInstance;
 
     @UiThread
@@ -78,11 +82,16 @@ public class NotificationCenter {
         currentAccount = account;
     }
 
-    public void setAllowedNotificationsDutingAnimation(int notifications[]) {
+    public void setAllowedNotificationsDutingAnimation(int[] notifications) {
         allowedNotifications = notifications;
     }
 
     public void setAnimationInProgress(boolean value) {
+        if (value) {
+            NotificationCenter.getGlobalInstance().postNotificationName(stopAllHeavyOperations, 512);
+        } else {
+            NotificationCenter.getGlobalInstance().postNotificationName(startAllHeavyOperations, 512);
+        }
         animationInProgress = value;
         if (!animationInProgress && !delayedPosts.isEmpty()) {
             for (DelayedPost delayedPost : delayedPosts) {
@@ -96,15 +105,26 @@ public class NotificationCenter {
         return animationInProgress;
     }
 
+    public int getCurrentHeavyOperationFlags() {
+        return currentHeavyOperationFlags;
+    }
+
     public void postNotificationName(int id, Object... args) {
-        boolean allowDuringAnimation = false;
-        if (allowedNotifications != null) {
+        boolean allowDuringAnimation = id == startAllHeavyOperations || id == stopAllHeavyOperations;
+        if (!allowDuringAnimation && allowedNotifications != null) {
             for (int a = 0; a < allowedNotifications.length; a++) {
                 if (allowedNotifications[a] == id) {
                     allowDuringAnimation = true;
                     break;
                 }
             }
+        }
+        if (id == startAllHeavyOperations) {
+            Integer flags = (Integer) args[0];
+            currentHeavyOperationFlags &=~ flags;
+        } else if (id == stopAllHeavyOperations) {
+            Integer flags = (Integer) args[0];
+            currentHeavyOperationFlags |= flags;
         }
         postNotificationNameInternal(id, allowDuringAnimation, args);
     }
