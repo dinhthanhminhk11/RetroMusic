@@ -74,7 +74,7 @@ android {
     flavorDimensions += "environment"
 
     productFlavors {
-        create("company") {
+        create("product") {
             dimension = "environment"
             manifestPlaceholders["appLabel"] = "Retro Music Private"
             buildConfigField(
@@ -98,7 +98,7 @@ android {
                 "\"a9DDNtZ9E9X6fjU4mtvzaaWJsqshLgf/erLmUEqpj8KXysyYt2LNVrPYEl6D3HoG\""
             )
         }
-        create("house") {
+        create("private") {
             dimension = "environment"
             manifestPlaceholders["appLabel"] = "Retro Music"
             buildConfigField(
@@ -155,9 +155,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
+
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
