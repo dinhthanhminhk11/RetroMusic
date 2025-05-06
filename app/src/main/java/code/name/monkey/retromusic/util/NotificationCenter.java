@@ -5,6 +5,7 @@ import android.util.SparseArray;
 import androidx.annotation.UiThread;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import code.name.monkey.retromusic.BuildConfig;
 import timber.log.Timber;
@@ -27,8 +28,10 @@ public class NotificationCenter {
     private ArrayList<DelayedPost> delayedPosts = new ArrayList<>(10);
 
     private int broadcasting = 0;
-    private boolean animationInProgress;
-    private int[] allowedNotifications;
+    private int animationInProgressCount;
+    private int animationInProgressPointer = 1;
+
+    private final HashMap<Integer, int[]> allowedNotifications = new HashMap<>();
 
     public interface NotificationCenterDelegate {
         void didReceivedNotification(int id, int account, Object... args);
@@ -82,27 +85,52 @@ public class NotificationCenter {
         currentAccount = account;
     }
 
-    public void setAllowedNotificationsDutingAnimation(int[] notifications) {
-        allowedNotifications = notifications;
+    public int setAnimationInProgress(int oldIndex, int[] allowedNotifications) {
+        onAnimationFinish(oldIndex);
+        if (animationInProgressCount == 0) {
+            NotificationCenter.getGlobalInstance().postNotificationName(stopAllHeavyOperations, 512);
+        }
+
+        animationInProgressCount++;
+        animationInProgressPointer++;
+
+        if (allowedNotifications == null) {
+            allowedNotifications = new int[0];
+        }
+
+        this.allowedNotifications.put(animationInProgressPointer, allowedNotifications);
+
+        return animationInProgressPointer;
     }
 
-    public void setAnimationInProgress(boolean value) {
-        if (value) {
-            NotificationCenter.getGlobalInstance().postNotificationName(stopAllHeavyOperations, 512);
-        } else {
-            NotificationCenter.getGlobalInstance().postNotificationName(startAllHeavyOperations, 512);
-        }
-        animationInProgress = value;
-        if (!animationInProgress && !delayedPosts.isEmpty()) {
-            for (DelayedPost delayedPost : delayedPosts) {
-                postNotificationNameInternal(delayedPost.id, true, delayedPost.args);
+    public void updateAllowedNotifications(int transitionAnimationIndex, int[] allowedNotifications) {
+        if (this.allowedNotifications.containsKey(transitionAnimationIndex)) {
+            if (allowedNotifications == null) {
+                allowedNotifications = new int[0];
             }
-            delayedPosts.clear();
+            this.allowedNotifications.put(transitionAnimationIndex, allowedNotifications);
+        }
+    }
+
+    public void onAnimationFinish(int index) {
+        int[] notifications = allowedNotifications.remove(index);
+        if (notifications != null) {
+            animationInProgressCount--;
+            if (animationInProgressCount == 0) {
+                NotificationCenter.getGlobalInstance().postNotificationName(startAllHeavyOperations, 512);
+                if (!delayedPosts.isEmpty()) {
+                    for (int a = 0; a < delayedPosts.size(); a++) {
+                        DelayedPost delayedPost = delayedPosts.get(a);
+                        postNotificationNameInternal(delayedPost.id, true, delayedPost.args);
+                    }
+                    delayedPosts.clear();
+                }
+            }
         }
     }
 
     public boolean isAnimationInProgress() {
-        return animationInProgress;
+        return animationInProgressCount > 0;
     }
 
     public int getCurrentHeavyOperationFlags() {
@@ -111,13 +139,23 @@ public class NotificationCenter {
 
     public void postNotificationName(int id, Object... args) {
         boolean allowDuringAnimation = id == startAllHeavyOperations || id == stopAllHeavyOperations;
-        if (!allowDuringAnimation && allowedNotifications != null) {
-            for (int a = 0; a < allowedNotifications.length; a++) {
-                if (allowedNotifications[a] == id) {
-                    allowDuringAnimation = true;
+        if (!allowDuringAnimation && !allowedNotifications.isEmpty()) {
+            int size = allowedNotifications.size();
+            int allowedCount = 0;
+            for(Integer key : allowedNotifications.keySet()) {
+                int[] allowed = allowedNotifications.get(key);
+                if (allowed != null) {
+                    for (int a = 0; a < allowed.length; a++) {
+                        if (allowed[a] == id) {
+                            allowedCount++;
+                            break;
+                        }
+                    }
+                } else {
                     break;
                 }
             }
+            allowDuringAnimation = size == allowedCount;
         }
         if (id == startAllHeavyOperations) {
             Integer flags = (Integer) args[0];
@@ -131,7 +169,7 @@ public class NotificationCenter {
 
     @UiThread
     public void postNotificationNameInternal(int id, boolean allowDuringAnimation, Object... args) {
-        if (!allowDuringAnimation && animationInProgress) {
+        if (!allowDuringAnimation && isAnimationInProgress()) {
             DelayedPost delayedPost = new DelayedPost(id, args);
             delayedPosts.add(delayedPost);
             if (BuildConfig.DEBUG) {
