@@ -49,19 +49,6 @@ android {
         }
     }
 
-    buildTypes {
-        debug {
-
-        }
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
     buildFeatures {
         buildConfig = true
         viewBinding = true
@@ -85,6 +72,7 @@ android {
     }
 
     flavorDimensions += "environment"
+
     productFlavors {
         create("company") {
             dimension = "environment"
@@ -92,22 +80,22 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://e1ec-113-160-0-14.ngrok-free.app/api/v1/\""
+                "\"https://a100-123-25-30-77.ngrok-free.app/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"https://e1ec-113-160-0-14.ngrok-free.app/uploads/\""
+                "\"https://a100-123-25-30-77.ngrok-free.app/uploads/\""
             )
             buildConfigField(
                 "String",
                 "KEY_128",
-                "\"JGjmWcjUTHDG1o+Z+oUCf6KzzKm/0TKaWc/hEVm+IIy0a22PPPwS38/F/lryy3Cz\""
+                "\"NW2+izos97zgecEblcFMb8fQbnhjbehsw3XW+UGYG/GXysyYt2LNVrPYEl6D3HoG\""
             )
             buildConfigField(
                 "String",
                 "IV_128",
-                "\"AGsyNGA8JCrxVhwjSahHv6fAkcfe3RnM/24JuJz6ogK0a22PPPwS38/F/lryy3Cz\""
+                "\"a9DDNtZ9E9X6fjU4mtvzaaWJsqshLgf/erLmUEqpj8KXysyYt2LNVrPYEl6D3HoG\""
             )
         }
         create("house") {
@@ -126,28 +114,57 @@ android {
             buildConfigField(
                 "String",
                 "KEY_128",
-                "\"bT7xwdjJv88tsBaLZgeIoDlslAGMI3GGzMrSGGLQWLqbrdPLyM2dZEbIA8IodEfM\""
+                "\"NW2+izos97zgecEblcFMb8fQbnhjbehsw3XW+UGYG/GXysyYt2LNVrPYEl6D3HoG\""
             )
             buildConfigField(
                 "String",
                 "IV_128",
-                "\"8+stLyjjKVexGQMHGB0OAacknHLoW/julltva2loFEKbrdPLyM2dZEbIA8IodEfM\""
+                "\"a9DDNtZ9E9X6fjU4mtvzaaWJsqshLgf/erLmUEqpj8KXysyYt2LNVrPYEl6D3HoG\""
             )
         }
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("config/retromusic.keystore")
+            storePassword = project.findProperty("RETRO_KEY_PASSWORD").toString()
+            keyAlias = project.findProperty("RETRO_KEY_ALIAS").toString()
+            keyPassword = project.findProperty("RETRO_KEY_PASSWORD").toString()
+            enableV2Signing = true
+        }
+
+        create("release") {
+            storeFile = file("config/retromusic.keystore")
+            storePassword = project.findProperty("RETRO_KEY_PASSWORD").toString()
+            keyAlias = project.findProperty("RETRO_KEY_ALIAS").toString()
+            keyPassword = project.findProperty("RETRO_KEY_PASSWORD").toString()
+            enableV2Signing = true
+        }
+    }
     configurations.configureEach {
         resolutionStrategy.force("com.google.code.findbugs:jsr305:1.3.9")
     }
 
     sourceSets {
-        getByName("main") {
-            jni {
-                srcDirs("src\\main\\jniLibs")
-            }
+        getByName("debug") {
+            jniLibs.srcDirs("config/libDev")
+        }
+        getByName("release") {
+            jniLibs.srcDirs("config/libRelease")
         }
     }
 
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
 
 }
 
@@ -176,7 +193,7 @@ dependencies {
 
     implementation(libs.wire.runtime)
     implementation(libs.wire.moshi.adapter)
-    implementation (libs.converter.wire)
+    implementation(libs.converter.wire)
 
     // testing
     testImplementation(libs.junit)

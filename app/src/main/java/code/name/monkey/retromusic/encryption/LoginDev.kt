@@ -1,13 +1,13 @@
 package code.name.monkey.retromusic.encryption
 
+import androidx.annotation.Keep
 
-class LoginDev {
+@Keep
+object LoginDev {
     init {
         Login.load()
     }
 
-    companion object {
-        @JvmStatic
-        external fun encryptKey(input: String): String
-    }
+    @JvmStatic
+    external fun encryptKey(input: String): String
 }
