@@ -2,6 +2,8 @@ package code.name.monkey.retromusic.util;
 
 import android.util.SparseArray;
 
+import androidx.annotation.UiThread;
+
 import java.util.ArrayList;
 
 import code.name.monkey.retromusic.BuildConfig;
@@ -9,7 +11,6 @@ import timber.log.Timber;
 
 
 public class NotificationCenter {
-
     private static int totalEvents = 1;
     public static final int dialogsNeedReload = totalEvents++;
     public static final int closeChats = totalEvents++;
@@ -87,6 +88,7 @@ public class NotificationCenter {
         postNotificationNameInternal(id, allowDuringAnimation, args);
     }
 
+    @UiThread
     public void postNotificationNameInternal(int id, boolean allowDuringAnimation, Object... args) {
         if (!allowDuringAnimation && animationInProgress) {
             DelayedPost delayedPost = new DelayedPost(id, args);
