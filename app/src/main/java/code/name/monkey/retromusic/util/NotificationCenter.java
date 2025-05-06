@@ -42,19 +42,40 @@ public class NotificationCenter {
         private Object[] args;
     }
 
-    private static volatile NotificationCenter Instance = null;
+    private int currentAccount;
+    private static volatile NotificationCenter Instance[] = new NotificationCenter[3];
+    private static volatile NotificationCenter globalInstance;
 
-    public static NotificationCenter getInstance() {
-        NotificationCenter localInstance = Instance;
+    @UiThread
+    public static NotificationCenter getInstance(int num) {
+        NotificationCenter localInstance = Instance[num];
         if (localInstance == null) {
             synchronized (NotificationCenter.class) {
-                localInstance = Instance;
+                localInstance = Instance[num];
                 if (localInstance == null) {
-                    Instance = localInstance = new NotificationCenter();
+                    Instance[num] = localInstance = new NotificationCenter(num);
                 }
             }
         }
         return localInstance;
+    }
+
+    @UiThread
+    public static NotificationCenter getGlobalInstance() {
+        NotificationCenter localInstance = globalInstance;
+        if (localInstance == null) {
+            synchronized (NotificationCenter.class) {
+                localInstance = globalInstance;
+                if (localInstance == null) {
+                    globalInstance = localInstance = new NotificationCenter(-1);
+                }
+            }
+        }
+        return localInstance;
+    }
+
+    public NotificationCenter(int account) {
+        currentAccount = account;
     }
 
     public void setAllowedNotificationsDutingAnimation(int notifications[]) {
