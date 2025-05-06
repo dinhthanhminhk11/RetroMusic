@@ -6,6 +6,7 @@ import androidx.annotation.UiThread;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import code.name.monkey.retromusic.BuildConfig;
 import timber.log.Timber;
@@ -27,12 +28,17 @@ public class NotificationCenter {
     private SparseArray<ArrayList<NotificationCenterDelegate>> addAfterBroadcast = new SparseArray<>();
     private ArrayList<DelayedPost> delayedPosts = new ArrayList<>(10);
     private ArrayList<DelayedPost> delayedPostsTmp = new ArrayList<>(10);
+
+    private ArrayList<Runnable> delayedRunnables  = new ArrayList<>(10);
+    private ArrayList<Runnable> delayedRunnablesTmp  = new ArrayList<>(10);
     private ArrayList<PostponeNotificationCallback> postponeCallbackList = new ArrayList<>(10);
 
 
     private int broadcasting = 0;
     private int animationInProgressCount;
     private int animationInProgressPointer = 1;
+
+    HashSet<Integer> heavyOperationsCounter = new HashSet<>();
 
     private final HashMap<Integer, int[]> allowedNotifications = new HashMap<>();
 
@@ -89,14 +95,21 @@ public class NotificationCenter {
     }
 
     public int setAnimationInProgress(int oldIndex, int[] allowedNotifications) {
+        return setAnimationInProgress(oldIndex, allowedNotifications, true);
+    }
+
+    public int setAnimationInProgress(int oldIndex, int[] allowedNotifications, boolean stopHeavyOperations) {
         onAnimationFinish(oldIndex);
-        if (animationInProgressCount == 0) {
+        if (heavyOperationsCounter.isEmpty() && stopHeavyOperations) {
             NotificationCenter.getGlobalInstance().postNotificationName(stopAllHeavyOperations, 512);
         }
 
         animationInProgressCount++;
         animationInProgressPointer++;
 
+        if (stopHeavyOperations) {
+            heavyOperationsCounter.add(animationInProgressPointer);
+        }
         if (allowedNotifications == null) {
             allowedNotifications = new int[0];
         }
@@ -119,8 +132,13 @@ public class NotificationCenter {
         int[] notifications = allowedNotifications.remove(index);
         if (notifications != null) {
             animationInProgressCount--;
+            if (!heavyOperationsCounter.isEmpty()) {
+                heavyOperationsCounter.remove(index);
+                if (heavyOperationsCounter.isEmpty()) {
+                    NotificationCenter.getGlobalInstance().postNotificationName(startAllHeavyOperations, 512);
+                }
+            }
             if (animationInProgressCount == 0) {
-                NotificationCenter.getGlobalInstance().postNotificationName(startAllHeavyOperations, 512);
                 runDelayedNotifications();
             }
         }
@@ -136,6 +154,16 @@ public class NotificationCenter {
                 postNotificationNameInternal(delayedPost.id, true, delayedPost.args);
             }
             delayedPostsTmp.clear();
+        }
+
+        if (!delayedRunnables.isEmpty()) {
+            delayedRunnablesTmp.clear();
+            delayedRunnablesTmp.addAll(delayedRunnables);
+            delayedRunnables.clear();
+            for (int a = 0; a < delayedRunnablesTmp.size(); a++) {
+                delayedRunnablesTmp.get(a).run();
+            }
+            delayedRunnablesTmp.clear();
         }
     }
 
@@ -282,5 +310,13 @@ public class NotificationCenter {
 
     public interface PostponeNotificationCallback {
         boolean needPostpone(int id, int currentAccount, Object[] args);
+    }
+
+    public void doOnIdle(Runnable runnable) {
+        if (isAnimationInProgress()) {
+            delayedRunnables.add(runnable);
+        } else {
+            runnable.run();
+        }
     }
 }
