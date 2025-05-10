@@ -94,7 +94,8 @@ class UploadProgressIcon @JvmOverloads constructor(
         super.onAttachedToWindow()
         NotificationCenter.getInstance(0).addObserver(this, NotificationCenter.uploadProgressAction)
         NotificationCenter.getInstance(0).addObserver(this, NotificationCenter.uploadActionFailed)
-        NotificationCenter.getInstance(0).addObserver(this, NotificationCenter.uploadStartUploadProgress)
+        NotificationCenter.getInstance(0)
+            .addObserver(this, NotificationCenter.uploadStartUploadProgress)
 
         val allowed = intArrayOf(
             NotificationCenter.uploadProgressAction,
@@ -107,48 +108,54 @@ class UploadProgressIcon @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        NotificationCenter.getInstance(0).removeObserver(this, NotificationCenter.uploadProgressAction)
-        NotificationCenter.getInstance(0).removeObserver(this, NotificationCenter.uploadActionFailed)
-        NotificationCenter.getInstance(0).removeObserver(this, NotificationCenter.uploadStartUploadProgress)
+        NotificationCenter.getInstance(0)
+            .removeObserver(this, NotificationCenter.uploadProgressAction)
+        NotificationCenter.getInstance(0)
+            .removeObserver(this, NotificationCenter.uploadActionFailed)
+        NotificationCenter.getInstance(0)
+            .removeObserver(this, NotificationCenter.uploadStartUploadProgress)
         NotificationCenter.getInstance(0).onAnimationFinish(0)
         Log.d("MinhProgressIcon", "Observer unregistered for $this")
     }
 
     override fun didReceivedNotification(id: Int, account: Int, vararg args: Any?) {
-        post {
-            Log.d("didReceivedNotification", "UploadProgressIcon Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}")
-            if (!isAttachedToWindow) return@post
-            when (id) {
-                NotificationCenter.uploadProgressAction -> {
-                    stateClick(false)
-                    val progress = args.getOrNull(0) as? Int ?: run {
-                        Log.e("MinhProgressIcon", "Invalid progress value: ${args.contentToString()}")
-                        return@post
-                    }
-                    Log.d("MinhProgressIcon", "Upload progress: $progress")
-                    progressBar.setProgress(progress.toFloat())
-
-                    if (progress in 1 until 100) {
-                        if (!iconUpload.isAnimating) {
-                            setAnimationWithAutoColor(R.raw.download_progress)
-                            iconUpload.repeatCount = ValueAnimator.INFINITE
-                            iconUpload.playAnimation()
-                        }
-                    } else if (progress >= 100) {
-                        onUploadComplete()
-                        stateClick(true)
-                    }
+        Log.d(
+            "didReceivedNotification",
+            "UploadProgressIcon Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}"
+        )
+        if (!isAttachedToWindow) return
+        when (id) {
+            NotificationCenter.uploadProgressAction -> {
+                stateClick(false)
+                val progress = args.getOrNull(0) as? Int ?: run {
+                    Log.e("MinhProgressIcon", "Invalid progress value: ${args.contentToString()}")
+                    return
                 }
-                NotificationCenter.uploadActionFailed -> {
-                    Log.w("MinhProgressIcon", "Upload failed")
+                Log.d("MinhProgressIcon", "Upload progress: $progress")
+                progressBar.setProgress(progress.toFloat())
+
+                if (progress in 1 until 100) {
+                    if (!iconUpload.isAnimating) {
+                        setAnimationWithAutoColor(R.raw.download_progress)
+                        iconUpload.repeatCount = ValueAnimator.INFINITE
+                        iconUpload.playAnimation()
+                    }
+                } else if (progress >= 100) {
                     onUploadComplete()
                     stateClick(true)
                 }
-                NotificationCenter.uploadStartUploadProgress -> {
-                    Log.i("MinhProgressIcon", "Upload started")
-                    stateClick(false)
-                    startUpload()
-                }
+            }
+
+            NotificationCenter.uploadActionFailed -> {
+                Log.w("MinhProgressIcon", "Upload failed")
+                onUploadComplete()
+                stateClick(true)
+            }
+
+            NotificationCenter.uploadStartUploadProgress -> {
+                Log.i("MinhProgressIcon", "Upload started")
+                stateClick(false)
+                startUpload()
             }
         }
     }

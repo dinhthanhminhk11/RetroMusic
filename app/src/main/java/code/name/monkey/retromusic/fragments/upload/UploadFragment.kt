@@ -327,18 +327,20 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
     }
 
     override fun didReceivedNotification(id: Int, account: Int, vararg args: Any?) {
-        requireActivity().runOnUiThread {
-            Log.d("didReceivedNotification", "UploadFragment Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}")
-            if (!isAdded) return@runOnUiThread
+        Log.d(
+            "didReceivedNotification",
+            "UploadFragment Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}"
+        )
+        if (!isAdded) return
 
-            when (id) {
-                NotificationCenter.uploadProgressAction -> {
-                    val data = args[0] as Int
-                    binding.genre.setText("$data %")
-                }
-                NotificationCenter.uploadActionFailed -> {
-                    showToast("Upload Failed", Toast.LENGTH_SHORT)
-                }
+        when (id) {
+            NotificationCenter.uploadProgressAction -> {
+                val data = args[0] as Int
+                binding.genre.setText("$data %")
+            }
+
+            NotificationCenter.uploadActionFailed -> {
+                showToast("Upload Failed", Toast.LENGTH_SHORT)
             }
         }
     }

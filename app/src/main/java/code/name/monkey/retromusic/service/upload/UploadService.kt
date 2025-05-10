@@ -14,6 +14,7 @@ import code.name.monkey.retromusic.FILE_URI
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.UPLOAD_CHANNEL
 import code.name.monkey.retromusic.UPLOAD_CHUNKS
+import code.name.monkey.retromusic.extensions.postOnMainThread
 import code.name.monkey.retromusic.fragments.upload.FileUploader
 import code.name.monkey.retromusic.util.NotificationCenter
 import kotlinx.coroutines.CoroutineScope
@@ -83,16 +84,16 @@ class UploadService : Service() {
 
     private fun sendUploadProgress(progress: Int) {
         NotificationCenter.getInstance(0)
-            .postNotificationName(NotificationCenter.uploadProgressAction, progress)
+            .postOnMainThread(NotificationCenter.uploadProgressAction, progress)
     }
 
     private fun sendStart() {
         NotificationCenter.getInstance(0)
-            .postNotificationName(NotificationCenter.uploadStartUploadProgress)
+            .postOnMainThread(NotificationCenter.uploadStartUploadProgress)
     }
 
     private fun sendUploadFailed() {
         NotificationCenter.getInstance(0)
-            .postNotificationName(NotificationCenter.uploadActionFailed)
+            .postOnMainThread(NotificationCenter.uploadActionFailed)
     }
 }
