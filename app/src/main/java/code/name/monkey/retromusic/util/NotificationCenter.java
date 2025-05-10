@@ -14,14 +14,12 @@ import timber.log.Timber;
 
 public class NotificationCenter {
     private static int totalEvents = 1;
-    public static final int dialogsNeedReload = totalEvents++;
-    public static final int closeChats = totalEvents++;
-    public static final int mediaDidLoaded = totalEvents++;
-    public static final int messagesDidLoaded = totalEvents++;
-    public static final int mediaCountDidLoaded = totalEvents++;
     public static final int stopAllHeavyOperations = totalEvents++;
     public static final int startAllHeavyOperations = totalEvents++;
 
+    public static final int uploadProgressAction = totalEvents++;
+    public static final int uploadActionFailed = totalEvents++;
+    public static final int uploadStartUploadProgress = totalEvents++;
 
     private SparseArray<ArrayList<NotificationCenterDelegate>> observers = new SparseArray<>();
     private SparseArray<ArrayList<NotificationCenterDelegate>> removeAfterBroadcast = new SparseArray<>();

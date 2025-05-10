@@ -12,13 +12,10 @@ import code.name.monkey.retromusic.FILE_NAME
 import code.name.monkey.retromusic.FILE_SIZE
 import code.name.monkey.retromusic.FILE_URI
 import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.UPLOAD_ACTION_FAILED
 import code.name.monkey.retromusic.UPLOAD_CHANNEL
 import code.name.monkey.retromusic.UPLOAD_CHUNKS
-import code.name.monkey.retromusic.UPLOAD_PROGRESS
-import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
-import code.name.monkey.retromusic.UPLOAD_START_UPLOAD_PROGRESS
 import code.name.monkey.retromusic.fragments.upload.FileUploader
+import code.name.monkey.retromusic.util.NotificationCenter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -85,18 +82,17 @@ class UploadService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun sendUploadProgress(progress: Int) {
-        val intent = Intent(UPLOAD_PROGRESS_ACTION)
-        intent.putExtra(UPLOAD_PROGRESS, progress)
-        sendBroadcast(intent)
+        NotificationCenter.getInstance(0)
+            .postNotificationName(NotificationCenter.uploadProgressAction, progress)
     }
 
     private fun sendStart() {
-        val intent = Intent(UPLOAD_START_UPLOAD_PROGRESS)
-        sendBroadcast(intent)
+        NotificationCenter.getInstance(0)
+            .postNotificationName(NotificationCenter.uploadStartUploadProgress)
     }
 
     private fun sendUploadFailed() {
-        val intent = Intent(UPLOAD_ACTION_FAILED)
-        sendBroadcast(intent)
+        NotificationCenter.getInstance(0)
+            .postNotificationName(NotificationCenter.uploadActionFailed)
     }
 }

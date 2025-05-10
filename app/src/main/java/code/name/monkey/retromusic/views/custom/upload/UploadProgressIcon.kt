@@ -1,10 +1,7 @@
 package code.name.monkey.retromusic.views.custom.upload
 
 import android.animation.ValueAnimator
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.res.ColorStateList
 import android.graphics.drawable.RippleDrawable
 import android.os.Build
@@ -12,13 +9,9 @@ import android.util.AttributeSet
 import android.util.Log
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.UPLOAD_ACTION_FAILED
-import code.name.monkey.retromusic.UPLOAD_PROGRESS
-import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
-import code.name.monkey.retromusic.UPLOAD_START_UPLOAD_PROGRESS
+import code.name.monkey.retromusic.util.NotificationCenter
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -32,17 +25,16 @@ class UploadProgressIcon @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr) {
-    private var currentColor: Int
-    private var iconUpload: LottieAnimationView
-    private var progressBar: LinearProgressBar
+) : LinearLayout(context, attrs, defStyleAttr), NotificationCenter.NotificationCenterDelegate {
+
+    private var currentColor: Int = ThemeStore.accentColor(context)
+    private val iconUpload: LottieAnimationView
+    private val progressBar: LinearProgressBar
 
     init {
         inflate(context, R.layout.view_upload_progress_icon, this)
         iconUpload = findViewById(R.id.iconUpload)
         progressBar = findViewById(R.id.progressBar)
-
-        currentColor = ThemeStore.accentColor(context)
 
         iconUpload.scaleY = -1f
         setAnimationWithAutoColor(R.raw.download_finish)
@@ -57,22 +49,6 @@ class UploadProgressIcon @JvmOverloads constructor(
             null,
             MaterialShapeDrawable(ShapeAppearanceModel.builder().setAllCornerSizes(50f).build())
         )
-
-    }
-
-    fun startUpload() {
-        setAnimationWithAutoColor(R.raw.download_progress)
-        iconUpload.repeatCount = ValueAnimator.INFINITE
-        iconUpload.playAnimation()
-        progressBar.visibility = VISIBLE
-        progressBar.setProgress(0f)
-    }
-
-    fun onUploadComplete() {
-        setAnimationWithAutoColor(R.raw.download_finish)
-        iconUpload.repeatCount = 0
-        iconUpload.playAnimation()
-        progressBar.setProgress(100f)
     }
 
     private fun stateClick(allow: Boolean) {
@@ -82,59 +58,27 @@ class UploadProgressIcon @JvmOverloads constructor(
         }
     }
 
-    val uploadReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            when (intent?.action) {
-                UPLOAD_PROGRESS_ACTION -> {
-                    stateClick(false)
-                    val progress = intent.getIntExtra(UPLOAD_PROGRESS, 0)
-                    progressBar.setProgress(progress.toFloat())
-
-                    if (progress > 0 && !iconUpload.isAnimating) {
-                        Log.e("MinhProgressIcon", "iconUpload.isAnimating ");
-                        setAnimationWithAutoColor(R.raw.download_progress)
-                        iconUpload.playAnimation()
-                    }
-
-                    if (progress >= 100) {
-                        onUploadComplete()
-                        stateClick(true)
-                    }
-                }
-
-                UPLOAD_ACTION_FAILED -> {
-                    onUploadComplete()
-                    stateClick(true)
-                }
-
-                UPLOAD_START_UPLOAD_PROGRESS -> {
-                    stateClick(false)
-                    startUpload()
-                }
-            }
+    fun startUpload() {
+        if (iconUpload.isAnimating) {
+            iconUpload.cancelAnimation()
         }
+        setAnimationWithAutoColor(R.raw.download_progress)
+        iconUpload.repeatCount = ValueAnimator.INFINITE
+        iconUpload.playAnimation()
+        progressBar.visibility = VISIBLE
+        progressBar.setProgress(0f)
+        Log.d("MinhProgressIcon", "Started upload animation")
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        val intentFilter = IntentFilter().apply {
-            addAction(UPLOAD_PROGRESS_ACTION)
-            addAction(UPLOAD_ACTION_FAILED)
-            addAction(UPLOAD_START_UPLOAD_PROGRESS)
+    fun onUploadComplete() {
+        if (iconUpload.isAnimating) {
+            iconUpload.cancelAnimation()
         }
-
-
-        ContextCompat.registerReceiver(
-            context,
-            uploadReceiver,
-            intentFilter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        context.unregisterReceiver(uploadReceiver)
+        setAnimationWithAutoColor(R.raw.download_finish)
+        iconUpload.repeatCount = 0
+        iconUpload.playAnimation()
+        progressBar.setProgress(100f)
+        Log.d("MinhProgressIcon", "Completed upload animation")
     }
 
     fun setAnimationWithAutoColor(animationRes: Int) {
@@ -145,6 +89,67 @@ class UploadProgressIcon @JvmOverloads constructor(
             LottieValueCallback(SimpleColorFilter(currentColor))
         )
     }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        NotificationCenter.getInstance(0).addObserver(this, NotificationCenter.uploadProgressAction)
+        NotificationCenter.getInstance(0).addObserver(this, NotificationCenter.uploadActionFailed)
+        NotificationCenter.getInstance(0).addObserver(this, NotificationCenter.uploadStartUploadProgress)
+
+        val allowed = intArrayOf(
+            NotificationCenter.uploadProgressAction,
+            NotificationCenter.uploadActionFailed,
+            NotificationCenter.uploadStartUploadProgress
+        )
+        NotificationCenter.getInstance(0).setAnimationInProgress(0, allowed)
+        Log.d("MinhProgressIcon", "Observer registered for $this")
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        NotificationCenter.getInstance(0).removeObserver(this, NotificationCenter.uploadProgressAction)
+        NotificationCenter.getInstance(0).removeObserver(this, NotificationCenter.uploadActionFailed)
+        NotificationCenter.getInstance(0).removeObserver(this, NotificationCenter.uploadStartUploadProgress)
+        NotificationCenter.getInstance(0).onAnimationFinish(0)
+        Log.d("MinhProgressIcon", "Observer unregistered for $this")
+    }
+
+    override fun didReceivedNotification(id: Int, account: Int, vararg args: Any?) {
+        post {
+            Log.d("didReceivedNotification", "UploadProgressIcon Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}")
+            if (!isAttachedToWindow) return@post
+            when (id) {
+                NotificationCenter.uploadProgressAction -> {
+                    stateClick(false)
+                    val progress = args.getOrNull(0) as? Int ?: run {
+                        Log.e("MinhProgressIcon", "Invalid progress value: ${args.contentToString()}")
+                        return@post
+                    }
+                    Log.d("MinhProgressIcon", "Upload progress: $progress")
+                    progressBar.setProgress(progress.toFloat())
+
+                    if (progress in 1 until 100) {
+                        if (!iconUpload.isAnimating) {
+                            setAnimationWithAutoColor(R.raw.download_progress)
+                            iconUpload.repeatCount = ValueAnimator.INFINITE
+                            iconUpload.playAnimation()
+                        }
+                    } else if (progress >= 100) {
+                        onUploadComplete()
+                        stateClick(true)
+                    }
+                }
+                NotificationCenter.uploadActionFailed -> {
+                    Log.w("MinhProgressIcon", "Upload failed")
+                    onUploadComplete()
+                    stateClick(true)
+                }
+                NotificationCenter.uploadStartUploadProgress -> {
+                    Log.i("MinhProgressIcon", "Upload started")
+                    stateClick(false)
+                    startUpload()
+                }
+            }
+        }
+    }
 }
-
-

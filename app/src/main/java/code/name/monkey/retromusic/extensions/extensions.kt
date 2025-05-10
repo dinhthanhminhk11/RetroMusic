@@ -5,6 +5,8 @@ package code.name.monkey.retromusic.extensions
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -38,6 +40,7 @@ import code.name.monkey.retromusic.SERVER_ERROR
 import code.name.monkey.retromusic.SET_PASS_SUCCESS
 import code.name.monkey.retromusic.UPDATE_SUCCESS
 import code.name.monkey.retromusic.USER_REGISTER_SUCCESS
+import code.name.monkey.retromusic.util.NotificationCenter
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
 import com.google.gson.Gson
@@ -191,6 +194,12 @@ fun showConfirmDialog(
     }
 
     dialog.show()
+}
+
+fun NotificationCenter.postOnMainThread(id: Int, vararg args: Any?) {
+    Handler(Looper.getMainLooper()).post {
+        postNotificationName(id, *args)
+    }
 }
 
 

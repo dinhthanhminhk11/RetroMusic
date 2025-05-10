@@ -1,11 +1,8 @@
 package code.name.monkey.retromusic.fragments.upload
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -14,26 +11,24 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.text.Editable
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import code.name.monkey.retromusic.FILE_HASH
 import code.name.monkey.retromusic.FILE_NAME
 import code.name.monkey.retromusic.FILE_SIZE
 import code.name.monkey.retromusic.FILE_URI
 import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.UPLOAD_ACTION_FAILED
 import code.name.monkey.retromusic.UPLOAD_CHUNKS
-import code.name.monkey.retromusic.UPLOAD_PROGRESS
-import code.name.monkey.retromusic.UPLOAD_PROGRESS_ACTION
 import code.name.monkey.retromusic.databinding.FragmentUploadBinding
 import code.name.monkey.retromusic.extensions.showConfirmDialog
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.service.upload.UploadService
+import code.name.monkey.retromusic.util.NotificationCenter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -50,14 +45,14 @@ import java.io.IOException
 import java.security.MessageDigest
 
 
-class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadBinding::inflate) {
+class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadBinding::inflate),
+    NotificationCenter.NotificationCenterDelegate {
     private var imagePath: Uri? = null
     private var fileHash: String? = null
     private var fileName: String? = null
     private var file: File? = null
 
     private val viewModel by viewModel<UploadViewModel>()
-    private lateinit var uploadReceiver: BroadcastReceiver
 
     override fun onNetworkChanged() {
 
@@ -65,36 +60,6 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        uploadReceiver = object : BroadcastReceiver() {
-            @SuppressLint("SetTextI18n")
-            override fun onReceive(context: Context?, intent: Intent?) {
-                when (intent?.action) {
-                    UPLOAD_PROGRESS_ACTION -> {
-                        val data = intent.getIntExtra(UPLOAD_PROGRESS, 0)
-                        binding.genre.setText("$data %")
-                    }
-
-                    UPLOAD_ACTION_FAILED -> {
-                        //todo upload fail
-                        showToast("Upload Failed", Toast.LENGTH_SHORT)
-                    }
-
-                }
-
-            }
-        }
-        val intentFilter = IntentFilter().apply {
-            addAction(UPLOAD_PROGRESS_ACTION)
-            addAction(UPLOAD_ACTION_FAILED)
-        }
-
-
-        ContextCompat.registerReceiver(
-            requireContext(),
-            uploadReceiver,
-            intentFilter,
-            ContextCompat.RECEIVER_NOT_EXPORTED // trong app thì dùng thằng ngoài app thì dùng thằng này RECEIVER_EXPORTED
-        )
     }
 
     override fun initView() {
@@ -124,7 +89,6 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
 
                 is Result.Success -> {
                     if (result.data.exists == true) {
-                        //todo create song
                         showToast("FILE exist")
                     } else {
                         startUploadService(
@@ -345,8 +309,37 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
         requireContext().startService(intent)
     }
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        NotificationCenter.getInstance(0)
+            .addObserver(this, NotificationCenter.uploadProgressAction)
+        NotificationCenter.getInstance(0)
+            .addObserver(this, NotificationCenter.uploadActionFailed)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        requireContext().unregisterReceiver(uploadReceiver)
+        NotificationCenter.getInstance(0)
+            .removeObserver(this, NotificationCenter.uploadProgressAction)
+        NotificationCenter.getInstance(0)
+            .removeObserver(this, NotificationCenter.uploadActionFailed)
+    }
+
+    override fun didReceivedNotification(id: Int, account: Int, vararg args: Any?) {
+        requireActivity().runOnUiThread {
+            Log.d("didReceivedNotification", "UploadFragment Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}")
+            if (!isAdded) return@runOnUiThread
+
+            when (id) {
+                NotificationCenter.uploadProgressAction -> {
+                    val data = args[0] as Int
+                    binding.genre.setText("$data %")
+                }
+                NotificationCenter.uploadActionFailed -> {
+                    showToast("Upload Failed", Toast.LENGTH_SHORT)
+                }
+            }
+        }
     }
 }
