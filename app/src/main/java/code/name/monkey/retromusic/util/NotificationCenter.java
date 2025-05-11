@@ -1,5 +1,6 @@
 package code.name.monkey.retromusic.util;
 
+import android.os.Looper;
 import android.util.SparseArray;
 
 import androidx.annotation.UiThread;
@@ -27,8 +28,8 @@ public class NotificationCenter {
     private ArrayList<DelayedPost> delayedPosts = new ArrayList<>(10);
     private ArrayList<DelayedPost> delayedPostsTmp = new ArrayList<>(10);
 
-    private ArrayList<Runnable> delayedRunnables  = new ArrayList<>(10);
-    private ArrayList<Runnable> delayedRunnablesTmp  = new ArrayList<>(10);
+    private ArrayList<Runnable> delayedRunnables = new ArrayList<>(10);
+    private ArrayList<Runnable> delayedRunnablesTmp = new ArrayList<>(10);
     private ArrayList<PostponeNotificationCallback> postponeCallbackList = new ArrayList<>(10);
 
 
@@ -205,6 +206,11 @@ public class NotificationCenter {
 
     @UiThread
     public void postNotificationNameInternal(int id, boolean allowDuringAnimation, Object... args) {
+        if (BuildConfig.DEBUG) {
+            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+                throw new RuntimeException("postNotificationName allowed only from MAIN thread");
+            }
+        }
         if (!allowDuringAnimation && isAnimationInProgress()) {
             DelayedPost delayedPost = new DelayedPost(id, args);
             delayedPosts.add(delayedPost);
@@ -255,6 +261,11 @@ public class NotificationCenter {
     }
 
     public void addObserver(NotificationCenterDelegate observer, int id) {
+        if (BuildConfig.DEBUG) {
+            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+                throw new RuntimeException("addObserver allowed only from MAIN thread");
+            }
+        }
         if (broadcasting != 0) {
             ArrayList<NotificationCenterDelegate> arrayList = addAfterBroadcast.get(id);
             if (arrayList == null) {
@@ -275,6 +286,11 @@ public class NotificationCenter {
     }
 
     public void removeObserver(NotificationCenterDelegate observer, int id) {
+        if (BuildConfig.DEBUG) {
+            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+                throw new RuntimeException("removeObserver allowed only from MAIN thread");
+            }
+        }
         if (broadcasting != 0) {
             ArrayList<NotificationCenterDelegate> arrayList = removeAfterBroadcast.get(id);
             if (arrayList == null) {
@@ -295,12 +311,22 @@ public class NotificationCenter {
     }
 
     public void addPostponeNotificationsCallback(PostponeNotificationCallback callback) {
+        if (BuildConfig.DEBUG) {
+            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+                throw new RuntimeException("PostponeNotificationsCallback allowed only from MAIN thread");
+            }
+        }
         if (!postponeCallbackList.contains(callback)) {
             postponeCallbackList.add(callback);
         }
     }
 
     public void removePostponeNotificationsCallback(PostponeNotificationCallback callback) {
+        if (BuildConfig.DEBUG) {
+            if (Thread.currentThread() != Looper.getMainLooper().getThread()) {
+                throw new RuntimeException("removePostponeNotificationsCallback allowed only from MAIN thread");
+            }
+        }
         if (postponeCallbackList.remove(callback)) {
             runDelayedNotifications();
         }

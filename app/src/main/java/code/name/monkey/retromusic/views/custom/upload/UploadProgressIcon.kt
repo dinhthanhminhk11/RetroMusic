@@ -97,12 +97,12 @@ class UploadProgressIcon @JvmOverloads constructor(
         NotificationCenter.getInstance(0)
             .addObserver(this, NotificationCenter.uploadStartUploadProgress)
 
-        val allowed = intArrayOf(
-            NotificationCenter.uploadProgressAction,
-            NotificationCenter.uploadActionFailed,
-            NotificationCenter.uploadStartUploadProgress
-        )
-        NotificationCenter.getInstance(0).setAnimationInProgress(0, allowed)
+//        val allowed = intArrayOf(
+//            NotificationCenter.uploadProgressAction,
+//            NotificationCenter.uploadActionFailed,
+//            NotificationCenter.uploadStartUploadProgress
+//        )
+//        NotificationCenter.getInstance(0).setAnimationInProgress(0, allowed)
         Log.d("MinhProgressIcon", "Observer registered for $this")
     }
 
@@ -114,7 +114,7 @@ class UploadProgressIcon @JvmOverloads constructor(
             .removeObserver(this, NotificationCenter.uploadActionFailed)
         NotificationCenter.getInstance(0)
             .removeObserver(this, NotificationCenter.uploadStartUploadProgress)
-        NotificationCenter.getInstance(0).onAnimationFinish(0)
+//        NotificationCenter.getInstance(0).onAnimationFinish(0)
         Log.d("MinhProgressIcon", "Observer unregistered for $this")
     }
 
