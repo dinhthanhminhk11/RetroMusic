@@ -24,14 +24,14 @@ import code.name.monkey.retromusic.fragments.base.AbsPlayerControlsFragment
 import code.name.monkey.retromusic.fragments.base.goToAlbum
 import code.name.monkey.retromusic.fragments.base.goToArtist
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
-import code.name.monkey.retromusic.util.EventCenter
+import code.name.monkey.retromusic.util.EventsCenter
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import com.google.android.material.slider.Slider
 
 class PlayerPlaybackControlsFragment :
     AbsPlayerControlsFragment(R.layout.fragment_player_playback_controls),
-    EventCenter.EventCenterDelegate {
+    EventsCenter.EventCenterDelegate {
 
     private var _binding: FragmentPlayerPlaybackControlsBinding? = null
     private val binding get() = _binding!!
@@ -190,14 +190,14 @@ class PlayerPlaybackControlsFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        EventCenter.getInstance(0)
-            .addObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventsCenter.getInstance(0)
+            .addObserverExt(this, EventsCenter.EventType.UPLOAD_PROGRESS_ACTION)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        EventCenter.getInstance(0)
-            .removeObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventsCenter.getInstance(0)
+            .removeObserverExt(this, EventsCenter.EventType.UPLOAD_PROGRESS_ACTION)
     }
 
 
@@ -208,7 +208,7 @@ class PlayerPlaybackControlsFragment :
         vararg args: Any?
     ) {
         when (id) {
-            EventCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal -> {
+            EventsCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal -> {
                 val data = args[0] as Int
                 binding.title.text = "$data %"
             }

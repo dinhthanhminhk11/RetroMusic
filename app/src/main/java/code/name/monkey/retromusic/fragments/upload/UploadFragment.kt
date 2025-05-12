@@ -30,7 +30,7 @@ import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.service.upload.UploadService
-import code.name.monkey.retromusic.util.EventCenter
+import code.name.monkey.retromusic.util.EventsCenter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -49,7 +49,7 @@ import java.security.MessageDigest
 
 
 class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadBinding::inflate),
-    EventCenter.EventCenterDelegate {
+    EventsCenter.EventCenterDelegate {
     private var imagePath: Uri? = null
     private var fileHash: String? = null
     private var fileName: String? = null
@@ -315,18 +315,18 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        EventCenter.getInstance(0)
-            .addObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
-        EventCenter.getInstance(0)
-            .addObserverExt(this, EventCenter.EventType.UPLOAD_ACTION_FAILED)
+        EventsCenter.getInstance(0)
+            .addObserverExt(this, EventsCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventsCenter.getInstance(0)
+            .addObserverExt(this, EventsCenter.EventType.UPLOAD_ACTION_FAILED)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        EventCenter.getInstance(0)
-            .removeObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
-        EventCenter.getInstance(0)
-            .removeObserverExt(this, EventCenter.EventType.UPLOAD_ACTION_FAILED)
+        EventsCenter.getInstance(0)
+            .removeObserverExt(this, EventsCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventsCenter.getInstance(0)
+            .removeObserverExt(this, EventsCenter.EventType.UPLOAD_ACTION_FAILED)
     }
 
     @SuppressLint("SetTextI18n")
@@ -336,12 +336,12 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
         if (!isAdded) return
 
         when (id) {
-            EventCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal -> {
+            EventsCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal -> {
                 val data = args[0] as Int
                 binding.genre.setText("$data %")
             }
 
-            EventCenter.EventType.UPLOAD_ACTION_FAILED.ordinal -> {
+            EventsCenter.EventType.UPLOAD_ACTION_FAILED.ordinal -> {
                 showToast("Upload Failed", Toast.LENGTH_SHORT)
             }
         }

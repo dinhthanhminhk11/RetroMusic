@@ -12,7 +12,7 @@ import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.extensions.addObserverExt
 import code.name.monkey.retromusic.extensions.removeObserverExt
-import code.name.monkey.retromusic.util.EventCenter
+import code.name.monkey.retromusic.util.EventsCenter
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -27,7 +27,7 @@ class UploadProgressIcon @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr), EventCenter.EventCenterDelegate {
+) : LinearLayout(context, attrs, defStyleAttr), EventsCenter.EventCenterDelegate {
 
     private var currentColor: Int = ThemeStore.accentColor(context)
     private val iconUpload: LottieAnimationView
@@ -94,31 +94,31 @@ class UploadProgressIcon @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        EventCenter.getInstance(0)
-            .addObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
-        EventCenter.getInstance(0)
-            .addObserverExt(this, EventCenter.EventType.UPLOAD_ACTION_FAILED)
-        EventCenter.getInstance(0)
-            .addObserverExt(this, EventCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS)
+        EventsCenter.getInstance(0)
+            .addObserverExt(this, EventsCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventsCenter.getInstance(0)
+            .addObserverExt(this, EventsCenter.EventType.UPLOAD_ACTION_FAILED)
+        EventsCenter.getInstance(0)
+            .addObserverExt(this, EventsCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS)
 
         val allowed = intArrayOf(
-            EventCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal,
-            EventCenter.EventType.UPLOAD_ACTION_FAILED.ordinal,
-            EventCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS.ordinal
+            EventsCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal,
+            EventsCenter.EventType.UPLOAD_ACTION_FAILED.ordinal,
+            EventsCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS.ordinal
         )
-        EventCenter.getInstance(0).setAnimationInProgress(0, allowed)
+        EventsCenter.getInstance(0).setAnimationInProgress(0, allowed)
         Timber.tag("MinhProgressIcon").d("Observer registered for $this")
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        EventCenter.getInstance(0)
-            .removeObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
-        EventCenter.getInstance(0)
-            .removeObserverExt(this, EventCenter.EventType.UPLOAD_ACTION_FAILED)
-        EventCenter.getInstance(0)
-            .removeObserverExt(this, EventCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS)
-        EventCenter.getInstance(0).onAnimationFinish(0)
+        EventsCenter.getInstance(0)
+            .removeObserverExt(this, EventsCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventsCenter.getInstance(0)
+            .removeObserverExt(this, EventsCenter.EventType.UPLOAD_ACTION_FAILED)
+        EventsCenter.getInstance(0)
+            .removeObserverExt(this, EventsCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS)
+        EventsCenter.getInstance(0).onAnimationFinish(0)
         Timber.tag("MinhProgressIcon").d("Observer unregistered for $this")
     }
 
@@ -127,7 +127,7 @@ class UploadProgressIcon @JvmOverloads constructor(
             .d("UploadProgressIcon Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}")
         if (!isAttachedToWindow) return
         when (id) {
-            EventCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal -> {
+            EventsCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal -> {
                 stateClick(false)
                 val progress = args.getOrNull(0) as? Int ?: run {
                     Timber.tag("MinhProgressIcon")
@@ -149,13 +149,13 @@ class UploadProgressIcon @JvmOverloads constructor(
                 }
             }
 
-            EventCenter.EventType.UPLOAD_ACTION_FAILED.ordinal -> {
+            EventsCenter.EventType.UPLOAD_ACTION_FAILED.ordinal -> {
                 Timber.tag("MinhProgressIcon").w("Upload failed")
                 onUploadComplete()
                 stateClick(true)
             }
 
-            EventCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS.ordinal -> {
+            EventsCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS.ordinal -> {
                 Timber.tag("MinhProgressIcon").i("Upload started")
                 stateClick(false)
                 startUpload()

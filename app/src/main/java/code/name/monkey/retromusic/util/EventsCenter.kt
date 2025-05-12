@@ -8,7 +8,7 @@ import timber.log.Timber
 import androidx.core.util.isNotEmpty
 import androidx.core.util.size
 
-class EventCenter private constructor(private val currentAccount: Int) {
+class EventsCenter private constructor(private val currentAccount: Int) {
     enum class EventType {
         STOP_ALL_HEAVY_OPERATIONS,
         START_ALL_HEAVY_OPERATIONS,
@@ -18,18 +18,18 @@ class EventCenter private constructor(private val currentAccount: Int) {
     }
 
     companion object {
-        private val instance = arrayOfNulls<EventCenter>(3)
-        private var globalInstance: EventCenter? = null
+        private val instance = arrayOfNulls<EventsCenter>(3)
+        private var globalInstance: EventsCenter? = null
 
         @UiThread
         @JvmStatic
-        fun getInstance(num: Int): EventCenter {
+        fun getInstance(num: Int): EventsCenter {
             var localInstance = instance[num]
             if (localInstance == null) {
-                synchronized(EventCenter::class.java) {
+                synchronized(EventsCenter::class.java) {
                     localInstance = instance[num]
                     if (localInstance == null) {
-                        instance[num] = EventCenter(num).also { localInstance = it }
+                        instance[num] = EventsCenter(num).also { localInstance = it }
                     }
                 }
             }
@@ -38,13 +38,13 @@ class EventCenter private constructor(private val currentAccount: Int) {
 
         @UiThread
         @JvmStatic
-        fun getGlobalInstance(): EventCenter {
+        fun getGlobalInstance(): EventsCenter {
             var localInstance = globalInstance
             if (localInstance == null) {
-                synchronized(EventCenter::class.java) {
+                synchronized(EventsCenter::class.java) {
                     localInstance = globalInstance
                     if (localInstance == null) {
-                        globalInstance = EventCenter(-1).also { localInstance = it }
+                        globalInstance = EventsCenter(-1).also { localInstance = it }
                     }
                 }
             }
