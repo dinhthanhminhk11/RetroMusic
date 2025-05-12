@@ -16,7 +16,7 @@ import code.name.monkey.retromusic.UPLOAD_CHANNEL
 import code.name.monkey.retromusic.UPLOAD_CHUNKS
 import code.name.monkey.retromusic.extensions.postOnMainThread
 import code.name.monkey.retromusic.fragments.upload.FileUploader
-import code.name.monkey.retromusic.util.NotificationCenter
+import code.name.monkey.retromusic.util.EventCenter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -83,17 +83,17 @@ class UploadService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun sendUploadProgress(progress: Int) {
-        NotificationCenter.getInstance(0)
-            .postOnMainThread(NotificationCenter.uploadProgressAction, progress)
+        EventCenter.getInstance(0)
+            .postOnMainThread(EventCenter.EventType.UPLOAD_PROGRESS_ACTION, progress)
     }
 
     private fun sendStart() {
-        NotificationCenter.getInstance(0)
-            .postOnMainThread(NotificationCenter.uploadStartUploadProgress)
+        EventCenter.getInstance(0)
+            .postOnMainThread(EventCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS)
     }
 
     private fun sendUploadFailed() {
-        NotificationCenter.getInstance(0)
-            .postOnMainThread(NotificationCenter.uploadActionFailed)
+        EventCenter.getInstance(0)
+            .postOnMainThread(EventCenter.EventType.UPLOAD_ACTION_FAILED)
     }
 }

@@ -182,8 +182,8 @@ public class NotificationCenter {
             for (Integer key : allowedNotifications.keySet()) {
                 int[] allowed = allowedNotifications.get(key);
                 if (allowed != null) {
-                    for (int a = 0; a < allowed.length; a++) {
-                        if (allowed[a] == id) {
+                    for (int i : allowed) {
+                        if (i == id) {
                             allowedCount++;
                             break;
                         }

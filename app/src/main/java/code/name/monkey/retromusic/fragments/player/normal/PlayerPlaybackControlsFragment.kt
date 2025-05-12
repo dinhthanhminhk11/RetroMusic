@@ -1,6 +1,6 @@
-
 package code.name.monkey.retromusic.fragments.player.normal
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.view.animation.DecelerateInterpolator
@@ -12,17 +12,26 @@ import code.name.monkey.appthemehelper.util.MaterialValueHelper
 import code.name.monkey.appthemehelper.util.TintHelper
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.databinding.FragmentPlayerPlaybackControlsBinding
-import code.name.monkey.retromusic.extensions.*
+import code.name.monkey.retromusic.extensions.accentColor
+import code.name.monkey.retromusic.extensions.addObserverExt
+import code.name.monkey.retromusic.extensions.applyColor
+import code.name.monkey.retromusic.extensions.getSongInfo
+import code.name.monkey.retromusic.extensions.hide
+import code.name.monkey.retromusic.extensions.removeObserverExt
+import code.name.monkey.retromusic.extensions.ripAlpha
+import code.name.monkey.retromusic.extensions.show
 import code.name.monkey.retromusic.fragments.base.AbsPlayerControlsFragment
 import code.name.monkey.retromusic.fragments.base.goToAlbum
 import code.name.monkey.retromusic.fragments.base.goToArtist
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
+import code.name.monkey.retromusic.util.EventCenter
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.color.MediaNotificationProcessor
 import com.google.android.material.slider.Slider
 
 class PlayerPlaybackControlsFragment :
-    AbsPlayerControlsFragment(R.layout.fragment_player_playback_controls) {
+    AbsPlayerControlsFragment(R.layout.fragment_player_playback_controls),
+    EventCenter.EventCenterDelegate {
 
     private var _binding: FragmentPlayerPlaybackControlsBinding? = null
     private val binding get() = _binding!!
@@ -176,5 +185,33 @@ class PlayerPlaybackControlsFragment :
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        EventCenter.getInstance(0)
+            .addObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        EventCenter.getInstance(0)
+            .removeObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    override fun didReceivedNotification(
+        id: Int,
+        account: Int,
+        vararg args: Any?
+    ) {
+        when (id) {
+            EventCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal -> {
+                val data = args[0] as Int
+                binding.title.text = "$data %"
+            }
+        }
     }
 }

@@ -6,12 +6,13 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.RippleDrawable
 import android.os.Build
 import android.util.AttributeSet
-import android.util.Log
 import android.widget.LinearLayout
 import androidx.annotation.RequiresApi
 import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.util.NotificationCenter
+import code.name.monkey.retromusic.extensions.addObserverExt
+import code.name.monkey.retromusic.extensions.removeObserverExt
+import code.name.monkey.retromusic.util.EventCenter
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -19,13 +20,14 @@ import com.airbnb.lottie.model.KeyPath
 import com.airbnb.lottie.value.LottieValueCallback
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
+import timber.log.Timber
 
 @RequiresApi(Build.VERSION_CODES.S)
 class UploadProgressIcon @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr), NotificationCenter.NotificationCenterDelegate {
+) : LinearLayout(context, attrs, defStyleAttr), EventCenter.EventCenterDelegate {
 
     private var currentColor: Int = ThemeStore.accentColor(context)
     private val iconUpload: LottieAnimationView
@@ -67,7 +69,7 @@ class UploadProgressIcon @JvmOverloads constructor(
         iconUpload.playAnimation()
         progressBar.visibility = VISIBLE
         progressBar.setProgress(0f)
-        Log.d("MinhProgressIcon", "Started upload animation")
+        Timber.tag("MinhProgressIcon").d("Started upload animation")
     }
 
     fun onUploadComplete() {
@@ -78,7 +80,7 @@ class UploadProgressIcon @JvmOverloads constructor(
         iconUpload.repeatCount = 0
         iconUpload.playAnimation()
         progressBar.setProgress(100f)
-        Log.d("MinhProgressIcon", "Completed upload animation")
+        Timber.tag("MinhProgressIcon").d("Completed upload animation")
     }
 
     fun setAnimationWithAutoColor(animationRes: Int) {
@@ -92,46 +94,47 @@ class UploadProgressIcon @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        NotificationCenter.getInstance(0).addObserver(this, NotificationCenter.uploadProgressAction)
-        NotificationCenter.getInstance(0).addObserver(this, NotificationCenter.uploadActionFailed)
-        NotificationCenter.getInstance(0)
-            .addObserver(this, NotificationCenter.uploadStartUploadProgress)
+        EventCenter.getInstance(0)
+            .addObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventCenter.getInstance(0)
+            .addObserverExt(this, EventCenter.EventType.UPLOAD_ACTION_FAILED)
+        EventCenter.getInstance(0)
+            .addObserverExt(this, EventCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS)
 
-//        val allowed = intArrayOf(
-//            NotificationCenter.uploadProgressAction,
-//            NotificationCenter.uploadActionFailed,
-//            NotificationCenter.uploadStartUploadProgress
-//        )
-//        NotificationCenter.getInstance(0).setAnimationInProgress(0, allowed)
-        Log.d("MinhProgressIcon", "Observer registered for $this")
+        val allowed = intArrayOf(
+            EventCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal,
+            EventCenter.EventType.UPLOAD_ACTION_FAILED.ordinal,
+            EventCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS.ordinal
+        )
+        EventCenter.getInstance(0).setAnimationInProgress(0, allowed)
+        Timber.tag("MinhProgressIcon").d("Observer registered for $this")
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        NotificationCenter.getInstance(0)
-            .removeObserver(this, NotificationCenter.uploadProgressAction)
-        NotificationCenter.getInstance(0)
-            .removeObserver(this, NotificationCenter.uploadActionFailed)
-        NotificationCenter.getInstance(0)
-            .removeObserver(this, NotificationCenter.uploadStartUploadProgress)
-//        NotificationCenter.getInstance(0).onAnimationFinish(0)
-        Log.d("MinhProgressIcon", "Observer unregistered for $this")
+        EventCenter.getInstance(0)
+            .removeObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventCenter.getInstance(0)
+            .removeObserverExt(this, EventCenter.EventType.UPLOAD_ACTION_FAILED)
+        EventCenter.getInstance(0)
+            .removeObserverExt(this, EventCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS)
+        EventCenter.getInstance(0).onAnimationFinish(0)
+        Timber.tag("MinhProgressIcon").d("Observer unregistered for $this")
     }
 
     override fun didReceivedNotification(id: Int, account: Int, vararg args: Any?) {
-        Log.d(
-            "didReceivedNotification",
-            "UploadProgressIcon Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}"
-        )
+        Timber.tag("didReceivedNotification")
+            .d("UploadProgressIcon Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}")
         if (!isAttachedToWindow) return
         when (id) {
-            NotificationCenter.uploadProgressAction -> {
+            EventCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal -> {
                 stateClick(false)
                 val progress = args.getOrNull(0) as? Int ?: run {
-                    Log.e("MinhProgressIcon", "Invalid progress value: ${args.contentToString()}")
+                    Timber.tag("MinhProgressIcon")
+                        .e("Invalid progress value: ${args.contentToString()}")
                     return
                 }
-                Log.d("MinhProgressIcon", "Upload progress: $progress")
+                Timber.tag("MinhProgressIcon").d("Upload progress: $progress")
                 progressBar.setProgress(progress.toFloat())
 
                 if (progress in 1 until 100) {
@@ -146,14 +149,14 @@ class UploadProgressIcon @JvmOverloads constructor(
                 }
             }
 
-            NotificationCenter.uploadActionFailed -> {
-                Log.w("MinhProgressIcon", "Upload failed")
+            EventCenter.EventType.UPLOAD_ACTION_FAILED.ordinal -> {
+                Timber.tag("MinhProgressIcon").w("Upload failed")
                 onUploadComplete()
                 stateClick(true)
             }
 
-            NotificationCenter.uploadStartUploadProgress -> {
-                Log.i("MinhProgressIcon", "Upload started")
+            EventCenter.EventType.UPLOAD_START_UPLOAD_PROGRESS.ordinal -> {
+                Timber.tag("MinhProgressIcon").i("Upload started")
                 stateClick(false)
                 startUpload()
             }

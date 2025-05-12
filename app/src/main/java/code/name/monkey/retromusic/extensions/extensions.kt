@@ -40,6 +40,9 @@ import code.name.monkey.retromusic.SERVER_ERROR
 import code.name.monkey.retromusic.SET_PASS_SUCCESS
 import code.name.monkey.retromusic.UPDATE_SUCCESS
 import code.name.monkey.retromusic.USER_REGISTER_SUCCESS
+import code.name.monkey.retromusic.util.EventCenter
+import code.name.monkey.retromusic.util.EventCenter.EventCenterDelegate
+import code.name.monkey.retromusic.util.EventCenter.EventType
 import code.name.monkey.retromusic.util.NotificationCenter
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
@@ -202,4 +205,21 @@ fun NotificationCenter.postOnMainThread(id: Int, vararg args: Any?) {
     }
 }
 
+fun EventCenter.postOnMainThread(id: EventType, vararg args: Any?) {
+    Handler(Looper.getMainLooper()).post {
+        postNotificationName(id.ordinal, *args)
+    }
+}
+
+fun EventCenter.postNotificationNameExt(id: EventType, vararg args: Any?) {
+    postNotificationName(id.ordinal, *args)
+}
+
+fun EventCenter.addObserverExt(observer: EventCenterDelegate, id: EventType) {
+    addObserver(observer, id.ordinal)
+}
+
+fun EventCenter.removeObserverExt(observer: EventCenterDelegate, id: EventType) {
+    removeObserver(observer, id.ordinal)
+}
 

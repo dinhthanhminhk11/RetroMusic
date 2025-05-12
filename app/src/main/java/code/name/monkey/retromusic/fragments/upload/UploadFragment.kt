@@ -1,5 +1,6 @@
 package code.name.monkey.retromusic.fragments.upload
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -11,7 +12,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.text.Editable
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -23,12 +23,14 @@ import code.name.monkey.retromusic.FILE_URI
 import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.UPLOAD_CHUNKS
 import code.name.monkey.retromusic.databinding.FragmentUploadBinding
+import code.name.monkey.retromusic.extensions.addObserverExt
+import code.name.monkey.retromusic.extensions.removeObserverExt
 import code.name.monkey.retromusic.extensions.showConfirmDialog
 import code.name.monkey.retromusic.extensions.showToast
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.service.upload.UploadService
-import code.name.monkey.retromusic.util.NotificationCenter
+import code.name.monkey.retromusic.util.EventCenter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -38,6 +40,7 @@ import com.bumptech.glide.request.target.Target
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.github.dhaval2404.imagepicker.constant.ImageProvider
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -46,7 +49,7 @@ import java.security.MessageDigest
 
 
 class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadBinding::inflate),
-    NotificationCenter.NotificationCenterDelegate {
+    EventCenter.EventCenterDelegate {
     private var imagePath: Uri? = null
     private var fileHash: String? = null
     private var fileName: String? = null
@@ -312,34 +315,33 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        NotificationCenter.getInstance(0)
-            .addObserver(this, NotificationCenter.uploadProgressAction)
-        NotificationCenter.getInstance(0)
-            .addObserver(this, NotificationCenter.uploadActionFailed)
+        EventCenter.getInstance(0)
+            .addObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventCenter.getInstance(0)
+            .addObserverExt(this, EventCenter.EventType.UPLOAD_ACTION_FAILED)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        NotificationCenter.getInstance(0)
-            .removeObserver(this, NotificationCenter.uploadProgressAction)
-        NotificationCenter.getInstance(0)
-            .removeObserver(this, NotificationCenter.uploadActionFailed)
+        EventCenter.getInstance(0)
+            .removeObserverExt(this, EventCenter.EventType.UPLOAD_PROGRESS_ACTION)
+        EventCenter.getInstance(0)
+            .removeObserverExt(this, EventCenter.EventType.UPLOAD_ACTION_FAILED)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun didReceivedNotification(id: Int, account: Int, vararg args: Any?) {
-        Log.d(
-            "didReceivedNotification",
-            "UploadFragment Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}"
-        )
+        Timber.tag("didReceivedNotification")
+            .d("UploadFragment Received on thread: ${Thread.currentThread().name}, id=$id, args=${args.contentToString()}")
         if (!isAdded) return
 
         when (id) {
-            NotificationCenter.uploadProgressAction -> {
+            EventCenter.EventType.UPLOAD_PROGRESS_ACTION.ordinal -> {
                 val data = args[0] as Int
                 binding.genre.setText("$data %")
             }
 
-            NotificationCenter.uploadActionFailed -> {
+            EventCenter.EventType.UPLOAD_ACTION_FAILED.ordinal -> {
                 showToast("Upload Failed", Toast.LENGTH_SHORT)
             }
         }
