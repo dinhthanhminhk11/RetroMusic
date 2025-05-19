@@ -1,11 +1,15 @@
-
 package code.name.monkey.retromusic.fragments.albums
 
+import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.SubMenu
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.text.parseAsHtml
@@ -30,7 +34,11 @@ import code.name.monkey.retromusic.adapter.song.SimpleSongAdapter
 import code.name.monkey.retromusic.databinding.FragmentAlbumDetailsBinding
 import code.name.monkey.retromusic.dialogs.AddToPlaylistDialog
 import code.name.monkey.retromusic.dialogs.DeleteSongsDialog
-import code.name.monkey.retromusic.extensions.*
+import code.name.monkey.retromusic.extensions.applyColor
+import code.name.monkey.retromusic.extensions.applyOutlineColor
+import code.name.monkey.retromusic.extensions.findActivityNavController
+import code.name.monkey.retromusic.extensions.show
+import code.name.monkey.retromusic.extensions.surfaceColor
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
 import code.name.monkey.retromusic.glide.RetroGlideExtension
 import code.name.monkey.retromusic.glide.RetroGlideExtension.albumCoverOptions
@@ -48,7 +56,11 @@ import code.name.monkey.retromusic.model.Artist
 import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.repository.Repository
-import code.name.monkey.retromusic.util.*
+import code.name.monkey.retromusic.util.MusicUtil
+import code.name.monkey.retromusic.util.PreferenceUtil
+import code.name.monkey.retromusic.util.RetroUtil
+import code.name.monkey.retromusic.util.logD
+import code.name.monkey.retromusic.util.logE
 import com.bumptech.glide.Glide
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.transition.MaterialArcMotion
@@ -228,10 +240,13 @@ class AlbumDetailsFragment : AbsMainActivityFragment(R.layout.fragment_album_det
                 is Result.Success -> {
                     aboutAlbum(result.data)
                 }
+
+                is Result.Empty -> {}
             }
         }
     }
 
+    @SuppressLint("StringFormatInvalid")
     private fun moreAlbums(albums: List<Album>) {
         binding.fragmentAlbumContent.moreTitle.show()
         binding.fragmentAlbumContent.moreRecyclerView.show()

@@ -16,20 +16,21 @@ import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
 import code.name.monkey.retromusic.extensions.hideKeyboard
+import code.name.monkey.retromusic.extensions.launchAndCollectIn
 import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
-import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.network.handleResult
 import code.name.monkey.retromusic.util.ViewUtil.navOptionsByMinh
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class RegisterFragment :
     BaseNormalFragment<FragmentRegisterBinding>(FragmentRegisterBinding::inflate) {
     private val viewModel by viewModel<RegisterViewModel>()
-    private var isEmailValid = false;
+    private var isEmailValid = false
 
     override fun onNetworkChanged() {
         updateButtonState()
@@ -58,47 +59,37 @@ class RegisterFragment :
     }
 
     override fun initObserver() {
-        viewModel.authState.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.btnContinue.isEnabled = false
+        viewModel.authState.launchAndCollectIn(viewLifecycleOwner) { result ->
+            result.handleResult(onLoading = {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.btnContinue.isEnabled = false
+            }, onError = {
+                binding.progressBar.visibility = View.GONE
+                binding.btnContinue.isEnabled = true
+                it.code?.let {
+                    handErrorServerProtobuf(binding.root, it)
                 }
+            }, onSuccess = { data ->
+                binding.progressBar.visibility = View.GONE
+                binding.btnContinue.isEnabled = true
 
-                is Result.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnContinue.isEnabled = true
-                    result.code?.let {
-                        handErrorServerProtobuf(binding.root, it)
+                if (Constants.ON_OFF_SETTING_TOAST_SUCCESS) {
+                    data.data_.code.let {
+                        showSuccessLoginProtobuf(binding.root, it)
                     }
                 }
 
-                is Result.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnContinue.isEnabled = true
-
-                    if (Constants.ON_OFF_SETTING_TOAST_SUCCESS) {
-                        result.data.data_.code.let {
-                            showSuccessLoginProtobuf(binding.root, it)
-                        }
-                    }
-
-                    result.data.data_.details?.let {
-                        if (result.data.data_.details.verified == false) {
-                            findNavController().navigate(
-                                R.id.otpFragment,
-                                bundleOf(
-                                    OTP_TYPE to TYPE_REGISTER,
-                                    EMAIL to binding.username.text.toString()
-                                ),
-                                navOptionsByMinh
-                            )
-                        }
+                data.data_.details?.let {
+                    if (data.data_.details.verified == false) {
+                        findNavController().navigate(
+                            R.id.otpFragment, bundleOf(
+                                OTP_TYPE to TYPE_REGISTER,
+                                EMAIL to binding.username.text.toString()
+                            ), navOptionsByMinh
+                        )
                     }
                 }
-
-                else -> {}
-            }
+            })
         }
     }
 
@@ -113,14 +104,13 @@ class RegisterFragment :
                 if (validateEmail(email)) {
                     binding.btnContinue.isEnabled = false
                     binding.progressBar.visibility = View.VISIBLE
-                    val text =
-                        "{\"email\" : \"${binding.username.text.toString()}\"}"
+                    val text = "{\"email\" : \"${binding.username.text.toString()}\"}"
                     val textEntryPoint = Login.encryptData(text)
 
                     val authRequest = AuthRequest(textEntryPoint)
                     val byteArray = authRequest.encode()
                     val requestBody =
-                        RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
+                        byteArray.toRequestBody("application/x-protobuf".toMediaType())
                     viewModel.register(requestBody)
                 }
             }

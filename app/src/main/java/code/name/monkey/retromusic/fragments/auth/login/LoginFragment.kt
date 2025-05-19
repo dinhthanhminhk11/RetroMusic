@@ -23,17 +23,18 @@ import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
 import code.name.monkey.retromusic.extensions.hideKeyboard
+import code.name.monkey.retromusic.extensions.launchAndCollectIn
 import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.extensions.validateEmail
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.fragments.search.clearText
 import code.name.monkey.retromusic.model.auth.UserClient
-import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.network.handleResult
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.ViewUtil
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBinding::inflate) {
@@ -77,44 +78,39 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
     }
 
     override fun initObserver() {
-        loginViewModel.authState.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
+        loginViewModel.authState.launchAndCollectIn(viewLifecycleOwner) { result ->
+            result.handleResult(
+                onLoading = {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.btnContinue.isEnabled = false
-                }
-
-                is Result.Error -> {
+                }, onError = {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
-                    result.code?.let {
+                    it.code?.let {
                         handErrorServerProtobuf(binding.root, it)
                     }
-                }
-
-                is Result.Success -> {
+                }, onSuccess = { data ->
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
 
                     if (ON_OFF_SETTING_TOAST_SUCCESS) {
-                        result.data.data_.code.let {
+                        data.data_.code.let {
                             showSuccessLoginProtobuf(binding.root, it)
                         }
                     }
 
-                    result.data.let {
-                        if (result.data.success) {
-                            result.data.data_.let {
-                                when (result.data.data_.code) {
+                    data.let {
+                        if (data.success) {
+                            data.data_.let {
+                                when (data.data_.code) {
                                     LOGIN_SUCCESS -> {
                                         showSuccessLoginProtobuf(binding.root, LOGIN_SUCCESS)
-                                        result.data.data_.details?.data_.let { dataLogin ->
+                                        data.data_.details?.data_.let { dataLogin ->
                                             val gson = Gson()
-                                            val userClient: UserClient =
-                                                gson.fromJson(
-                                                    Login.decryptData(dataLogin.toString()),
-                                                    UserClient::class.java
-                                                )
+                                            val userClient: UserClient = gson.fromJson(
+                                                Login.decryptData(dataLogin.toString()),
+                                                UserClient::class.java
+                                            )
                                             PreferenceUtil.userClient = userClient
                                         }
 
@@ -128,33 +124,26 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                             }
                         }
                     }
-                }
-
-                else -> {}
-            }
+                })
         }
 
-        loginViewModel.accountState.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
+        loginViewModel.accountState.launchAndCollectIn(viewLifecycleOwner) { result ->
+            result.handleResult(
+                onLoading = {
                     binding.progressBar.visibility = View.VISIBLE
                     binding.btnContinue.isEnabled = false
-                }
-
-                is Result.Error -> {
+                }, onError = {
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
-                    result.code?.let {
+                    it.code?.let {
                         handErrorServerProtobuf(binding.root, it) { errorCode ->
                             when (errorCode) {
                                 ACCOUNT_CAN_NOT_LOGIN -> {
                                     findNavController().navigate(
-                                        R.id.otpFragment,
-                                        bundleOf(
+                                        R.id.otpFragment, bundleOf(
                                             OTP_TYPE to TYPE_REGISTER,
                                             EMAIL to binding.username.text.toString()
-                                        ),
-                                        ViewUtil.navOptions
+                                        ), ViewUtil.navOptions
                                     )
                                 }
 
@@ -164,30 +153,26 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                             }
                         }
                     }
-                }
-
-                is Result.Success -> {
+                }, onSuccess = { data ->
                     binding.progressBar.visibility = View.GONE
                     binding.btnContinue.isEnabled = true
 
                     if (ON_OFF_SETTING_TOAST_SUCCESS) {
-                        result.data.data_.code.let {
+                        data.data_.code.let {
                             showSuccessLoginProtobuf(binding.root, it)
                         }
                     }
 
-                    result.data.let {
-                        if (result.data.success) {
-                            result.data.data_.let {
-                                when (result.data.data_.code) {
+                    data.let {
+                        if (data.success) {
+                            data.data_.let {
+                                when (data.data_.code) {
                                     ACCOUNT_CAN_LOGIN -> {
                                         findNavController().navigate(
-                                            R.id.otpFragment,
-                                            bundleOf(
+                                            R.id.otpFragment, bundleOf(
                                                 OTP_TYPE to TYPE_LOGIN,
                                                 EMAIL to binding.username.text.toString()
-                                            ),
-                                            ViewUtil.navOptions
+                                            ), ViewUtil.navOptions
                                         )
                                     }
                                 }
@@ -195,9 +180,7 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                         }
                     }
                 }
-
-                else -> {}
-            }
+            )
         }
     }
 
@@ -232,7 +215,7 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                         val authRequest = AuthRequest(textEntryPoint)
                         val byteArray = authRequest.encode()
                         val requestBody =
-                            RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
+                            byteArray.toRequestBody("application/x-protobuf".toMediaType())
                         loginViewModel.login(requestBody)
                     } else {
                         textEncrypt = "{\"email\" : \"${binding.username.text.toString()}\"}"
@@ -240,7 +223,7 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
                         val authRequest = AuthRequest(textEntryPoint)
                         val byteArray = authRequest.encode()
                         val requestBody =
-                            RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
+                            byteArray.toRequestBody("application/x-protobuf".toMediaType())
                         loginViewModel.checkAccount(requestBody)
                     }
                 }
@@ -265,7 +248,8 @@ class LoginFragment : BaseNormalFragment<FragmentLoginBinding>(FragmentLoginBind
 
     override fun onDestroyView() {
         super.onDestroyView()
-        loginViewModel.clearState()
+        loginViewModel.clearAuthState()
+        loginViewModel.clearAccountState()
     }
 
     override fun onResume() {

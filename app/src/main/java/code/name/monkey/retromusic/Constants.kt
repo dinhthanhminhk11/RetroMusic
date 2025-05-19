@@ -4,6 +4,8 @@ import android.provider.BaseColumns
 import android.provider.MediaStore
 
 object Constants {
+    const val NO_INTERNET = "NO_INTERNET"
+
     const val ON_OFF_SETTING_TOAST_SUCCESS = false
     const val PRO_VERSION_PRODUCT_ID = "pro_version"
     const val RATE_ON_GOOGLE_PLAY =

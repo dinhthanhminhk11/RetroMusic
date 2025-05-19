@@ -40,6 +40,7 @@ import code.name.monkey.retromusic.SERVER_ERROR
 import code.name.monkey.retromusic.SET_PASS_SUCCESS
 import code.name.monkey.retromusic.UPDATE_SUCCESS
 import code.name.monkey.retromusic.USER_REGISTER_SUCCESS
+import code.name.monkey.retromusic.network.model.response.BaseError
 import code.name.monkey.retromusic.util.EventsCenter
 import code.name.monkey.retromusic.util.EventsCenter.EventCenterDelegate
 import code.name.monkey.retromusic.util.EventsCenter.EventType
@@ -47,6 +48,7 @@ import code.name.monkey.retromusic.util.NotificationCenter
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
 import com.google.gson.Gson
+import kotlin.jvm.java
 
 fun Context.setUpMediaRouteButton(menu: Menu) {}
 
@@ -221,5 +223,13 @@ fun EventsCenter.addObserverExt(observer: EventCenterDelegate, id: EventType) {
 
 fun EventsCenter.removeObserverExt(observer: EventCenterDelegate, id: EventType) {
     removeObserver(observer, id.ordinal)
+}
+
+fun String.mapErrorMessage(): BaseError? {
+    return try {
+        Gson().fromJson(this, BaseError::class.java)
+    } catch (e: Exception) {
+        null
+    }
 }
 

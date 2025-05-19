@@ -8,4 +8,19 @@ sealed class Result<out R> {
         val message: String? = null,
         val error: Exception? = null
     ) : Result<Nothing>()
+
+    data object Empty : Result<Nothing>()
+}
+
+inline fun <T> Result<T>.handleResult(
+    onLoading: () -> Unit,
+    onError: (Result.Error) -> Unit,
+    onSuccess: (T) -> Unit
+) {
+    when (this) {
+        is Result.Loading -> onLoading()
+        is Result.Error -> onError(this)
+        is Result.Success -> onSuccess(data)
+        else -> {}
+    }
 }

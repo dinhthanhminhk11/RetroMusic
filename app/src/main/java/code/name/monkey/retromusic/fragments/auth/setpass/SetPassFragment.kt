@@ -16,22 +16,24 @@ import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.animatedTextChange
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
 import code.name.monkey.retromusic.extensions.hideKeyboard
+import code.name.monkey.retromusic.extensions.launchAndCollectIn
 import code.name.monkey.retromusic.extensions.showConfirmDialog
 import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
 import code.name.monkey.retromusic.model.auth.UserClient
 import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.network.handleResult
 import code.name.monkey.retromusic.util.PreferenceUtil
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class SetPassFragment :
     BaseNormalFragment<FragmentSetPassBinding>(FragmentSetPassBinding::inflate) {
     private val viewModel by viewModel<SetPassViewModel>()
-    private var isPasswordValid = false;
+    private var isPasswordValid = false
     private val arguments by navArgs<SetPassFragmentArgs>()
 
     override fun onNetworkChanged() {
@@ -47,15 +49,15 @@ class SetPassFragment :
 
     override fun initView() {
         binding.toolbar.setNavigationOnClickListener {
-            showConfirmDialog(context = requireActivity(),
+            showConfirmDialog(
+                context = requireActivity(),
                 title = getString(R.string.notification),
                 message = getString(R.string.text_confirm_setPass),
                 textPositiveButton = getString(R.string.out),
                 textNegativeButton = getString(R.string.cancel),
                 onConfirm = {
                     findNavController().navigateUp()
-                }
-            )
+                })
         }
         binding.btnContinue.isEnabled = false
         binding.password.addTextChangedListener(object : TextWatcher {
@@ -72,7 +74,7 @@ class SetPassFragment :
     }
 
     override fun initObserver() {
-        viewModel.authState.observe(viewLifecycleOwner) { result ->
+        viewModel.authState.launchAndCollectIn(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
@@ -106,11 +108,10 @@ class SetPassFragment :
 
                                         result.data.data_.details?.data_.let { dataLogin ->
                                             val gson = Gson()
-                                            val userClient: UserClient =
-                                                gson.fromJson(
-                                                    Login.decryptData(dataLogin.toString()),
-                                                    UserClient::class.java
-                                                )
+                                            val userClient: UserClient = gson.fromJson(
+                                                Login.decryptData(dataLogin.toString()),
+                                                UserClient::class.java
+                                            )
                                             PreferenceUtil.userClient = userClient
                                         }
 
@@ -126,58 +127,52 @@ class SetPassFragment :
                     }
 
                 }
+
+                is Result.Empty -> {
+
+                }
             }
         }
-        viewModel.setPassState.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.btnContinue.isEnabled = false
+        viewModel.setPassState.launchAndCollectIn(viewLifecycleOwner) { result ->
+            result.handleResult(onLoading = {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.btnContinue.isEnabled = false
+            }, onError = {
+                binding.progressBar.visibility = View.GONE
+                binding.btnContinue.isEnabled = true
+                it.code?.let {
+                    handErrorServerProtobuf(binding.root, it)
                 }
-
-                is Result.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnContinue.isEnabled = true
-                    result.code?.let {
-                        handErrorServerProtobuf(binding.root, it)
+            }, onSuccess = { data ->
+                binding.progressBar.visibility = View.GONE
+                binding.btnContinue.isEnabled = true
+                //todo START login
+                if (ON_OFF_SETTING_TOAST_SUCCESS) {
+                    data.data_.code.let {
+                        showSuccessLoginProtobuf(binding.root, it)
                     }
                 }
+                showConfirmDialog(
+                    context = requireActivity(),
+                    title = getString(R.string.notification),
+                    message = getString(R.string.text_confirm_setPass_login),
+                    textPositiveButton = getString(R.string.agree),
+                    textNegativeButton = getString(R.string.cancel),
+                    onConfirm = {
+                        val textEncrypt =
+                            "{\"email\" : \"${arguments.email}\" , \"password\" : \"${binding.password.text.toString()}\"}"
+                        val textEntryPoint = Login.encryptData(textEncrypt)
 
-                is Result.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnContinue.isEnabled = true
-                    //todo START login
-
-                    if (ON_OFF_SETTING_TOAST_SUCCESS) {
-                        result.data.data_.code.let {
-                            showSuccessLoginProtobuf(binding.root, it)
-                        }
-                    }
-                    showConfirmDialog(context = requireActivity(),
-                        title = getString(R.string.notification),
-                        message = getString(R.string.text_confirm_setPass_login),
-                        textPositiveButton = getString(R.string.agree),
-                        textNegativeButton = getString(R.string.cancel),
-                        onConfirm = {
-                            val textencrpt =
-                                "{\"email\" : \"${arguments.email}\" , \"password\" : \"${binding.password.text.toString()}\"}"
-                            val textEntryPoint = Login.encryptData(textencrpt)
-
-                            val authRequest = AuthRequest(textEntryPoint)
-                            val byteArray = authRequest.encode()
-                            val requestBody =
-                                RequestBody.create(
-                                    "application/x-protobuf".toMediaType(),
-                                    byteArray
-                                )
-                            viewModel.login(requestBody)
-                        },
-                        onCancel = {
-                            findNavController().navigateUp()
-                        }
-                    )
-                }
-            }
+                        val authRequest = AuthRequest(textEntryPoint)
+                        val byteArray = authRequest.encode()
+                        val requestBody =
+                            byteArray.toRequestBody("application/x-protobuf".toMediaType())
+                        viewModel.login(requestBody)
+                    },
+                    onCancel = {
+                        findNavController().navigateUp()
+                    })
+            })
         }
     }
 
@@ -196,8 +191,7 @@ class SetPassFragment :
 
                 val authRequest = AuthRequest(textEntryPoint)
                 val byteArray = authRequest.encode()
-                val requestBody =
-                    RequestBody.create("application/x-protobuf".toMediaType(), byteArray)
+                val requestBody = byteArray.toRequestBody("application/x-protobuf".toMediaType())
                 viewModel.setPassword(requestBody)
             }
         }

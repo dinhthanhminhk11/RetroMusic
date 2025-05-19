@@ -104,12 +104,12 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"http://192.168.0.103:8000/api/v1/\""
+                "\"https://1ce3-113-160-73-210.ngrok-free.app/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"http://192.168.0.103:8000/uploads/\""
+                "\"https://1ce3-113-160-73-210.ngrok-free.app/uploads/\""
             )
             buildConfigField(
                 "String",

@@ -168,6 +168,7 @@ abstract class AbsArtistDetailsFragment : AbsMainActivityFragment(R.layout.fragm
                 is Result.Loading -> logD("Loading")
                 is Result.Error -> logE("Error")
                 is Result.Success -> artistInfo(result.data)
+                is Result.Empty -> {}
             }
         }
     }
