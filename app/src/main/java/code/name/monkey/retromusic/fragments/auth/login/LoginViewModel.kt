@@ -9,7 +9,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
 import okhttp3.RequestBody
 import timber.log.Timber
 
@@ -24,26 +25,32 @@ class LoginViewModel(private val repository: Repository) : BaseViewModel() {
     }
 
     fun login(reqLogin: RequestBody) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchJobCustom(coroutineException(_authState)) {
             _authState.emit(Result.Loading)
-            try {
-                val response = repository.login(reqLogin)
-                _authState.emit(response)
-            } catch (e: Exception) {
-                _authState.emit(Result.Error(error = e))
-            }
+            repository.login(reqLogin)
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    flowCatch(e, _authState)
+                    _authState.emit(Result.Error(error = Exception(e.message, e)))
+                }
+                .collect { data ->
+                    _authState.emit(data)
+                }
         }
     }
 
     fun checkAccount(reqLogin: RequestBody) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchJobCustom(coroutineException(_accountState)) {
             _accountState.emit(Result.Loading)
-            try {
-                val response = repository.checkAccount(reqLogin)
-                _accountState.emit(response)
-            } catch (e: Exception) {
-                _accountState.emit(Result.Error(error = e))
-            }
+            repository.checkAccount(reqLogin)
+                .flowOn(Dispatchers.IO)
+                .catch { e ->
+                    flowCatch(e, _accountState)
+                    _accountState.emit(Result.Error(error = Exception(e.message, e)))
+
+                }.collect { data ->
+                    _accountState.emit(data)
+                }
         }
     }
 

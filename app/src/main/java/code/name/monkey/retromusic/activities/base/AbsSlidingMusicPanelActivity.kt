@@ -5,7 +5,6 @@ import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -50,6 +49,7 @@ import code.name.monkey.retromusic.extensions.hide
 import code.name.monkey.retromusic.extensions.isColorLight
 import code.name.monkey.retromusic.extensions.isLandscape
 import code.name.monkey.retromusic.extensions.keepScreenOn
+import code.name.monkey.retromusic.extensions.launchAndCollectIn
 import code.name.monkey.retromusic.extensions.maybeSetScreenOn
 import code.name.monkey.retromusic.extensions.peekHeightAnimate
 import code.name.monkey.retromusic.extensions.setLightNavigationBar
@@ -88,7 +88,7 @@ import code.name.monkey.retromusic.fragments.queue.PlayingQueueFragment
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.model.CategoryInfo
 import code.name.monkey.retromusic.model.auth.UserClient
-import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.network.handleResult
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.PreferenceUtil.isTokenNullOrEmpty
 import code.name.monkey.retromusic.util.PreferenceUtil.userClient
@@ -105,6 +105,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_SETTLIN
 import com.google.android.material.bottomsheet.BottomSheetBehavior.from
 import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.core.view.size
 
 
 abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
@@ -121,7 +122,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
     private var miniPlayerFragment: MiniPlayerFragment? = null
     private var nowPlayingScreen: NowPlayingScreen? = null
     private var taskColor: Int = 0
-    private var paletteColor: Int = Color.WHITE
+    private var paletteColor: Int = android.graphics.Color.WHITE
     private var navigationBarColor = 0
 
     private val panelState: Int
@@ -285,7 +286,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
 
             ALBUM_COVER_TRANSFORM, CAROUSEL_EFFECT,
             ALBUM_COVER_STYLE, TOGGLE_VOLUME, EXTRA_SONG_INFO, CIRCLE_PLAY_BUTTON,
-            -> {
+                -> {
                 chooseFragmentForTheme()
                 onServiceConnected()
             }
@@ -433,8 +434,8 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
                 setLightNavigationBar(true)
                 setLightStatusBar(isColorLight)
             } else if (nowPlayingScreen == Card || nowPlayingScreen == Blur || nowPlayingScreen == BlurCard) {
-                animateNavigationBarColor(Color.BLACK)
-                navigationBarColor = Color.BLACK
+                animateNavigationBarColor(android.graphics.Color.BLACK)
+                navigationBarColor = android.graphics.Color.BLACK
                 setLightStatusBar(false)
                 setLightNavigationBar(true)
             } else if (nowPlayingScreen == Color || nowPlayingScreen == Tiny || nowPlayingScreen == Gradient) {
@@ -472,7 +473,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
                     .setIcon(menu.icon)
             }
         }
-        if (binding.navigationView.menu.size() == 1) {
+        if (binding.navigationView.menu.size == 1) {
             isInOneTabMode = true
             binding.navigationView.isVisible = false
         } else {
@@ -609,10 +610,17 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
     private fun loginByToken() {
         val tokenEncrypt = Login.encryptData(userClient.accessToken.toString())
         libraryViewModel.loginByToken(tokenEncrypt)
-            .observe(this) { result ->
-                when (result) {
-                    is Result.Success -> {
-                        result.data.data_.details?.data_.let { dataLogin ->
+            .launchAndCollectIn(this) { result ->
+                result.handleResult(
+                    onLoading = {
+
+                    },
+                    onError = {
+                        startActivity(Intent(this, AuthActivity::class.java))
+                        finish()
+                    },
+                    onSuccess = { data ->
+                        data.data_.details?.data_.let { dataLogin ->
                             val gson = Gson()
                             val userClient: UserClient =
                                 gson.fromJson(
@@ -622,17 +630,7 @@ abstract class AbsSlidingMusicPanelActivity : AbsMusicServiceActivity(),
                             PreferenceUtil.userClient = userClient
                         }
                     }
-
-                    is Result.Error -> {
-                        startActivity(Intent(this, AuthActivity::class.java))
-                        finish()
-                    }
-
-                    else -> {
-                        startActivity(Intent(this, AuthActivity::class.java))
-                        finish()
-                    }
-                }
+                )
             }
     }
 }

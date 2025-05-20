@@ -21,6 +21,7 @@ import code.name.monkey.retromusic.network.model.LastFmAlbum
 import code.name.monkey.retromusic.network.model.LastFmArtist
 import code.name.monkey.retromusic.network.model.response.auth.ResponseDataAuth
 import code.name.monkey.retromusic.network.model.response.file.ResponseFile
+import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -90,14 +91,14 @@ interface Repository {
     fun getSongByGenre(genreId: Long): Song
     fun checkPlaylistExists(playListId: Long): LiveData<Boolean>
     fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs>
-    suspend fun login(reqLogin: RequestBody): Result<SuccessResponse>
-    suspend fun logout(reqLogin: RequestBody): Result<SuccessResponse>
-    suspend fun register(requestBody: RequestBody): Result<SuccessResponse>
-    suspend fun verifyOtp(reqLogin: RequestBody): Result<SuccessResponse>
-    suspend fun reSentOtp(reqLogin: RequestBody): Result<SuccessResponse>
-    suspend fun setPassword(reqLogin: RequestBody): Result<SuccessResponse>
-    suspend fun checkAccount(reqLogin: RequestBody): Result<SuccessResponse>
-    suspend fun loginByToken(token: String): Result<SuccessResponse>
+    fun login(reqLogin: RequestBody): Flow<Result<SuccessResponse>>
+    fun logout(reqLogin: RequestBody): Flow<Result<SuccessResponse>>
+    fun register(requestBody: RequestBody): Flow<Result<SuccessResponse>>
+    fun verifyOtp(reqLogin: RequestBody): Flow<Result<SuccessResponse>>
+    fun reSentOtp(reqLogin: RequestBody): Flow<Result<SuccessResponse>>
+    fun setPassword(reqLogin: RequestBody): Flow<Result<SuccessResponse>>
+    fun checkAccount(reqLogin: RequestBody): Flow<Result<SuccessResponse>>
+    fun loginByToken(token: String): Flow<Result<SuccessResponse>>
     suspend fun updateUserInfo(
         token: String,
         data: RequestBody?,

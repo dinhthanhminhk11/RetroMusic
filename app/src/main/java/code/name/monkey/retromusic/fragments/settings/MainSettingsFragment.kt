@@ -17,10 +17,11 @@ import code.name.monkey.retromusic.encryption.Login
 import code.name.monkey.retromusic.extensions.drawAboveSystemBarsWithPadding
 import code.name.monkey.retromusic.extensions.goToProVersion
 import code.name.monkey.retromusic.extensions.handErrorServerProtobuf
+import code.name.monkey.retromusic.extensions.launchAndCollectIn
 import code.name.monkey.retromusic.extensions.showConfirmDialog
 import code.name.monkey.retromusic.extensions.showSuccessLoginProtobuf
 import code.name.monkey.retromusic.fragments.base.BaseNormalFragment
-import code.name.monkey.retromusic.network.Result
+import code.name.monkey.retromusic.network.handleResult
 import code.name.monkey.retromusic.util.PreferenceUtil
 import code.name.monkey.retromusic.util.PreferenceUtil.clearUser
 import okhttp3.MediaType.Companion.toMediaType
@@ -44,7 +45,8 @@ class MainSettingsFragment :
         binding.notificationSettings.setOnClickListener(this)
         binding.otherSettings.setOnClickListener(this)
         binding.logout.setOnClickListener {
-            showConfirmDialog(context = requireActivity(),
+            showConfirmDialog(
+                context = requireActivity(),
                 title = getString(R.string.notification),
                 message = getString(R.string.text_logout),
                 textPositiveButton = getString(R.string.logout),
@@ -70,7 +72,8 @@ class MainSettingsFragment :
             }
         }
         binding.buyPremium.setOnClickListener {
-            showConfirmDialog(context = requireActivity(),
+            showConfirmDialog(
+                context = requireActivity(),
                 title = getString(R.string.notification),
                 message = getString(R.string.text_primeum),
                 textPositiveButton = getString(R.string.confirm),
@@ -89,29 +92,27 @@ class MainSettingsFragment :
     }
 
     override fun initObserver() {
-        mainSettingsViewModel.authState.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
+        mainSettingsViewModel.authState.launchAndCollectIn(viewLifecycleOwner) { result ->
+            result.handleResult(
+                onLoading = {
 
-                }
-
-                is Result.Error -> {
-                    result.code?.let {
+                },
+                onError = {
+                    it.code?.let {
                         handErrorServerProtobuf(binding.root, it)
                     }
-                }
-
-                is Result.Success -> {
+                },
+                onSuccess = { data ->
                     if (Constants.ON_OFF_SETTING_TOAST_SUCCESS) {
-                        result.data.data_.code.let {
+                        data.data_.code.let {
                             showSuccessLoginProtobuf(binding.root, it)
                         }
                     }
 
-                    result.data.let {
-                        if (result.data.success) {
-                            result.data.data_.let {
-                                when (result.data.data_.code) {
+                    data.let {
+                        if (data.success) {
+                            data.data_.let {
+                                when (data.data_.code) {
                                     LOGOUT_SUCCESS -> {
                                         showSuccessLoginProtobuf(binding.root, LOGIN_SUCCESS)
                                         clearUser()
@@ -127,9 +128,7 @@ class MainSettingsFragment :
                         }
                     }
                 }
-
-                else -> {}
-            }
+            )
         }
     }
 

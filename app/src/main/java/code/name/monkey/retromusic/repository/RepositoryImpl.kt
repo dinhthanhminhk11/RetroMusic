@@ -20,7 +20,7 @@ import code.name.monkey.retromusic.db.SongEntity
 import code.name.monkey.retromusic.db.fromHistoryToSongs
 import code.name.monkey.retromusic.db.toSong
 import code.name.monkey.retromusic.extensions.responseToResource
-import code.name.monkey.retromusic.extensions.responseToResourceProtobuf
+import code.name.monkey.retromusic.extensions.responseToResourceProtobufFlow
 import code.name.monkey.retromusic.fragments.search.Filter
 import code.name.monkey.retromusic.model.AbsCustomPlaylist
 import code.name.monkey.retromusic.model.Album
@@ -51,6 +51,7 @@ import code.name.monkey.retromusic.repository.data_source.TopPlayedRepository
 import code.name.monkey.retromusic.repository.data_source.network.AuthRepository
 import code.name.monkey.retromusic.repository.data_source.network.SongRemoteRepository
 import code.name.monkey.retromusic.util.logE
+import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -180,31 +181,49 @@ class RepositoryImpl(
     override fun getPlaylist(playlistId: Long): LiveData<PlaylistWithSongs> =
         roomRepository.getPlaylist(playlistId)
 
-    override suspend fun login(reqLogin: RequestBody): Result<SuccessResponse> =
-        responseToResourceProtobuf(authRepository.login(reqLogin), SuccessResponse.ADAPTER)
+    override fun login(reqLogin: RequestBody): Flow<Result<SuccessResponse>> =
+        responseToResourceProtobufFlow(
+            call = { authRepository.login(reqLogin) }, SuccessResponse.ADAPTER
+        )
 
-    override suspend fun logout(reqLogin: RequestBody): Result<SuccessResponse> =
-        responseToResourceProtobuf(authRepository.logout(reqLogin), SuccessResponse.ADAPTER)
+    override fun logout(reqLogin: RequestBody): Flow<Result<SuccessResponse>> =
+        responseToResourceProtobufFlow(
+            call = { authRepository.logout(reqLogin) }, SuccessResponse.ADAPTER
+        )
 
-    override suspend fun register(requestBody: RequestBody): Result<SuccessResponse> {
-        val response = authRepository.register(requestBody)
-        return responseToResourceProtobuf(response, SuccessResponse.ADAPTER)
+    override fun register(requestBody: RequestBody): Flow<Result<SuccessResponse>> {
+        return responseToResourceProtobufFlow(
+            { authRepository.register(requestBody) }, SuccessResponse.ADAPTER
+        )
     }
 
-    override suspend fun verifyOtp(reqLogin: RequestBody): Result<SuccessResponse> =
-        responseToResourceProtobuf(authRepository.verifyOtp(reqLogin), SuccessResponse.ADAPTER)
+    override fun verifyOtp(reqLogin: RequestBody): Flow<Result<SuccessResponse>> =
+        responseToResourceProtobufFlow(
+            call = { authRepository.verifyOtp(reqLogin) }, SuccessResponse.ADAPTER
+        )
 
-    override suspend fun reSentOtp(reqLogin: RequestBody): Result<SuccessResponse> =
-        responseToResourceProtobuf(authRepository.reSentOtp(reqLogin), SuccessResponse.ADAPTER)
+    override fun reSentOtp(reqLogin: RequestBody): Flow<Result<SuccessResponse>> =
+        responseToResourceProtobufFlow(
+            call = { authRepository.reSentOtp(reqLogin) },
+            SuccessResponse.ADAPTER
+        )
 
-    override suspend fun setPassword(reqLogin: RequestBody): Result<SuccessResponse> =
-        responseToResourceProtobuf(authRepository.setPassword(reqLogin), SuccessResponse.ADAPTER)
+    override fun setPassword(reqLogin: RequestBody): Flow<Result<SuccessResponse>> =
+        responseToResourceProtobufFlow(
+            call = { authRepository.setPassword(reqLogin) },
+            SuccessResponse.ADAPTER
+        )
 
-    override suspend fun checkAccount(reqLogin: RequestBody): Result<SuccessResponse> =
-        responseToResourceProtobuf(authRepository.checkAccount(reqLogin), SuccessResponse.ADAPTER)
+    override fun checkAccount(reqLogin: RequestBody): Flow<Result<SuccessResponse>> =
+        responseToResourceProtobufFlow(
+            call = { authRepository.checkAccount(reqLogin) }, SuccessResponse.ADAPTER
+        )
 
-    override suspend fun loginByToken(token: String): Result<SuccessResponse> =
-        responseToResourceProtobuf(authRepository.loginByToken(token), SuccessResponse.ADAPTER)
+    override fun loginByToken(token: String): Flow<Result<SuccessResponse>> =
+        responseToResourceProtobufFlow(
+            call = { authRepository.loginByToken(token) },
+            SuccessResponse.ADAPTER
+        )
 
     override suspend fun updateUserInfo(
         token: String,
@@ -213,10 +232,7 @@ class RepositoryImpl(
         imageBanner: MultipartBody.Part?
     ): Result<ResponseDataAuth> = responseToResource(
         authRepository.updateUserInfo(
-            token,
-            data,
-            image,
-            imageBanner
+            token, data, image, imageBanner
         )
     )
 
@@ -224,9 +240,7 @@ class RepositoryImpl(
         responseToResource(songRemoteRepository.checkFile(hashFile))
 
     override suspend fun uploadChunk(
-        fileHash: String,
-        chunkIndex: Int,
-        file: MultipartBody.Part
+        fileHash: String, chunkIndex: Int, file: MultipartBody.Part
     ): Result<Unit> =
         responseToResource(songRemoteRepository.uploadChunk(fileHash, chunkIndex, file))
 

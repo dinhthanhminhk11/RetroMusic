@@ -49,7 +49,13 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-
+import code.name.monkey.retromusic.network.Result
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 
 class LibraryViewModel(
     private val repository: Repository,
@@ -73,15 +79,16 @@ class LibraryViewModel(
         loadLibraryContent()
     }
 
-    fun loginByToken(token: String): LiveData<code.name.monkey.retromusic.network.Result<SuccessResponse>> =
-        liveData(IO) {
-            try {
-                val loginResponse = repository.loginByToken(token)
-                emit(loginResponse)
-            } catch (e: Exception) {
-                emit(code.name.monkey.retromusic.network.Result.Error(error = e))
-            }
+    fun loginByToken(token: String): StateFlow<Result<SuccessResponse>> {
+        return repository.loginByToken(token).flowOn(IO).catch { e ->
+            emit(Result.Error(error = Exception(e.message, e)))
         }
+            .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = Result.Loading
+        )
+    }
 
     private fun loadLibraryContent() {
         viewModelScope.launch(IO) {
