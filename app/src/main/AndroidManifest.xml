@@ -42,6 +42,7 @@
 
     <application
         android:name=".App"
+        android:extractNativeLibs="false"
         android:allowBackup="@bool/allowBackup"
         android:appCategory="audio"
         android:configChanges="locale|layoutDirection"

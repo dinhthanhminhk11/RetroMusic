@@ -6,7 +6,6 @@ import java.util.Calendar
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.cacheFixPlugin)
     alias(libs.plugins.firebase.crashlytics)
 //    alias(libs.plugins.gms.googleServices)
     alias(libs.plugins.android.dagger.hilt)
@@ -39,7 +38,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        archivesName.set("Retro Music-($versionCode-$versionName)${getDate()}")
+//        archivesName.set("Retro Music-($versionCode-$versionName)${getDate()}")
 
         ndk {
             abiFilters += listOf(
@@ -47,6 +46,10 @@ android {
                 "arm64-v8a"
             )
         }
+    }
+
+    base {
+        archivesName.set("Retro Music${getDate()}")
     }
 
     buildFeatures {
