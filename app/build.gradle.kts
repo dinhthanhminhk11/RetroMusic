@@ -104,22 +104,22 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://1ce3-113-160-73-210.ngrok-free.app/api/v1/\""
+                "\"https://aab4-222-252-104-198.ngrok-free.app/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"https://1ce3-113-160-73-210.ngrok-free.app/uploads/\""
+                "\"https://aab4-222-252-104-198.ngrok-free.app/uploads/\""
             )
             buildConfigField(
                 "String",
                 "KEY_128",
-                "\"NW2+izos97zgecEblcFMb8fQbnhjbehsw3XW+UGYG/GXysyYt2LNVrPYEl6D3HoG\""
+                "\"NSAXxdjncI0Gw2QsnkGglggu9MNeweld8k4fPBYd5faXysyYt2LNVrPYEl6D3HoG\""
             )
             buildConfigField(
                 "String",
                 "IV_128",
-                "\"a9DDNtZ9E9X6fjU4mtvzaaWJsqshLgf/erLmUEqpj8KXysyYt2LNVrPYEl6D3HoG\""
+                "\"69TeNmC77r1Bo2drLxHJV8xhdVDODbLv1i6gk8xRi5GXysyYt2LNVrPYEl6D3HoG\""
             )
         }
     }
