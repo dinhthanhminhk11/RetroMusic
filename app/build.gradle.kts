@@ -16,6 +16,10 @@ plugins {
     alias(libs.plugins.androidx.navigation.safe.args)
 }
 
+
+val serverHost: String = (project.findProperty("SERVER_HOST") as String?) ?: "192.168.1.100"
+val serverBase: String = /*"http://$serverHost:8000"*/ "https://distant-landscape-corporate-specifically.trycloudflare.com"
+
 fun getDate(): String {
     val format = "HH\'h\'-dd"
     val current = Calendar.getInstance().time
@@ -83,12 +87,12 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://1ce3-113-160-73-210.ngrok-free.app/api/v1/\""
+                "\"$serverBase/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"https://1ce3-113-160-73-210.ngrok-free.app/uploads/\""
+                "\"$serverBase/uploads/\""
             )
             buildConfigField(
                 "String",
@@ -107,12 +111,12 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://cec0-222-252-104-198.ngrok-free.app/api/v1/\""
+                "\"$serverBase/api/v1/\""
             )
             buildConfigField(
                 "String",
                 "BASE_URL_IMAGE",
-                "\"https://cec0-222-252-104-198.ngrok-free.app/uploads/\""
+                "\"$serverBase/uploads/\""
             )
             buildConfigField(
                 "String",

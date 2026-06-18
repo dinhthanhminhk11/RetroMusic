@@ -50,7 +50,7 @@ class FileUploader(private val context: Context, private val repository: Reposit
             else -> Pair(CHUNK_SIZE_MOBILE, SIZE_STREAM_CHUNKS_MOBILE)
         }
 
-        val totalChunks = (file.length() / chunkSize).toInt() + 1
+        val totalChunks = ((file.length() + chunkSize - 1) / chunkSize).toInt().coerceAtLeast(1)
         val remainingChunks = (0 until totalChunks).filter { uploadedChunks?.contains(it) == false }
 
         if (remainingChunks.isEmpty()) return@withContext Result.Success(Unit)
@@ -190,16 +190,22 @@ class FileUploader(private val context: Context, private val repository: Reposit
         file: File,
         chunkSize: Int
     ): Sequence<Pair<Int, ByteArray>> = sequence {
-        val inputStream = file.inputStream().buffered()
-        var chunkIndex = 0
-        val buffer = ByteArray(chunkSize)
-        var bytesRead: Int
+        file.inputStream().buffered().use { inputStream ->
+            var chunkIndex = 0
+            val buffer = ByteArray(chunkSize)
 
-        while (inputStream.read(buffer).also { bytesRead = it } > 0) {
-            yield(chunkIndex to buffer.copyOf(bytesRead))
-            chunkIndex++
+            while (true) {
+                var offset = 0
+                while (offset < chunkSize) {
+                    val read = inputStream.read(buffer, offset, chunkSize - offset)
+                    if (read == -1) break
+                    offset += read
+                }
+                if (offset == 0) break
+                yield(chunkIndex to buffer.copyOf(offset))
+                chunkIndex++
+            }
         }
-        inputStream.close()
     }
 
     private fun getNetworkType(): NetworkType {

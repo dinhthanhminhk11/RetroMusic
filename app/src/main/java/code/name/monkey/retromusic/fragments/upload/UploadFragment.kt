@@ -16,6 +16,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import code.name.monkey.retromusic.FILE_HASH
 import code.name.monkey.retromusic.FILE_NAME
 import code.name.monkey.retromusic.FILE_SIZE
@@ -309,7 +310,7 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
             putExtra(FILE_SIZE, file.length() / 1024)
             putIntegerArrayListExtra(UPLOAD_CHUNKS, listUploaded)
         }
-        requireContext().startService(intent)
+        ContextCompat.startForegroundService(requireContext(), intent)
     }
 
 
@@ -319,6 +320,8 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
             .addObserverExt(this, EventsCenter.EventType.UPLOAD_PROGRESS_ACTION)
         EventsCenter.getInstance(0)
             .addObserverExt(this, EventsCenter.EventType.UPLOAD_ACTION_FAILED)
+        EventsCenter.getInstance(0)
+            .addObserverExt(this, EventsCenter.EventType.UPLOAD_ACTION_SUCCESS)
     }
 
     override fun onDestroy() {
@@ -327,6 +330,8 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
             .removeObserverExt(this, EventsCenter.EventType.UPLOAD_PROGRESS_ACTION)
         EventsCenter.getInstance(0)
             .removeObserverExt(this, EventsCenter.EventType.UPLOAD_ACTION_FAILED)
+        EventsCenter.getInstance(0)
+            .removeObserverExt(this, EventsCenter.EventType.UPLOAD_ACTION_SUCCESS)
     }
 
     @SuppressLint("SetTextI18n")
@@ -343,6 +348,11 @@ class UploadFragment : BaseNormalFragment<FragmentUploadBinding>(FragmentUploadB
 
             EventsCenter.EventType.UPLOAD_ACTION_FAILED.ordinal -> {
                 showToast("Upload Failed", Toast.LENGTH_SHORT)
+            }
+
+            EventsCenter.EventType.UPLOAD_ACTION_SUCCESS.ordinal -> {
+                binding.genre.setText("100 %")
+                showToast("Upload thành công", Toast.LENGTH_SHORT)
             }
         }
     }

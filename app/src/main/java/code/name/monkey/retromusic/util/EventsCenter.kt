@@ -14,7 +14,8 @@ class EventsCenter private constructor(private val currentAccount: Int) {
         START_ALL_HEAVY_OPERATIONS,
         UPLOAD_PROGRESS_ACTION,
         UPLOAD_ACTION_FAILED,
-        UPLOAD_START_UPLOAD_PROGRESS
+        UPLOAD_START_UPLOAD_PROGRESS,
+        UPLOAD_ACTION_SUCCESS
     }
 
     companion object {

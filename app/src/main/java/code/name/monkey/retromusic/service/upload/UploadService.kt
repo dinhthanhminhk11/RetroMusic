@@ -5,8 +5,11 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import code.name.monkey.retromusic.FILE_HASH
 import code.name.monkey.retromusic.FILE_NAME
 import code.name.monkey.retromusic.FILE_SIZE
@@ -16,6 +19,7 @@ import code.name.monkey.retromusic.UPLOAD_CHANNEL
 import code.name.monkey.retromusic.UPLOAD_CHUNKS
 import code.name.monkey.retromusic.extensions.postOnMainThread
 import code.name.monkey.retromusic.fragments.upload.FileUploader
+import code.name.monkey.retromusic.network.Result
 import code.name.monkey.retromusic.util.EventsCenter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +27,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 import java.io.File
 
 class UploadService : Service() {
@@ -42,25 +47,47 @@ class UploadService : Service() {
             return START_NOT_STICKY
         }
 
-        startForeground(1, createNotification(0))
+        try {
+            ServiceCompat.startForeground(
+                this,
+                1,
+                createNotification(0),
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                else
+                    0
+            )
+        } catch (e: Exception) {
+            Timber.tag("UploadService").e(e, "Không thể start foreground service")
+            sendUploadFailed()
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
         serviceScope.launch {
             sendStart()
-            uploadManager.uploadFile(
+            val result = uploadManager.uploadFile(
                 fileHash = fileHash,
                 file = file,
                 uploadedChunks = uploadedChunks,
                 fileName = fileName,
-                fileSize = fileSize.toInt(),
+                fileSize = fileSize,
                 onProgress = { progress ->
                     updateNotification(progress)
                     sendUploadProgress(progress)
                 },
                 onError = {
                     sendUploadFailed()
-                    stopSelf()
                 }
             )
+            when (result) {
+                is Result.Success -> {
+                    updateNotification(100)
+                    sendUploadProgress(100)
+                    sendUploadSuccess()
+                }
+                else -> sendUploadFailed()
+            }
             stopSelf()
         }
         return START_STICKY
@@ -95,5 +122,10 @@ class UploadService : Service() {
     private fun sendUploadFailed() {
         EventsCenter.getInstance(0)
             .postOnMainThread(EventsCenter.EventType.UPLOAD_ACTION_FAILED)
+    }
+
+    private fun sendUploadSuccess() {
+        EventsCenter.getInstance(0)
+            .postOnMainThread(EventsCenter.EventType.UPLOAD_ACTION_SUCCESS)
     }
 }
