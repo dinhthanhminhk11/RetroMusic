@@ -18,7 +18,7 @@ plugins {
 
 
 val serverHost: String = (project.findProperty("SERVER_HOST") as String?) ?: "192.168.1.100"
-val serverBase: String = /*"http://$serverHost:8000"*/ "https://distant-landscape-corporate-specifically.trycloudflare.com"
+val serverBase: String = /*"http://$serverHost:8000"*/ "https://gentle-endorsed-tops-tri.trycloudflare.com"
 
 fun getDate(): String {
     val format = "HH\'h\'-dd"
